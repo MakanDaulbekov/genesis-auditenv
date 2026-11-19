@@ -99,14 +99,18 @@ def run_policies(policies, splits, episodes_root="episodes", grader_root="grader
         Path(grader_log).parent.mkdir(parents=True, exist_ok=True)
         Path(grader_log).write_text("", encoding="utf-8")
     results = []
-    with GraderClient(episodes_root, grader_root, log_path=grader_log) as g, \
-            open(trajectories, "w", encoding="utf-8") as traj:
+    grader_results = []
+    with open(trajectories, "w", encoding="utf-8") as traj:
         for pol in policies:
-            for split, ref in refs:
-                env = AuditEnv(g, mode=mode, policy_name=pol)
-                results.append(dict(run_episode(env, pol, {"episode_ref": ref}, traj, {"split": split}), split=split))
-        g.call("finalize")
-        grader_results = g.call("results")["results"]
+            # у каждой политики свой процесс оценщика; op "oracle" разрешён только процессу oracle,
+            # поэтому никакая политика не может вызвать oracle через клиент среды
+            with GraderClient(episodes_root, grader_root, log_path=grader_log, allow_oracle=(pol == "oracle")) as g:
+                for split, ref in refs:
+                    env = AuditEnv(g, mode=mode, policy_name=pol)
+                    results.append(dict(run_episode(env, pol, {"episode_ref": ref}, traj, {"split": split}),
+                                        split=split))
+                g.call("finalize")
+                grader_results += g.call("results")["results"]
     clean_ids = {r["episode_id"] for r in grader_results if r["n_truth"] == 0}
     return {"aggregate": aggregate(results, grader_results, clean_ids), "episodes": results,
             "grader": grader_results}

@@ -5,8 +5,8 @@ export PYTHONDONTWRITEBYTECODE := 1
 .PHONY: check generate validate validate-seeds test run report determinism leaks jury demo clean
 
 ## Единая команда проверки: ненулевой выход при любом провале
-check: generate validate validate-seeds test run determinism
-	@echo "== make check: OK =="
+check:
+	$(PY) -m auditenv.cli check
 
 generate:
 	$(PY) -m auditenv.cli generate --split configs/splits/train.json

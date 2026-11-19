@@ -125,6 +125,47 @@ def cmd_run(args) -> int:
     return 0
 
 
+CHECK_STEPS = [
+    ("generate train", ["-m", "auditenv.cli", "generate", "--split", "configs/splits/train.json"]),
+    ("generate dev", ["-m", "auditenv.cli", "generate", "--split", "configs/splits/dev.json"]),
+    ("validate episodes", ["-m", "auditenv.cli", "validate", "--splits", "train", "dev"]),
+    ("validate 300 random seeds", ["-m", "auditenv.cli", "validate-seeds", "--n", "300"]),
+    ("pytest", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]),
+    ("run 4 baseline policies", ["-m", "auditenv.cli", "run"]),
+    ("trajectory leak scan", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_policies.py", "-k",
+                              "committed_trajectories"]),
+    ("determinism (2 processes, PYTHONHASHSEED)", ["-m", "auditenv.checks", "determinism"]),
+    ("report", ["-m", "auditenv.report"]),
+]
+
+
+def cmd_check(args) -> int:
+    """Единая проверка (то же, что make check): ненулевой выход при любом провале."""
+    import subprocess
+    import time
+    env = dict(os.environ, PYTHONPATH=str(ROOT), PYTHONDONTWRITEBYTECODE="1")
+    rows = []
+    ok_all = True
+    for name, cmd in CHECK_STEPS:
+        if cmd[1] == "auditenv.report" and not (ROOT / "auditenv" / "report.py").exists():
+            continue
+        t0 = time.monotonic()
+        r = subprocess.run([sys.executable] + cmd, cwd=ROOT, env=env, capture_output=True, text=True)
+        dt = time.monotonic() - t0
+        ok = r.returncode == 0
+        ok_all &= ok
+        tail = (r.stdout.strip().splitlines() or [""])[-1][:110]
+        rows.append((name, ok, dt, tail))
+        print(f"[{'OK' if ok else 'FAIL'}] {name:44s} {dt:6.1f}s  {tail}", flush=True)
+        if not ok:
+            print(r.stdout[-4000:])
+            print(r.stderr[-4000:])
+            if not args.keep_going:
+                break
+    print("== check: " + ("OK ==" if ok_all else "FAILED =="))
+    return 0 if ok_all else 1
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="auditenv")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -151,6 +192,9 @@ def main(argv=None) -> int:
     r.add_argument("--grader-log", default="grader_data/grader_log.jsonl")
     r.add_argument("--summary", default="grader_data/run_summary.json")
     r.set_defaults(fn=cmd_run)
+    c = sub.add_parser("check")
+    c.add_argument("--keep-going", action="store_true")
+    c.set_defaults(fn=cmd_check)
     args = p.parse_args(argv)
     return args.fn(args)
 

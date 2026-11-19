@@ -27,7 +27,8 @@ def clean_cfg(cfg):
 @pytest.fixture(scope="session")
 def grader(tmp_path_factory):
     log = tmp_path_factory.mktemp("glog") / "grader_log.jsonl"
-    g = GraderClient(episodes_root=str(ROOT / "episodes"), grader_root=str(ROOT / "grader_data"), log_path=str(log))
+    g = GraderClient(episodes_root=str(ROOT / "episodes"), grader_root=str(ROOT / "grader_data"), log_path=str(log),
+                     allow_oracle=True)
     g.log_path = log
     yield g
     g.close()

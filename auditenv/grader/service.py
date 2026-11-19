@@ -41,6 +41,7 @@ class GraderCore:
         self.closed = []
         if settings.get("closed_episodes_file"):
             self.closed = json.loads(Path(settings["closed_episodes_file"]).read_text(encoding="utf-8"))
+        self.allow_oracle = bool(settings.get("allow_oracle", False))
         self.sessions: dict[str, dict] = {}
         self.counter = 0
         self.results: list[dict] = []
@@ -123,6 +124,9 @@ class GraderCore:
     def op_oracle(self, token: str) -> dict:
         """Oracle работает только здесь: эталон не покидает процесс оценщика."""
         from .reward import oracle_findings
+        if not self.allow_oracle:
+            self.log({"event": "rejected_oracle", "token": token})
+            return {"error": "oracle_disabled"}
         s = self.sessions.get(token)
         if s is None:
             return {"error": "unknown_token"}
@@ -188,8 +192,8 @@ class GraderClient:
 
     def __init__(self, episodes_root: str = "episodes", grader_root: str = "grader_data",
                  log_path: str | None = None, secret_file: str | None = None,
-                 closed_episodes_file: str | None = None):
-        settings = {"episodes_root": os.path.abspath(episodes_root), "grader_root": os.path.abspath(grader_root),
+                 closed_episodes_file: str | None = None, allow_oracle: bool = False):
+        settings = {"allow_oracle": bool(allow_oracle),"episodes_root": os.path.abspath(episodes_root), "grader_root": os.path.abspath(grader_root),
                     "log_path": os.path.abspath(log_path) if log_path else None,
                     "secret_file": os.path.abspath(secret_file) if secret_file else None,
                     "closed_episodes_file": os.path.abspath(closed_episodes_file) if closed_episodes_file else None}

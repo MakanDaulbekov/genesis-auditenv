@@ -121,8 +121,9 @@ class AuditEnv:
                 else:
                     findings = args["findings"]
                     try:
-                        json.dumps(findings)
-                    except (TypeError, ValueError):
+                        if len(json.dumps(findings)) > MAX_ACTION_BYTES:
+                            findings = {"__invalid__": "too_large"}
+                    except (TypeError, ValueError, RecursionError):
                         findings = {"__invalid__": "not_serializable"}
                 reward, info = self._finish(findings, "submit")
                 return self._obs(result={"status": "submitted"}), reward, True, False, info
