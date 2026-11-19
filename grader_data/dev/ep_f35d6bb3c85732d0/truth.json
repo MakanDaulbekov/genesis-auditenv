@@ -50,20 +50,20 @@
     },
     {
       "affected_ids": [
-        "INV-DAYZLJG"
+        "INV-AH69MAC"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-DAYZLJG",
-          "R-72FRHRHMR"
+          "INV-AH69MAC",
+          "R-EXTGKDTLF"
         ],
         [
-          "INV-DAYZLJG",
-          "R-XAN8TXJ9V"
+          "INV-AH69MAC",
+          "R-LWAJYGUWV"
         ]
       ],
-      "expected_amount_minor": 3120000,
+      "expected_amount_minor": 1310716,
       "interaction_group": null,
       "issue_id": "ISS-9TAGTV94",
       "type": "period_cutoff_error"

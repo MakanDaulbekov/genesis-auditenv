@@ -227,10 +227,10 @@
         "R-3QFKMC4RB",
         "R-AXYCCRCDD",
         "R-B86GYGUH4",
-        "R-LJY6PRWTA",
+        "R-HJZKSWPT8",
+        "R-HXH2N6SM5",
         "R-M4T3MZ5LB",
-        "R-NJ6CG7C5J",
-        "R-QFAGD5WGT"
+        "R-NJ6CG7C5J"
       ],
       "updated": [
         {
@@ -772,7 +772,42 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2030-04-01T02:39:48+04:00",
+          "ledger_timestamp": "2030-04-30T22:31:53+04:00",
+          "posting": "issue"
+        },
+        "before": {
+          "posting": null
+        },
+        "document_instant": "2030-04-30T22:31:53-03:00",
+        "invoice_id": "INV-DSET7AR"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-DSET7AR"
+        ],
+        "currency": "EUR",
+        "evidence_sets": [
+          [
+            "INV-DSET7AR",
+            "R-HJZKSWPT8"
+          ],
+          [
+            "INV-DSET7AR",
+            "R-HXH2N6SM5"
+          ]
+        ],
+        "expected_amount_minor": 3699624,
+        "interaction_group": null,
+        "type": "period_cutoff_error"
+      },
+      "issue_id": "ISS-55WSMKTB",
+      "type": "period_cutoff_error",
+      "variant": "next_period_booked:timezone_ignored"
+    },
+    {
+      "cause": {
+        "after": {
+          "ledger_timestamp": "2030-04-01T01:28:08+04:00",
           "posting": "issue"
         },
         "before": {
@@ -800,44 +835,9 @@
         "interaction_group": null,
         "type": "period_cutoff_error"
       },
-      "issue_id": "ISS-55WSMKTB",
-      "type": "period_cutoff_error",
-      "variant": "prior_period_booked:booked_at_period_open"
-    },
-    {
-      "cause": {
-        "after": {
-          "ledger_timestamp": "2030-04-30T22:31:52+04:00",
-          "posting": "issue"
-        },
-        "before": {
-          "posting": null
-        },
-        "document_instant": "2030-05-01T22:07:10+00:00",
-        "invoice_id": "INV-HMKR2D2"
-      },
-      "issue": {
-        "affected_ids": [
-          "INV-HMKR2D2"
-        ],
-        "currency": "EUR",
-        "evidence_sets": [
-          [
-            "INV-HMKR2D2",
-            "R-LJY6PRWTA"
-          ],
-          [
-            "INV-HMKR2D2",
-            "R-QFAGD5WGT"
-          ]
-        ],
-        "expected_amount_minor": 2641462,
-        "interaction_group": null,
-        "type": "period_cutoff_error"
-      },
       "issue_id": "ISS-BSXHGPRW",
       "type": "period_cutoff_error",
-      "variant": "next_period_booked:accrued_at_period_close"
+      "variant": "prior_period_booked:booked_at_period_open"
     }
   ],
   "plan": {

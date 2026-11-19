@@ -279,7 +279,10 @@ def period_cutoff_error(world: dict, rng: DRBG, params: dict) -> dict:
             cands.append(("prior_period_booked", iid))
     if not cands:
         raise GenerationError("no cutoff candidates")
-    variant, iid = rng.choice(cands)
+    # в половине случаев предпочитаем ловушку часового пояса: наивная дата документа внутри периода
+    tz_trap = [c for c in cands if start <= datetime.fromisoformat(world["invoices"][c[1]]["issued_at"][:19] + tz) < end]
+    pool = tz_trap if tz_trap and rng.randint(0, 1) == 1 else cands
+    variant, iid = rng.choice(pool)
     inv = world["invoices"][iid]
     t = parse_ts(inv["issued_at"])
     # «наивная» интерпретация: настенное время документа считается временем компании

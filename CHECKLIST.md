@@ -2,9 +2,9 @@
 
 | Раздел PDF | Требование | Где реализовано | Тест | Статус |
 |---|---|---|---|---|
-| 02 | 4 независимо настраиваемых типа ошибок | `generator/mutations.py`, `configs/default.json:errors` | `tests/test_reward.py` (все 4 типа в эпизоде) | ✅ Ф1 (валидатор — Ф2) |
-| 02 | 2 сценария взаимодействующих ошибок | `mutations.py: SCENARIOS` | — | 🟡 код есть, тесты Ф3 |
-| 02 | Чистые компании + отвлекающие случаи | `world.py` (recurring, split, partial, overpay, batch, prepay/refund, tz-boundary) | `test_clean_episode_empty_findings_is_max` | 🟡 независимая проверка Ф2 |
+| 02 | 4 независимо настраиваемых типа ошибок | `generator/mutations.py`, `configs/default.json:errors` | `test_each_error_type_independently_configurable`, `test_variants_present_across_seeds` | ✅ |
+| 02 | 2 сценария взаимодействующих ошибок | `mutations.py: SCENARIOS` | `test_interaction_scenarios` (+валидатор) | ✅ |
+| 02 | Чистые компании + отвлекающие случаи (9 видов) | `world.py` | `test_clean_companies_have_distractors`, валидатор п.5 | ✅ |
 | 02 | Сначала история, потом документы, потом ошибки | `world.build_world → render → mutations → post_all → render` | — | ✅ |
 | 03 | manifest с schema_version, episode_id, base, период, tz, счётчики, округление | `render.public_files`, `schemas/manifest.schema.json` | `test_reset_signature_and_first_observation` | ✅ |
 | 03 | ledger/invoices/payments/fx/policy ровно по схеме | `render.py`, `schemas/*.schema.json` | `test_step_signature_and_json` | ✅ |
@@ -20,8 +20,10 @@
 | 05 | взаимно-однозначное сопоставление, TP-условия, дубли → FP | `grader/matcher.py` | `test_duplicate_findings_give_no_gain`, `test_findings_order_invariance` | ✅ |
 | 05 | P/R/F1, краевые случаи, общая награда | `grader/reward.py` | `test_metric_edge_cases`, `test_step_cost_small` | ✅ |
 | 05 | 5 свойств награды + атаки | — | `test_reward.py` (16 групп, fuzz 800 ответов) | ✅ |
-| 06 | 4 базовые политики | — | — | ⏳ Ф2 |
-| 07 | траектории без эталона | — | — | ⏳ Ф2 |
+| 06 | 4 базовые политики | `policies/baselines.py`, `runner.py`, oracle — `grader/service.py:op_oracle` | `tests/test_policies.py` | ✅ |
+| 07 | траектории без эталона | `trajectories.jsonl`, `runner.py` | `test_trajectory_fields_and_no_truth`, `test_committed_trajectories_have_no_truth` | ✅ |
 | 07 | Контейнер + единая команда | `Makefile: check` | `make check` | 🟡 Dockerfile Ф3 |
 | 10 | детерминизм seed/config/version | `common/drbg.py`, `checks.py` | `make determinism` (2 процесса, разный PYTHONHASHSEED) | ✅ |
 | 10 | перестановки и смена ID | — | — | ⏳ Ф3 |
+| 06/10 | Независимая проверка эталона и доказательств | `generator/validate.py` (не импортирует генератор) | `make validate`, `make validate-seeds` (300 seed × 6 сочетаний), `test_validator_detects_corruption` | ✅ |
+| 02 | Анти-трюки: позиция, порядок ID, круглые суммы | `render.py` (порядок по ключевому хешу), `common/drbg.py` | `test_position_heuristic_*`, `test_id_order_*`, `test_round_amounts_*` | ✅ |

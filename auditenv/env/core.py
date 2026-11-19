@@ -136,6 +136,17 @@ class AuditEnv:
             return self._obs(result=result, error=error), reward, False, True, info
         return self._obs(result=result, error=error), 0.0, False, False, {}
 
+    def oracle_step(self):
+        """ТОЛЬКО для harness: ответ oracle строит процесс оценщика по эталону; эталон сюда
+        не передаётся, возвращается лишь награда (train) или 0 (eval)."""
+        if self._store is None or self._done:
+            return self._obs(error=err("episode_finished")), 0.0, True, False, {}
+        self._steps += 1
+        self._done = True
+        out = self.__grader.call("oracle", token=self._token)
+        reward = 0.0 if self.mode == "eval" or "error" in out else float(out["reward"])
+        return self._obs(result={"status": "submitted"}), reward, True, False, {}
+
     def _parse(self, action):
         if isinstance(action, (str, bytes)):
             if len(action) > MAX_ACTION_BYTES:

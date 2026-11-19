@@ -2,10 +2,10 @@ PY ?= python3.11
 export PYTHONPATH := $(CURDIR)
 export PYTHONDONTWRITEBYTECODE := 1
 
-.PHONY: check generate validate test run report determinism leaks jury demo clean
+.PHONY: check generate validate validate-seeds test run report determinism leaks jury demo clean
 
 ## Единая команда проверки: ненулевой выход при любом провале
-check: generate validate test run determinism
+check: generate validate validate-seeds test run determinism
 	@echo "== make check: OK =="
 
 generate:
@@ -13,14 +13,17 @@ generate:
 	$(PY) -m auditenv.cli generate --split configs/splits/dev.json
 
 validate:
-	@if [ -f auditenv/generator/validate.py ]; then $(PY) -m auditenv.cli validate --splits train dev; \
-	else echo "[validate] (фаза 2)"; fi
+	$(PY) -m auditenv.cli validate --splits train dev
+
+validate-seeds:
+	$(PY) -m auditenv.cli validate-seeds --n 300
 
 test:
 	$(PY) -m pytest -q tests
 
 run:
-	@if [ -f auditenv/runner.py ]; then $(PY) -m auditenv.cli run; else echo "[run] (фаза 2)"; fi
+	$(PY) -m auditenv.cli run > /dev/null
+	$(PY) -m pytest -q tests/test_policies.py -k committed_trajectories
 
 determinism:
 	$(PY) -m auditenv.checks determinism

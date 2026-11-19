@@ -35,6 +35,22 @@ def shared_reward(f1: Fraction, inspection_steps: int) -> Fraction:
     return max(Fraction(-1), min(Fraction(1), r))
 
 
+TYPES = ("duplicate_invoice", "missing_or_partial_allocation", "fx_wrong_date_or_rate", "period_cutoff_error")
+
+
+def _by_type(findings, issues, pairs) -> dict:
+    """Диагностика по типам (только для журнала/отчёта оценщика, не для политики)."""
+    out = {t: {"tp": 0, "fp": 0, "fn": 0} for t in TYPES}
+    matched_f = {fi for fi, _ in pairs}
+    matched_t = {iid for _, iid in pairs}
+    for f in findings:
+        out[f.type]["tp" if f.index in matched_f else "fp"] += 1
+    for t in issues:
+        if t["issue_id"] not in matched_t:
+            out[t["type"]]["fn"] += 1
+    return out
+
+
 def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_steps: int) -> dict:
     """Полная оценка одного эпизода. Возвращает только JSON-совместимые значения."""
     if isinstance(inspection_steps, bool) or not isinstance(inspection_steps, int) or inspection_steps < 0:
@@ -44,8 +60,10 @@ def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_ste
     except InvalidFindings as e:
         return {"valid": False, "error": str(e), "reward": -1.0, "reward_exact": "-1",
                 "tp": 0, "fp": 0, "fn": len(truth["issues"]), "precision": 0.0, "recall": 0.0, "f1": 0.0,
-                "inspection_steps": inspection_steps, "n_findings": None, "matches": []}
+                "inspection_steps": inspection_steps, "n_findings": None, "matches": [],
+                "by_type": _by_type([], truth["issues"], [])}
     pairs = max_matching(findings, truth["issues"], tolerance)
+    by_type = _by_type(findings, truth["issues"], pairs)
     tp = len(pairs)
     fp = len(findings) - tp
     fn = len(truth["issues"]) - tp
@@ -54,7 +72,7 @@ def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_ste
     return {"valid": True, "error": None, "reward": float(r), "reward_exact": f"{r.numerator}/{r.denominator}",
             "tp": tp, "fp": fp, "fn": fn,
             "precision": float(m["precision"]), "recall": float(m["recall"]), "f1": float(m["f1"]),
-            "inspection_steps": inspection_steps, "n_findings": len(findings),
+            "inspection_steps": inspection_steps, "n_findings": len(findings), "by_type": by_type,
             "matches": [{"finding_index": fi, "issue_id": iid} for fi, iid in pairs]}
 
 

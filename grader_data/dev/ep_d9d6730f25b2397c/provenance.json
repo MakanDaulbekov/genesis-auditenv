@@ -896,41 +896,6 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2030-04-30T22:51:12+03:00",
-          "posting": "issue"
-        },
-        "before": {
-          "posting": null
-        },
-        "document_instant": "2030-05-01T06:16:14+09:00",
-        "invoice_id": "INV-KJ325WL"
-      },
-      "issue": {
-        "affected_ids": [
-          "INV-KJ325WL"
-        ],
-        "currency": "USD",
-        "evidence_sets": [
-          [
-            "INV-KJ325WL",
-            "R-2GM5QDS78"
-          ],
-          [
-            "INV-KJ325WL",
-            "R-MFYEAX72Y"
-          ]
-        ],
-        "expected_amount_minor": 1823732,
-        "interaction_group": null,
-        "type": "period_cutoff_error"
-      },
-      "issue_id": "ISS-XRQ98VEF",
-      "type": "period_cutoff_error",
-      "variant": "next_period_booked:accrued_at_period_close"
-    },
-    {
-      "cause": {
-        "after": {
           "ledger_timestamp": "2030-04-30T13:36:34+03:00",
           "posting": "issue"
         },
@@ -959,9 +924,44 @@
         "interaction_group": null,
         "type": "period_cutoff_error"
       },
-      "issue_id": "ISS-B96MFC8F",
+      "issue_id": "ISS-XRQ98VEF",
       "type": "period_cutoff_error",
       "variant": "next_period_booked:timezone_ignored"
+    },
+    {
+      "cause": {
+        "after": {
+          "ledger_timestamp": "2030-04-30T18:37:59+03:00",
+          "posting": "issue"
+        },
+        "before": {
+          "posting": null
+        },
+        "document_instant": "2030-05-01T06:16:14+09:00",
+        "invoice_id": "INV-KJ325WL"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-KJ325WL"
+        ],
+        "currency": "USD",
+        "evidence_sets": [
+          [
+            "INV-KJ325WL",
+            "R-2GM5QDS78"
+          ],
+          [
+            "INV-KJ325WL",
+            "R-MFYEAX72Y"
+          ]
+        ],
+        "expected_amount_minor": 1823732,
+        "interaction_group": null,
+        "type": "period_cutoff_error"
+      },
+      "issue_id": "ISS-B96MFC8F",
+      "type": "period_cutoff_error",
+      "variant": "next_period_booked:accrued_at_period_close"
     }
   ],
   "plan": {

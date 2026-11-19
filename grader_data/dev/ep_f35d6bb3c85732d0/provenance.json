@@ -216,9 +216,9 @@
       ],
       "inserted": [
         "R-6NF48KLTV",
-        "R-72FRHRHMR",
-        "R-RV9WPTH33",
-        "R-XAN8TXJ9V"
+        "R-EXTGKDTLF",
+        "R-LWAJYGUWV",
+        "R-RV9WPTH33"
       ],
       "updated": [
         {
@@ -693,37 +693,37 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2033-08-31T18:14:59-03:00",
+          "ledger_timestamp": "2033-08-31T22:28:55-03:00",
           "posting": "issue"
         },
         "before": {
           "posting": null
         },
-        "document_instant": "2033-09-04T04:40:40+06:00",
-        "invoice_id": "INV-DAYZLJG"
+        "document_instant": "2033-08-31T22:28:55-05:00",
+        "invoice_id": "INV-AH69MAC"
       },
       "issue": {
         "affected_ids": [
-          "INV-DAYZLJG"
+          "INV-AH69MAC"
         ],
         "currency": "EUR",
         "evidence_sets": [
           [
-            "INV-DAYZLJG",
-            "R-72FRHRHMR"
+            "INV-AH69MAC",
+            "R-EXTGKDTLF"
           ],
           [
-            "INV-DAYZLJG",
-            "R-XAN8TXJ9V"
+            "INV-AH69MAC",
+            "R-LWAJYGUWV"
           ]
         ],
-        "expected_amount_minor": 3120000,
+        "expected_amount_minor": 1310716,
         "interaction_group": null,
         "type": "period_cutoff_error"
       },
       "issue_id": "ISS-9TAGTV94",
       "type": "period_cutoff_error",
-      "variant": "next_period_booked:accrued_at_period_close"
+      "variant": "next_period_booked:timezone_ignored"
     }
   ],
   "plan": {

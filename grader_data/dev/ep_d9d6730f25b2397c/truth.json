@@ -54,20 +54,20 @@
     },
     {
       "affected_ids": [
-        "INV-YM54C8F"
+        "INV-KJ325WL"
       ],
       "currency": "USD",
       "evidence_sets": [
         [
-          "INV-YM54C8F",
-          "R-JKE8BLRWJ"
+          "INV-KJ325WL",
+          "R-2GM5QDS78"
         ],
         [
-          "INV-YM54C8F",
-          "R-ZJFWFWC4L"
+          "INV-KJ325WL",
+          "R-MFYEAX72Y"
         ]
       ],
-      "expected_amount_minor": 2487065,
+      "expected_amount_minor": 1823732,
       "interaction_group": null,
       "issue_id": "ISS-B96MFC8F",
       "type": "period_cutoff_error"
@@ -182,20 +182,20 @@
     },
     {
       "affected_ids": [
-        "INV-KJ325WL"
+        "INV-YM54C8F"
       ],
       "currency": "USD",
       "evidence_sets": [
         [
-          "INV-KJ325WL",
-          "R-2GM5QDS78"
+          "INV-YM54C8F",
+          "R-JKE8BLRWJ"
         ],
         [
-          "INV-KJ325WL",
-          "R-MFYEAX72Y"
+          "INV-YM54C8F",
+          "R-ZJFWFWC4L"
         ]
       ],
-      "expected_amount_minor": 1823732,
+      "expected_amount_minor": 2487065,
       "interaction_group": null,
       "issue_id": "ISS-XRQ98VEF",
       "type": "period_cutoff_error"

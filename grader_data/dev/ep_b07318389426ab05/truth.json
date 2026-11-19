@@ -56,6 +56,26 @@
     },
     {
       "affected_ids": [
+        "INV-DSET7AR"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-DSET7AR",
+          "R-HJZKSWPT8"
+        ],
+        [
+          "INV-DSET7AR",
+          "R-HXH2N6SM5"
+        ]
+      ],
+      "expected_amount_minor": 3699624,
+      "interaction_group": null,
+      "issue_id": "ISS-55WSMKTB",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
         "INV-TC4DP6L"
       ],
       "currency": "EUR",
@@ -70,26 +90,6 @@
         ]
       ],
       "expected_amount_minor": 3490843,
-      "interaction_group": null,
-      "issue_id": "ISS-55WSMKTB",
-      "type": "period_cutoff_error"
-    },
-    {
-      "affected_ids": [
-        "INV-HMKR2D2"
-      ],
-      "currency": "EUR",
-      "evidence_sets": [
-        [
-          "INV-HMKR2D2",
-          "R-LJY6PRWTA"
-        ],
-        [
-          "INV-HMKR2D2",
-          "R-QFAGD5WGT"
-        ]
-      ],
-      "expected_amount_minor": 2641462,
       "interaction_group": null,
       "issue_id": "ISS-BSXHGPRW",
       "type": "period_cutoff_error"

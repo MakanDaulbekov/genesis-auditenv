@@ -83,6 +83,37 @@ def cmd_validate(args) -> int:
     return 1 if bad else 0
 
 
+def cmd_validate_seeds(args) -> int:
+    """Сотни случайных seed и сочетаний параметров через независимый валидатор."""
+    from .common.drbg import DRBG
+    from .generator.episode import generate_episode
+    from .generator.validate import validate_episode
+    base = json.loads((ROOT / "configs" / "default.json").read_text(encoding="utf-8"))
+    rng = DRBG(b"validate-seeds")
+    variants = [{}, {"clean": True}, {"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 1}},
+                {"errors": {"duplicate_invoice": 3, "missing_or_partial_allocation": 3,
+                            "fx_wrong_date_or_rate": 3, "period_cutoff_error": 3},
+                 "interactions": {"partial_fx_boundary": 0, "duplicate_cutoff": 0}},
+                {"size": {"n_invoices": [80, 120], "n_expenses": [400, 700]}},
+                {"currencies": {"base": ["JPY", "GBP"], "foreign_customer_share_pct": 80}}]
+    bad = 0
+    stats = {"episodes": 0, "issues": 0, "clean": 0}
+    for i in range(args.n):
+        seed = rng.randint(0, 2**63 - 1)
+        cfg = deep_merge(base, variants[i % len(variants)])
+        ep = generate_episode(seed, cfg)
+        rep = validate_episode(ep.public, ep.truth, ep.provenance)
+        stats["episodes"] += 1
+        stats["issues"] += rep["n_issues"]
+        stats["clean"] += rep["n_issues"] == 0
+        if not rep["ok"]:
+            bad += 1
+            print(f"[validate-seeds] FAIL seed={seed} variant={i % len(variants)}: {rep['errors'][:3]}")
+    print(f"[validate-seeds] {stats['episodes'] - bad}/{stats['episodes']} OK, issues={stats['issues']}, "
+          f"clean={stats['clean']}")
+    return 1 if bad else 0
+
+
 def cmd_run(args) -> int:
     from .runner import run_policies
     summary = run_policies(policies=args.policies, splits=args.splits, episodes_root=args.episodes_root,
@@ -107,6 +138,9 @@ def main(argv=None) -> int:
     v.add_argument("--episodes-root", default="episodes")
     v.add_argument("--grader-root", default="grader_data")
     v.set_defaults(fn=cmd_validate)
+    vs = sub.add_parser("validate-seeds")
+    vs.add_argument("--n", type=int, default=300)
+    vs.set_defaults(fn=cmd_validate_seeds)
     r = sub.add_parser("run")
     r.add_argument("--policies", nargs="+", default=["random_explorer", "simple_reconciler", "flag_all", "oracle"])
     r.add_argument("--splits", nargs="+", default=["train", "dev"])

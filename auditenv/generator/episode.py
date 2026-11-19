@@ -47,7 +47,11 @@ def _plan(rng: DRBG, cfg: dict) -> tuple[list[str], list[str]]:
     singles = []
     for t in ERROR_TYPES:
         singles += [t] * _rand_range(rng, cfg["errors"].get(t, 0))
-    return scen, singles
+    # не более MAX_ISSUES: сценарий даёт 2 issue; лишние одиночные отбрасываются с конца
+    room = MAX_ISSUES - 2 * len(scen)
+    if room < 0:
+        raise GenerationError("too many scenarios")
+    return scen, singles[:room]
 
 
 def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]:
