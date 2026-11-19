@@ -1,0 +1,103 @@
+{
+  "episode_id": "ep_053daf06ab62f121",
+  "interactions": [
+    {
+      "group": "G1",
+      "issue_ids": [
+        "ISS-45TBV54H",
+        "ISS-7ECPCXPH"
+      ],
+      "n_issues": 2,
+      "scenario": "duplicate_cutoff"
+    }
+  ],
+  "issues": [
+    {
+      "affected_ids": [
+        "INV-Y94Q7JT"
+      ],
+      "currency": "JPY",
+      "evidence_sets": [
+        [
+          "INV-Y94Q7JT",
+          "R-JY747BKJ9"
+        ],
+        [
+          "INV-Y94Q7JT",
+          "R-UU68EX7ZR"
+        ]
+      ],
+      "expected_amount_minor": 9149784,
+      "interaction_group": "G1",
+      "issue_id": "ISS-45TBV54H",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "INV-H2A2YJ8",
+        "INV-Y94Q7JT"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-H2A2YJ8",
+          "INV-Y94Q7JT",
+          "R-BDP57DGYB"
+        ],
+        [
+          "INV-H2A2YJ8",
+          "INV-Y94Q7JT",
+          "R-JY747BKJ9"
+        ],
+        [
+          "INV-H2A2YJ8",
+          "INV-Y94Q7JT",
+          "R-SURQBBZME"
+        ],
+        [
+          "INV-H2A2YJ8",
+          "INV-Y94Q7JT",
+          "R-UU68EX7ZR"
+        ]
+      ],
+      "expected_amount_minor": 6265748,
+      "interaction_group": "G1",
+      "issue_id": "ISS-7ECPCXPH",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-DPJ8PM3",
+        "INV-UH5BVFW"
+      ],
+      "currency": "JPY",
+      "evidence_sets": [
+        [
+          "INV-DPJ8PM3",
+          "INV-UH5BVFW",
+          "R-84W4X9P29"
+        ],
+        [
+          "INV-DPJ8PM3",
+          "INV-UH5BVFW",
+          "R-KZXS39NRG"
+        ],
+        [
+          "INV-DPJ8PM3",
+          "INV-UH5BVFW",
+          "R-T3D5ZQVVQ"
+        ],
+        [
+          "INV-DPJ8PM3",
+          "INV-UH5BVFW",
+          "R-V6W4W5F58"
+        ]
+      ],
+      "expected_amount_minor": 4004284,
+      "interaction_group": null,
+      "issue_id": "ISS-M8N2KQDG",
+      "type": "duplicate_invoice"
+    }
+  ],
+  "schema_version": "1.0"
+}

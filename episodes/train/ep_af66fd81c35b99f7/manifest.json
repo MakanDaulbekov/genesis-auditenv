@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Ember Retail GmbH",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 116,
+    "fx_rows": 580,
+    "invoices": 59,
+    "ledger_rows": 596,
+    "payments": 57
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_af66fd81c35b99f7",
+  "files": {
+    "documents.jsonl": "19cf3b531e1d1f0ec486109f8135d731e236b7f4aec352ddf8c780e4f06f01df",
+    "fx.csv": "0fcc53a0dc516f389de70253918acc5f2ebe1c3226679074c349a9b08b4d3dd2",
+    "invoices.jsonl": "17fc660c6f40d79d367af886100aeec359f0b55e6b57a454379e7f250db0ed8b",
+    "ledger.csv": "2aba1adbfc686bd524cfcf0f69afefbda6de126cf088bede9299574fcbb39a3c",
+    "payments.jsonl": "b9a62a6ab8b9d25d51964c80bdf3fc968ee2862b073f932bfd31bb4e025ed87b",
+    "policy.json": "a79efe419fecb5f288ce8bbce56672e172d0e487f672ea3cab668aa194f06b30"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-10-31",
+  "period_start": "2034-10-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+03:00"
+}

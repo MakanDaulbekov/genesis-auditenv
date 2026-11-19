@@ -187,12 +187,46 @@ def cmd_solvability(args) -> int:
     return 0 if out["max_steps"] < 100 else 1
 
 
+def _peak_rss_mb() -> dict:
+    import resource
+    # Linux: ru_maxrss в КБ. RUSAGE_CHILDREN — пик среди завершённых дочерних (процесс оценщика).
+    return {"peak_rss_mb_env_policy": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
+            "peak_rss_mb_grader": round(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024, 1)}
+
+
 def cmd_run(args) -> int:
+    """Прогон политик. По умолчанию каждая политика — в своём процессе (--isolate): так пик RSS и
+    время честно меряются по каждой политике отдельно; траектории склеиваются в порядке политик."""
+    import subprocess
+    import tempfile
     from .runner import run_policies
-    summary = run_policies(policies=args.policies, splits=args.splits, episodes_root=args.episodes_root,
-                           grader_root=args.grader_root, trajectories=args.trajectories,
-                           grader_log=args.grader_log, mode=args.mode, trusted=args.trusted,
-                           truth_dir=args.truth_dir)
+    if args.isolate and len(args.policies) > 1:
+        merged = {"aggregate": {}, "episodes": [], "grader": []}
+        with tempfile.TemporaryDirectory() as tmp, open(args.trajectories, "w", encoding="utf-8") as traj, \
+                open(args.grader_log, "w", encoding="utf-8") if args.grader_log else open(os.devnull, "w") as glog:
+            for i, pol in enumerate(args.policies):
+                t, sm, gl = (Path(tmp) / f"{i}.{x}" for x in ("traj.jsonl", "summary.json", "glog.jsonl"))
+                cmd = [sys.executable, "-m", "auditenv.cli", "run", "--no-isolate", "--policies", pol,
+                       "--splits", *args.splits, "--mode", args.mode, "--episodes-root", args.episodes_root,
+                       "--grader-root", args.grader_root, "--trajectories", str(t), "--grader-log", str(gl),
+                       "--summary", str(sm)] + (["--trusted"] if args.trusted else []) + \
+                      (["--truth-dir", args.truth_dir] if args.truth_dir else [])
+                env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(ROOT), os.getcwd()]))
+                subprocess.run(cmd, check=True, env=env, stdout=subprocess.DEVNULL)
+                traj.write(t.read_text(encoding="utf-8"))
+                glog.write(gl.read_text(encoding="utf-8"))
+                one = json.loads(sm.read_text(encoding="utf-8"))
+                merged["aggregate"].update(one["aggregate"])
+                merged["episodes"] += one["episodes"]
+                merged["grader"] += one["grader"]
+        summary = merged
+    else:
+        summary = run_policies(policies=args.policies, splits=args.splits, episodes_root=args.episodes_root,
+                               grader_root=args.grader_root, trajectories=args.trajectories,
+                               grader_log=args.grader_log, mode=args.mode, trusted=args.trusted,
+                               truth_dir=args.truth_dir)
+        if len(args.policies) == 1:
+            summary["aggregate"][args.policies[0]].update(_peak_rss_mb())
     print(json.dumps(summary["aggregate"], indent=2, ensure_ascii=False))
     if args.summary:
         Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -269,6 +303,8 @@ def main(argv=None) -> int:
                    default=["random_explorer", "simple_reconciler", "competent_reconciler", "flag_all", "oracle"],
                    help="встроенные имена и/или module.path:factory")
     r.add_argument("--trusted", action="store_true", help="доверенный режим: разрешает oracle_from_truth")
+    r.add_argument("--no-isolate", dest="isolate", action="store_false",
+                   help="все политики в одном процессе (без замера пика RSS по политикам)")
     r.add_argument("--truth-dir", default=None, help="каталог эталона для oracle_from_truth (по умолчанию grader-root)")
     r.add_argument("--splits", nargs="+", default=["train", "dev"])
     r.add_argument("--mode", default="train", choices=["train", "eval"])

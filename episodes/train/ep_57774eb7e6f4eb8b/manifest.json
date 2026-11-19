@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Saryn Labs LLP",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 135,
+    "fx_rows": 580,
+    "invoices": 72,
+    "ledger_rows": 748,
+    "payments": 63
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_57774eb7e6f4eb8b",
+  "files": {
+    "documents.jsonl": "a57a6c458cb280696a92ffa50fdf6b0113ebff8115bfc40dea979c6b8f01046a",
+    "fx.csv": "48a36b9739b569319b48055f4b3ced7d193ce55fe7c9d2d2d5dde51b5026d0cb",
+    "invoices.jsonl": "0efa85fc98f5d7b6f963470d193d3c3fd31d2c3e527ede7f77c6937b2edd756e",
+    "ledger.csv": "28bdfad7b50a051a650101489d0652ee03948fb1e4b8051d34b7e67ff58f70ea",
+    "payments.jsonl": "0ced14464230cc1a30f2b36b41c80a0038316d585f71c14286b191a9f2eb9239",
+    "policy.json": "f3f8f58e037608b544aa0d4ddd764627ae53b6d4e45fdab5d7b46ed25fd98de4"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2030-08-31",
+  "period_start": "2030-08-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+05:00"
+}

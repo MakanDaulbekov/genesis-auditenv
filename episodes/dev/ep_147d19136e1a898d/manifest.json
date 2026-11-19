@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Nord Trade Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 98,
+    "fx_rows": 580,
+    "invoices": 50,
+    "ledger_rows": 610,
+    "payments": 48
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_147d19136e1a898d",
+  "files": {
+    "documents.jsonl": "3f81abcf89e0828e22d3df825e7f4c86fb086e0f7c71e8530df6380057ddb7db",
+    "fx.csv": "784c27bb3b1d294ece28488d648f3412a0b616f1370457c9d042ac83373e9446",
+    "invoices.jsonl": "3cc2eb7fb65cb37504d4f701178065596414c419356499a0e08892810b62abaf",
+    "ledger.csv": "527be6423933f1dd933a81684fe88aa49c9824344615c20ad7f9a50720672335",
+    "payments.jsonl": "1785b5d4be1206b973218fb6279481b6c8266a91cd89379e6f605b8480022ad7",
+    "policy.json": "a60eed6c2b8bfe6e73145f8ce9025aeb9d38d5ae381edae33ba02dfb22fdebf5"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-07-31",
+  "period_start": "2031-07-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-08:00"
+}

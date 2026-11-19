@@ -1,0 +1,39 @@
+{
+  "base_currency": "JPY",
+  "company_name": "Orbita Pharma LLP",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 91,
+    "fx_rows": 580,
+    "invoices": 45,
+    "ledger_rows": 446,
+    "payments": 46
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_053daf06ab62f121",
+  "files": {
+    "documents.jsonl": "34a8daceaeec32db1ab059647ff28312e16df1c80fe2f9c0b6e3ee1566c8b106",
+    "fx.csv": "51183c293c5d33e355eea641e1bde99c31774e029e25b0a3b63f5caf63470e5f",
+    "invoices.jsonl": "5284ed3e87dbc727c82700613f8a4a960a140e50da68a0e2788442b716b5d623",
+    "ledger.csv": "3b5a0af7acb70f41c0da87009d682ca0129d0db9e343027cdc3620a8999df025",
+    "payments.jsonl": "214c7ae007593351e2a46f57812d1c29b579ec207bb41bc76b9466798fa8b658",
+    "policy.json": "1369e42ef225809e294cf61ebe728d91e4a76256b1c0bb4c7fbc0c3605dcdbb6"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-01-31",
+  "period_start": "2033-01-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-03:00"
+}

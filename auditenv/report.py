@@ -114,17 +114,20 @@ def main() -> int:
              "конфиги `configs/splits/*.json` (`config_version` = train-1.0.0 / dev-1.0.0).\n")
     L.append("## 1. Сводка по политикам (train+dev, режим train)\n")
     L.append("| политика | возврат (средний) | P (ср.) | R (ср.) | F1 (ср.) | micro P / R / F1 | TP/FP/FN | шаги (ср.) | "
-             "время эпизода, мс (ср. / макс.) | возврат на чистых | неверных submit |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+             "время эпизода, мс (p50 / p95 / макс.) | пик RSS, МБ (среда+политика / оценщик) | возврат на чистых | "
+             "неверных submit |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
     for pol in ("oracle", "competent_reconciler", "simple_reconciler", "random_explorer", "flag_all"):
         a = agg[pol]
         m = a["micro"]
         L.append(f"| {pol} | {_f(a['mean_return'])} | {_f(a['mean_precision'])} | {_f(a['mean_recall'])} | "
                  f"{_f(a['mean_f1'])} | {_f(m['precision'], 2)} / {_f(m['recall'], 2)} / {_f(m['f1'], 2)} | "
-                 f"{m['tp']}/{m['fp']}/{m['fn']} | {a['mean_steps']} | {a['mean_wall_ms']} / {a['max_wall_ms']} | "
+                 f"{m['tp']}/{m['fp']}/{m['fn']} | {a['mean_steps']} | {a.get('p50_wall_ms')} / {a.get('p95_wall_ms')} / "
+                 f"{a['max_wall_ms']} | {a.get('peak_rss_mb_env_policy', '—')} / {a.get('peak_rss_mb_grader', '—')} | "
                  f"{_f(a['clean_mean_return'])} | {a['invalid_submissions']} |")
     L.append("\nПримечания: P/R «средние» усредняются по эпизодам; на чистом эпизоде без выводов P=R=0 по правилу "
-             "нулевого знаменателя (поэтому у oracle средние P/R < 1 при F1 = 1). Лимит времени — 60 с на эпизод; "
+             "нулевого знаменателя (поэтому у oracle средние P/R < 1 при F1 = 1). Каждая политика прогоняется в своём "
+             "процессе, поэтому пик RSS — по политике (ограничение задачи — 4 ГБ). Лимит времени — 60 с на эпизод; "
              "максимум по всем прогонам указан в таблице. oracle отправляет ответ без осмотра (k = 0), поэтому его "
              "возврат = 1 − 0.002·0 = 1.\n")
     L.append("Пороговые свойства, которые подтверждают числа: oracle ≥ competent_reconciler > simple_reconciler > "

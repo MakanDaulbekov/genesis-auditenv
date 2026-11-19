@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Aster Trade Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 94,
+    "fx_rows": 580,
+    "invoices": 52,
+    "ledger_rows": 719,
+    "payments": 42
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_2309f26ac49aa18b",
+  "files": {
+    "documents.jsonl": "eb1229116e229596da34ed3f2900db344eb26852088cece194b011b69abba809",
+    "fx.csv": "dac96796e0059fd7de329fabee47c71ff3c2e41e6d32288767d93e2329a0592d",
+    "invoices.jsonl": "803b6d54b9f728fdf01e157e0d966c920e4811a71954770c80e642e1c9f9dd35",
+    "ledger.csv": "a02e2facbc98f00e4e3c19433cfeed0f7895c8586caa1002b34b0947fea64e03",
+    "payments.jsonl": "7f6ec027e594ad8171c9a743cb0de17d96a6247b752c3284b1651adc36071bfd",
+    "policy.json": "006e17cfb2cf0d111e497b22aa838417a2208ddf5fb561d292cc2b96a75cee3f"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-07-31",
+  "period_start": "2034-07-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+03:00"
+}

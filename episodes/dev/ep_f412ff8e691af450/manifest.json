@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Nord Foods Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 116,
+    "fx_rows": 570,
+    "invoices": 61,
+    "ledger_rows": 526,
+    "payments": 55
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_f412ff8e691af450",
+  "files": {
+    "documents.jsonl": "3c7933a30af33c8115a1b3c4c38c63683fe8fa86657963ebcdce726eb0f7609f",
+    "fx.csv": "5ad4a8c67a2b7ccab6dab3787634ba837593ec919f20cd5e50eaed1b84105023",
+    "invoices.jsonl": "c3e8fd88a04d5d2cd9ea7fcc19455c4dc2e68494efd5e9b4856ca1c223a9115a",
+    "ledger.csv": "24beace4db2ccbe0f4f2b7c2556e0abfe66830a7c1650d4f96f8ba991e2f94d9",
+    "payments.jsonl": "e73eceeee1604053e6b3b0761041659508b55b6583933153f56c9545e6b3fb54",
+    "policy.json": "69b80db0d39b070e36f9501b5d5eb7ad6bcbf390996d8ea252e9616b7a543075"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2032-02-29",
+  "period_start": "2032-02-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+04:00"
+}

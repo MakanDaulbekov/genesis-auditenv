@@ -62,7 +62,13 @@
     },
     {
       "seed": 2010,
-      "overrides": {}
+      "overrides": {
+        "currencies": {
+          "base": [
+            "JPY"
+          ]
+        }
+      }
     }
   ]
 }

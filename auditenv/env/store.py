@@ -60,6 +60,9 @@ class ReadOnlyStore:
             "payments": parse_jsonl(files["payments.jsonl"]),
             "fx": parse_fx_csv(files["fx.csv"]),
         }
+        # вычисляемое поле fx_id: агенту не нужно конструировать ID доказательства вслепую
+        # (сам fx.csv не меняется — схема раздела 03 буквальная)
+        tables["fx"] = [dict(r, fx_id=fx_id(r)) for r in tables["fx"]]
         docs = parse_jsonl(files["documents.jsonl"])
         self._tables = {t: tuple(_dumps(r) for r in rows) for t, rows in tables.items()}
         self._index = {}

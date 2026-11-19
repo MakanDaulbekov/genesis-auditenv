@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Polar Systems Ltd",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 128,
+    "fx_rows": 580,
+    "invoices": 65,
+    "ledger_rows": 529,
+    "payments": 63
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_30e4aabad4c2cce8",
+  "files": {
+    "documents.jsonl": "308b602780176793e7b2407081ed511585f11002f51c895e4a6715c75a8ef3d3",
+    "fx.csv": "6f0c709078cdbc291c116801a6e0e72a8af8ddfbab4068c4045dca73f48c4a34",
+    "invoices.jsonl": "1211a22d78a1a201bf426b961022fe53a0181f9332ee5fd9e5efadd1d4482c33",
+    "ledger.csv": "973aabfc0479c05511b7709156d28e29dacf9fe4f3108e23bf1f0886748aa2e1",
+    "payments.jsonl": "d48c1dce957f5cdb70ddf5786134790c3f9e27fbacfb9376d27122188c42d71e",
+    "policy.json": "8f878ebed885bd99b1bdb81f21ce49955565d59567f191879436460c5dfdab6f"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-03-31",
+  "period_start": "2031-03-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+03:00"
+}

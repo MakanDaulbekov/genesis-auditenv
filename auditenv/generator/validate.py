@@ -432,6 +432,15 @@ def recompute_from_evidence(t: dict, issue: dict, evidence: list[str]) -> tuple[
         booked = rows[0]["debit_minor"] or rows[0]["credit_minor"]
         exp = _convert(amt, d["currency"], base, fx["rate"], pol["currency_exponents"], pol["rounding"]["mode"])
         return {"type": typ, "affected_ids": [ident], "amount": abs(booked - exp), "currency": base}, ""
+    if typ == "period_cutoff_error" and len(kinds["payment"]) == 1 and not kinds["invoice"]:
+        p = kinds["payment"][0]
+        if _in_period(p["timestamp"], pol):
+            return None, "payment instant is inside the period"
+        rows = [r for r in kinds["ledger"] if r["payment_id"] == p["payment_id"] and r["account"] == "bank"]
+        if len(rows) != 1:
+            return None, "need the bank posting row"
+        return {"type": typ, "affected_ids": [p["payment_id"]],
+                "amount": rows[0]["debit_minor"] or rows[0]["credit_minor"], "currency": base}, ""
     if typ == "period_cutoff_error":
         if len(kinds["invoice"]) != 1:
             return None, "need one invoice"

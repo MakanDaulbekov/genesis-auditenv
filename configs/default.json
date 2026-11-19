@@ -2,38 +2,113 @@
   "config_version": "default-1.0.0",
   "schema_version": "1.0",
   "size": {
-    "n_customers": [6, 14],
-    "n_vendors": [3, 8],
-    "n_invoices": [24, 60],
-    "n_prior_invoices": [2, 6],
-    "n_next_invoices": [1, 3],
-    "n_expenses": [80, 260]
+    "n_customers": [
+      6,
+      14
+    ],
+    "n_vendors": [
+      3,
+      8
+    ],
+    "n_invoices": [
+      24,
+      60
+    ],
+    "n_prior_invoices": [
+      2,
+      6
+    ],
+    "n_next_invoices": [
+      1,
+      3
+    ],
+    "n_expenses": [
+      80,
+      260
+    ]
   },
   "currencies": {
-    "base": ["KZT", "USD", "EUR"],
-    "foreign": ["USD", "EUR", "GBP", "JPY", "CHF", "KZT"],
+    "base": [
+      "KZT",
+      "USD",
+      "EUR"
+    ],
+    "foreign": [
+      "USD",
+      "EUR",
+      "GBP",
+      "JPY",
+      "CHF",
+      "KZT"
+    ],
     "foreign_customer_share_pct": 45
   },
   "distractors": {
-    "recurring_groups": [1, 2],
-    "same_total_diff_lines": [0, 1],
-    "tz_boundary_invoices": [1, 3],
-    "tz_boundary_next_invoices": [1, 2],
-    "tz_boundary_receipts": [1, 2],
-    "prepayments": [1, 3],
+    "recurring_groups": [
+      1,
+      2
+    ],
+    "same_total_diff_lines": [
+      0,
+      1
+    ],
+    "tz_boundary_invoices": [
+      1,
+      3
+    ],
+    "tz_boundary_next_invoices": [
+      1,
+      2
+    ],
+    "tz_boundary_receipts": [
+      1,
+      2
+    ],
+    "prepayments": [
+      1,
+      3
+    ],
     "refund_pct": 50,
     "batch_payment_pct": 40,
-    "payment_mix_pct": {"none": 25, "full": 45, "split": 12, "partial": 10, "overpay": 8}
+    "payment_mix_pct": {
+      "none": 25,
+      "full": 45,
+      "split": 12,
+      "partial": 10,
+      "overpay": 8
+    },
+    "next_prepayments": [
+      0,
+      2
+    ]
   },
   "errors": {
-    "duplicate_invoice": [0, 2],
-    "missing_or_partial_allocation": [0, 2],
-    "fx_wrong_date_or_rate": [0, 2],
-    "period_cutoff_error": [0, 2]
+    "duplicate_invoice": [
+      0,
+      2
+    ],
+    "missing_or_partial_allocation": [
+      0,
+      2
+    ],
+    "fx_wrong_date_or_rate": [
+      0,
+      2
+    ],
+    "period_cutoff_error": [
+      0,
+      2
+    ]
   },
   "interactions": {
-    "partial_fx_boundary": [0, 1],
-    "duplicate_cutoff": [0, 1]
+    "partial_fx_boundary": [
+      0,
+      1
+    ],
+    "duplicate_cutoff": [
+      0,
+      1
+    ]
   },
   "clean": false
 }

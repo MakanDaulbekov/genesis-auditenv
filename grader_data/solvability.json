@@ -1,18 +1,18 @@
 {
   "episodes": 310,
   "perfect": 310,
-  "max_steps": 70,
-  "mean_steps": 40.71,
+  "max_steps": 73,
+  "mean_steps": 41.65,
   "steps_histogram": {
-    "20-29": 11,
-    "30-39": 183,
-    "40-49": 56,
-    "50-59": 30,
-    "60-69": 29,
-    "70-79": 1
+    "20-29": 10,
+    "30-39": 172,
+    "40-49": 68,
+    "50-59": 25,
+    "60-69": 33,
+    "70-79": 2
   },
-  "max_ledger_rows": 1892,
-  "max_documents": 202,
+  "max_ledger_rows": 1887,
+  "max_documents": 199,
   "tp": 1963,
   "fp": 0,
   "fn": 0,
@@ -25,32 +25,32 @@
     "clean": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 46
+      "max_steps": 44
     },
     "interactions": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 44
+      "max_steps": 45
     },
     "12_errors": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 49
+      "max_steps": 54
     },
     "large": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 66
+      "max_steps": 69
     },
     "base_JPY_GBP": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 44
+      "max_steps": 49
     },
     "worst_size": {
       "n": 10,
       "perfect": 10,
-      "max_steps": 70
+      "max_steps": 73
     }
   },
   "failures": []

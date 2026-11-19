@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Altyn Agro GmbH",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 101,
+    "fx_rows": 570,
+    "invoices": 56,
+    "ledger_rows": 496,
+    "payments": 45
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_3254277a9552d3b2",
+  "files": {
+    "documents.jsonl": "e96f0c2e0caea51cdf5c1e8112e01fd0e00ccf06308a8870e6e925b072a5327c",
+    "fx.csv": "763982c27281c61fbc4184c853435406820d1b408195e36ec793973e02c03803",
+    "invoices.jsonl": "3474f8382d6bd4038c5f1a5aa484c2e28b4bd8a327032a9941e152f3f8a8c76d",
+    "ledger.csv": "1fe48f2ac1c3ea85eade01a601f7c89cb44e411c73b8cef2ebd502d450d40b9a",
+    "payments.jsonl": "283399aece71bf07fe4fd79615a0dd2beff5e2d4848106e4418e37d5fbdf6dbe",
+    "policy.json": "c2e62afc52ae1ae6b59dc9bb76095ec7e08499ebfb5fe2ca6ae9b2aa098c06c9"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2032-02-29",
+  "period_start": "2032-02-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+09:00"
+}

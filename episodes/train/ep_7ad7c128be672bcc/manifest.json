@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Aster Foods GmbH",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 111,
+    "fx_rows": 575,
+    "invoices": 60,
+    "ledger_rows": 448,
+    "payments": 51
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_7ad7c128be672bcc",
+  "files": {
+    "documents.jsonl": "4e127ff69423e78ee83c99e919d020e280f6f7936fb15b3ccd8a8e9eca1df59c",
+    "fx.csv": "77e4de322b1f3019e922961dc9370fbc729013dc2fa498e35a2d78726e6b6bda",
+    "invoices.jsonl": "740b5e6ae67300213a30174d680c7d23ccc97f366afc4b00e5a7244fc832647c",
+    "ledger.csv": "b20276938ee347896cf7d3823d09aefe5a0266f737f1de13f6427c1d7e81d022",
+    "payments.jsonl": "ca531de790314f92bf2387e4f505a1d90fc975aea2c5dfaadab24cd015e17c7b",
+    "policy.json": "1934413b6c271dd812e6c23667233c29946295e8d69fb4b2ee645ee4ec65c390"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-11-30",
+  "period_start": "2033-11-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-09:30"
+}

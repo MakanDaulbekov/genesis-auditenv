@@ -1,0 +1,911 @@
+{
+  "attempt": 1,
+  "config": {
+    "clean": false,
+    "config_version": "dev-1.0.0",
+    "currencies": {
+      "base": [
+        "KZT",
+        "USD",
+        "EUR"
+      ],
+      "foreign": [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "CHF",
+        "KZT"
+      ],
+      "foreign_customer_share_pct": 45
+    },
+    "distractors": {
+      "batch_payment_pct": 40,
+      "next_prepayments": [
+        0,
+        2
+      ],
+      "payment_mix_pct": {
+        "full": 45,
+        "none": 25,
+        "overpay": 8,
+        "partial": 10,
+        "split": 12
+      },
+      "prepayments": [
+        1,
+        3
+      ],
+      "recurring_groups": [
+        1,
+        2
+      ],
+      "refund_pct": 50,
+      "same_total_diff_lines": [
+        0,
+        1
+      ],
+      "tz_boundary_invoices": [
+        1,
+        3
+      ],
+      "tz_boundary_next_invoices": [
+        1,
+        2
+      ],
+      "tz_boundary_receipts": [
+        1,
+        2
+      ]
+    },
+    "errors": {
+      "duplicate_invoice": [
+        0,
+        2
+      ],
+      "fx_wrong_date_or_rate": [
+        0,
+        2
+      ],
+      "missing_or_partial_allocation": [
+        0,
+        2
+      ],
+      "period_cutoff_error": [
+        0,
+        2
+      ]
+    },
+    "interactions": {
+      "duplicate_cutoff": [
+        0,
+        1
+      ],
+      "partial_fx_boundary": [
+        0,
+        1
+      ]
+    },
+    "schema_version": "1.0",
+    "size": {
+      "n_customers": [
+        6,
+        14
+      ],
+      "n_expenses": [
+        80,
+        260
+      ],
+      "n_invoices": [
+        24,
+        60
+      ],
+      "n_next_invoices": [
+        1,
+        3
+      ],
+      "n_prior_invoices": [
+        2,
+        6
+      ],
+      "n_vendors": [
+        3,
+        8
+      ]
+    }
+  },
+  "config_version": "dev-1.0.0",
+  "diff": {
+    "documents": {
+      "deleted": [],
+      "inserted": [
+        "D-B5BGPJSLJ",
+        "D-FUXFGR9BQ"
+      ],
+      "updated": [
+        {
+          "before": {
+            "bank_reference": "BR8797672992",
+            "doc_id": "D-44P6DQYDA",
+            "doc_type": "payment",
+            "payer_entity_id": "E-HFBWHK",
+            "payer_name": "Ember Energy LLP",
+            "record": {
+              "amount_minor": 1339200000,
+              "currency": "KZT",
+              "doc_id": "D-44P6DQYDA",
+              "invoice_refs": [
+                {
+                  "amount_minor": 1339200000,
+                  "invoice_id": "INV-NB97HSJ"
+                }
+              ],
+              "payment_id": "PAY-KD5R28B",
+              "timestamp": "2031-07-31T09:13:38+09:00"
+            },
+            "refund_of": null,
+            "remittance": {
+              "lines": [
+                {
+                  "amount_minor": 1339200000,
+                  "invoice_id": "INV-NB97HSJ"
+                }
+              ],
+              "note": "Payment for invoice"
+            }
+          },
+          "id": "D-44P6DQYDA"
+        },
+        {
+          "before": {
+            "bank_reference": "BR6888704558",
+            "doc_id": "D-NYCN88D8V",
+            "doc_type": "payment",
+            "payer_entity_id": "E-CZNDAG",
+            "payer_name": "Polar Motors JSC",
+            "record": {
+              "amount_minor": 2390223468,
+              "currency": "KZT",
+              "doc_id": "D-NYCN88D8V",
+              "invoice_refs": [
+                {
+                  "amount_minor": 2390223468,
+                  "invoice_id": "INV-NXS7WCX"
+                }
+              ],
+              "payment_id": "PAY-QDABVWE",
+              "timestamp": "2031-07-10T19:13:04+03:00"
+            },
+            "refund_of": null,
+            "remittance": {
+              "lines": [
+                {
+                  "amount_minor": 2390223468,
+                  "invoice_id": "INV-NXS7WCX"
+                }
+              ],
+              "note": "Partial settlement"
+            }
+          },
+          "id": "D-NYCN88D8V"
+        }
+      ]
+    },
+    "invoices": {
+      "deleted": [],
+      "inserted": [
+        "INV-2HSD6QX",
+        "INV-HVV79DS"
+      ],
+      "updated": []
+    },
+    "ledger": {
+      "deleted": [
+        {
+          "account": "accounts_receivable",
+          "credit_minor": 1339200000,
+          "currency": "KZT",
+          "debit_minor": 0,
+          "entity_id": "E-HFBWHK",
+          "invoice_id": "INV-NB97HSJ",
+          "payment_id": "PAY-KD5R28B",
+          "row_id": "R-6UGLDRTPW",
+          "timestamp": "2031-07-30T16:13:38-08:00"
+        },
+        {
+          "account": "opening_balance_equity",
+          "credit_minor": 1936469796,
+          "currency": "KZT",
+          "debit_minor": 0,
+          "entity_id": "E-CHKWMZ",
+          "invoice_id": "INV-YYGM4QJ",
+          "payment_id": null,
+          "row_id": "R-8VFGTA3NK",
+          "timestamp": "2031-07-01T00:00:00-08:00"
+        }
+      ],
+      "inserted": [
+        "R-GYZA9U9W9",
+        "R-H9VJYFVUK",
+        "R-KA43KBGK7",
+        "R-WDQDM8XFK",
+        "R-WYVXV3PHQ",
+        "R-XHE2Y6EAZ",
+        "R-XWWQCYTQ7",
+        "R-Z9GV5SKXW",
+        "R-ZJHMJWD24"
+      ],
+      "updated": [
+        {
+          "before": {
+            "account": "accounts_receivable",
+            "credit_minor": 0,
+            "currency": "KZT",
+            "debit_minor": 3656626524,
+            "entity_id": "E-P9AK7T",
+            "invoice_id": "INV-DKC75PS",
+            "payment_id": null,
+            "row_id": "R-3JJXXNBM2",
+            "timestamp": "2031-07-27T21:10:26-08:00"
+          },
+          "id": "R-3JJXXNBM2"
+        },
+        {
+          "before": {
+            "account": "bank",
+            "credit_minor": 0,
+            "currency": "KZT",
+            "debit_minor": 1313879794,
+            "entity_id": "E-FMPQT6",
+            "invoice_id": null,
+            "payment_id": "PAY-MSMPLA5",
+            "row_id": "R-68L7LF73Q",
+            "timestamp": "2031-07-27T07:08:35-08:00"
+          },
+          "id": "R-68L7LF73Q"
+        },
+        {
+          "before": {
+            "account": "accounts_receivable",
+            "credit_minor": 0,
+            "currency": "KZT",
+            "debit_minor": 1936469796,
+            "entity_id": "E-CHKWMZ",
+            "invoice_id": "INV-YYGM4QJ",
+            "payment_id": null,
+            "row_id": "R-CPSYUD53J",
+            "timestamp": "2031-07-01T00:00:00-08:00"
+          },
+          "id": "R-CPSYUD53J"
+        },
+        {
+          "before": {
+            "account": "fx_gain_loss",
+            "credit_minor": 0,
+            "currency": "KZT",
+            "debit_minor": 8848530,
+            "entity_id": "E-FMPQT6",
+            "invoice_id": null,
+            "payment_id": "PAY-MSMPLA5",
+            "row_id": "R-S4FE2WFVH",
+            "timestamp": "2031-07-27T07:08:35-08:00"
+          },
+          "id": "R-S4FE2WFVH"
+        },
+        {
+          "before": {
+            "account": "accounts_receivable",
+            "credit_minor": 2390223468,
+            "currency": "KZT",
+            "debit_minor": 0,
+            "entity_id": "E-CZNDAG",
+            "invoice_id": "INV-NXS7WCX",
+            "payment_id": "PAY-QDABVWE",
+            "row_id": "R-SD4LX4882",
+            "timestamp": "2031-07-10T08:13:04-08:00"
+          },
+          "id": "R-SD4LX4882"
+        },
+        {
+          "before": {
+            "account": "revenue",
+            "credit_minor": 3656626524,
+            "currency": "KZT",
+            "debit_minor": 0,
+            "entity_id": "E-P9AK7T",
+            "invoice_id": "INV-DKC75PS",
+            "payment_id": null,
+            "row_id": "R-YAR5QFF6X",
+            "timestamp": "2031-07-27T21:10:26-08:00"
+          },
+          "id": "R-YAR5QFF6X"
+        }
+      ]
+    },
+    "payments": {
+      "deleted": [],
+      "inserted": [],
+      "updated": [
+        {
+          "before": {
+            "amount_minor": 1339200000,
+            "currency": "KZT",
+            "doc_id": "D-44P6DQYDA",
+            "invoice_refs": [
+              {
+                "amount_minor": 1339200000,
+                "invoice_id": "INV-NB97HSJ"
+              }
+            ],
+            "payment_id": "PAY-KD5R28B",
+            "timestamp": "2031-07-31T09:13:38+09:00"
+          },
+          "id": "PAY-KD5R28B"
+        },
+        {
+          "before": {
+            "amount_minor": 2390223468,
+            "currency": "KZT",
+            "doc_id": "D-NYCN88D8V",
+            "invoice_refs": [
+              {
+                "amount_minor": 2390223468,
+                "invoice_id": "INV-NXS7WCX"
+              }
+            ],
+            "payment_id": "PAY-QDABVWE",
+            "timestamp": "2031-07-10T19:13:04+03:00"
+          },
+          "id": "PAY-QDABVWE"
+        }
+      ]
+    }
+  },
+  "distractors": [
+    {
+      "ids": [
+        "INV-8PZVA63",
+        "INV-RCASVRU"
+      ],
+      "kind": "recurring_same_amount"
+    },
+    {
+      "ids": [
+        "INV-U2F3NFM",
+        "INV-U4B97E8"
+      ],
+      "kind": "same_total_different_lines"
+    },
+    {
+      "ids": [
+        "INV-HKYT86C"
+      ],
+      "kind": "tz_boundary_invoice_in_period"
+    },
+    {
+      "ids": [
+        "INV-8MF5RUW"
+      ],
+      "kind": "tz_boundary_invoice_in_period"
+    },
+    {
+      "ids": [
+        "INV-7KCEEGJ",
+        "PAY-3BVXZPN"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-8PZVA63",
+        "PAY-VX87LA3"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-8YJK967",
+        "PAY-BNAGECV"
+      ],
+      "kind": "overpayment_to_advances"
+    },
+    {
+      "ids": [
+        "INV-A2MWER8",
+        "PAY-JVP63F4",
+        "PAY-KJK3XCS"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-DKC75PS",
+        "PAY-3HQ7GPE"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-HKYT86C",
+        "PAY-G8NXURH"
+      ],
+      "kind": "overpayment_to_advances"
+    },
+    {
+      "ids": [
+        "INV-LC75WHD",
+        "PAY-3HKXZWG"
+      ],
+      "kind": "overpayment_to_advances"
+    },
+    {
+      "ids": [
+        "INV-NXS7WCX",
+        "PAY-QDABVWE",
+        "PAY-WLWX2CK"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-RE7XR8Z",
+        "PAY-TBL8YQ8"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-U4B97E8",
+        "PAY-5RFVKXF"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-UENWJMK",
+        "PAY-MU22UMS",
+        "PAY-N53SKCR",
+        "PAY-RNY4VWE"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-UZE9MZC",
+        "PAY-J7H8HWS",
+        "PAY-KRUMVXP",
+        "PAY-VUZJMGB"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-XKUQQTM",
+        "PAY-4ECBWGJ",
+        "PAY-93CN4X6"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-YPPR2T4",
+        "PAY-NMPHWWB"
+      ],
+      "kind": "overpayment_to_advances"
+    },
+    {
+      "ids": [
+        "INV-YYGM4QJ",
+        "PAY-4QG893N",
+        "PAY-TRTZJV3"
+      ],
+      "kind": "split_payment"
+    },
+    {
+      "ids": [
+        "INV-ZLJ7JPF",
+        "PAY-7T6P4JZ"
+      ],
+      "kind": "partial_payment_open_invoice"
+    },
+    {
+      "ids": [
+        "INV-TAFEYJB",
+        "PAY-53Q5TLZ"
+      ],
+      "kind": "tz_boundary_foreign_receipt"
+    },
+    {
+      "ids": [
+        "PAY-GYYUM85",
+        "PAY-MPSJZ45"
+      ],
+      "kind": "prepayment_refunded"
+    },
+    {
+      "ids": [
+        "PAY-RD7TEV7"
+      ],
+      "kind": "prepayment"
+    },
+    {
+      "ids": [
+        "PAY-3Y85UWA",
+        "PAY-VE9XVUX"
+      ],
+      "kind": "prepayment_refunded"
+    }
+  ],
+  "episode_id": "ep_147d19136e1a898d",
+  "generator_version": "1.0.0",
+  "mutations": [
+    {
+      "cause": {
+        "after": {
+          "invoice_id": "INV-2HSD6QX",
+          "issued_at": "2031-08-02T09:07:51+06:00"
+        },
+        "before": null,
+        "duplicate_invoice_id": "INV-2HSD6QX",
+        "original_invoice_id": "INV-TAFEYJB"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-2HSD6QX",
+          "INV-TAFEYJB"
+        ],
+        "currency": "EUR",
+        "evidence_sets": [
+          [
+            "INV-2HSD6QX",
+            "INV-TAFEYJB",
+            "R-AXLWUGZH7"
+          ],
+          [
+            "INV-2HSD6QX",
+            "INV-TAFEYJB",
+            "R-H9VJYFVUK"
+          ],
+          [
+            "INV-2HSD6QX",
+            "INV-TAFEYJB",
+            "R-XHE2Y6EAZ"
+          ],
+          [
+            "INV-2HSD6QX",
+            "INV-TAFEYJB",
+            "R-Z8XT3E84W"
+          ]
+        ],
+        "expected_amount_minor": 865050,
+        "interaction_group": "G1",
+        "type": "duplicate_invoice"
+      },
+      "issue_id": "ISS-X9SPZLC8",
+      "type": "duplicate_invoice",
+      "variant": "out_of_period_copy"
+    },
+    {
+      "cause": {
+        "after": {
+          "ledger_timestamp": "2031-07-31T21:55:37-08:00",
+          "posting": "issue"
+        },
+        "before": {
+          "posting": "issue"
+        },
+        "document_instant": "2031-08-02T09:07:51+06:00",
+        "invoice_id": "INV-2HSD6QX"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-2HSD6QX"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-2HSD6QX",
+            "R-H9VJYFVUK"
+          ],
+          [
+            "INV-2HSD6QX",
+            "R-XHE2Y6EAZ"
+          ]
+        ],
+        "expected_amount_minor": 440478356,
+        "interaction_group": "G1",
+        "type": "period_cutoff_error"
+      },
+      "issue_id": "ISS-6V52GE4S",
+      "type": "period_cutoff_error",
+      "variant": "next_period_booked:accrued_at_period_close"
+    },
+    {
+      "cause": {
+        "after": {
+          "invoice_id": "INV-HVV79DS",
+          "issued_at": "2031-07-29T21:19:27+06:00"
+        },
+        "before": null,
+        "duplicate_invoice_id": "INV-HVV79DS",
+        "original_invoice_id": "INV-KQWMYYV"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-HVV79DS",
+          "INV-KQWMYYV"
+        ],
+        "currency": "EUR",
+        "evidence_sets": [
+          [
+            "INV-HVV79DS",
+            "INV-KQWMYYV",
+            "R-94VYQDDXN"
+          ],
+          [
+            "INV-HVV79DS",
+            "INV-KQWMYYV",
+            "R-KA43KBGK7"
+          ],
+          [
+            "INV-HVV79DS",
+            "INV-KQWMYYV",
+            "R-KH5SNR7DZ"
+          ],
+          [
+            "INV-HVV79DS",
+            "INV-KQWMYYV",
+            "R-ZJHMJWD24"
+          ]
+        ],
+        "expected_amount_minor": 2666894,
+        "interaction_group": null,
+        "type": "duplicate_invoice"
+      },
+      "issue_id": "ISS-FLEBPGJZ",
+      "type": "duplicate_invoice",
+      "variant": "in_period_copy"
+    },
+    {
+      "cause": {
+        "after": null,
+        "before": [
+          {
+            "amount_minor": 1339200000,
+            "invoice_id": "INV-NB97HSJ"
+          }
+        ],
+        "field": "invoice_refs",
+        "invoice_id": "INV-NB97HSJ",
+        "payment_id": "PAY-KD5R28B"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-NB97HSJ",
+          "PAY-KD5R28B"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-NB97HSJ",
+            "PAY-KD5R28B",
+            "R-XWWQCYTQ7"
+          ]
+        ],
+        "expected_amount_minor": 1339200000,
+        "interaction_group": null,
+        "type": "missing_or_partial_allocation"
+      },
+      "issue_id": "ISS-2KZP2K7V",
+      "type": "missing_or_partial_allocation",
+      "variant": "missing"
+    },
+    {
+      "cause": {
+        "after": [
+          {
+            "amount_minor": 1256119552,
+            "invoice_id": "INV-NXS7WCX"
+          }
+        ],
+        "before": [
+          {
+            "amount_minor": 2390223468,
+            "invoice_id": "INV-NXS7WCX"
+          }
+        ],
+        "field": "invoice_refs",
+        "invoice_id": "INV-NXS7WCX",
+        "payment_id": "PAY-QDABVWE"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-NXS7WCX",
+          "PAY-QDABVWE"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-NXS7WCX",
+            "PAY-QDABVWE",
+            "R-GYZA9U9W9"
+          ]
+        ],
+        "expected_amount_minor": 1134103916,
+        "interaction_group": null,
+        "type": "missing_or_partial_allocation"
+      },
+      "issue_id": "ISS-KYHBGAC9",
+      "type": "missing_or_partial_allocation",
+      "variant": "partial"
+    },
+    {
+      "cause": {
+        "after": {
+          "base_amount_minor": 3654774129,
+          "rate_date": "2031-07-29"
+        },
+        "before": {
+          "base_amount_minor": 3656626524,
+          "rate": "469.417",
+          "rate_currency": "USD",
+          "rate_date": "2031-07-27"
+        },
+        "document_id": "INV-DKC75PS",
+        "document_kind": "invoice"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-DKC75PS"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-DKC75PS",
+            "R-3JJXXNBM2",
+            "fx:2031-07-27:USD:KZT"
+          ],
+          [
+            "INV-DKC75PS",
+            "R-YAR5QFF6X",
+            "fx:2031-07-27:USD:KZT"
+          ]
+        ],
+        "expected_amount_minor": 1852395,
+        "interaction_group": null,
+        "type": "fx_wrong_date_or_rate"
+      },
+      "issue_id": "ISS-5FEDDB4E",
+      "type": "fx_wrong_date_or_rate",
+      "variant": "shifted_date"
+    },
+    {
+      "cause": {
+        "after": {
+          "base_amount_minor": 8367924,
+          "rate_ccy": "JPY"
+        },
+        "before": {
+          "base_amount_minor": 1313879794,
+          "rate": "511.7558",
+          "rate_currency": "EUR",
+          "rate_date": "2031-07-27"
+        },
+        "document_id": "PAY-MSMPLA5",
+        "document_kind": "payment"
+      },
+      "issue": {
+        "affected_ids": [
+          "PAY-MSMPLA5"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "PAY-MSMPLA5",
+            "R-68L7LF73Q",
+            "fx:2031-07-27:EUR:KZT"
+          ]
+        ],
+        "expected_amount_minor": 1305511870,
+        "interaction_group": null,
+        "type": "fx_wrong_date_or_rate"
+      },
+      "issue_id": "ISS-ESVSAQPY",
+      "type": "fx_wrong_date_or_rate",
+      "variant": "wrong_pair"
+    },
+    {
+      "cause": {
+        "after": {
+          "ledger_timestamp": "2031-07-31T21:37:43-08:00",
+          "posting": "issue"
+        },
+        "before": {
+          "posting": null
+        },
+        "document_instant": "2031-08-02T00:58:01-05:00",
+        "invoice_id": "INV-4V3B4FW"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-4V3B4FW"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-4V3B4FW",
+            "R-WYVXV3PHQ"
+          ],
+          [
+            "INV-4V3B4FW",
+            "R-Z9GV5SKXW"
+          ]
+        ],
+        "expected_amount_minor": 2647734504,
+        "interaction_group": null,
+        "type": "period_cutoff_error"
+      },
+      "issue_id": "ISS-V2XXCSY9",
+      "type": "period_cutoff_error",
+      "variant": "next_period_booked:accrued_at_period_close"
+    },
+    {
+      "cause": {
+        "after": {
+          "ledger_timestamp": "2031-07-01T00:08:43-08:00",
+          "posting": "issue"
+        },
+        "before": {
+          "posting": "opening"
+        },
+        "document_instant": "2031-05-23T06:26:34-05:00",
+        "invoice_id": "INV-YYGM4QJ"
+      },
+      "issue": {
+        "affected_ids": [
+          "INV-YYGM4QJ"
+        ],
+        "currency": "KZT",
+        "evidence_sets": [
+          [
+            "INV-YYGM4QJ",
+            "R-CPSYUD53J"
+          ],
+          [
+            "INV-YYGM4QJ",
+            "R-WDQDM8XFK"
+          ]
+        ],
+        "expected_amount_minor": 1936469796,
+        "interaction_group": null,
+        "type": "period_cutoff_error"
+      },
+      "issue_id": "ISS-GHB9FWBK",
+      "type": "period_cutoff_error",
+      "variant": "prior_period_booked:booked_at_period_open"
+    }
+  ],
+  "plan": {
+    "planned_scenarios": [
+      "duplicate_cutoff"
+    ],
+    "planned_singles": [
+      "duplicate_invoice",
+      "missing_or_partial_allocation",
+      "missing_or_partial_allocation",
+      "fx_wrong_date_or_rate",
+      "fx_wrong_date_or_rate",
+      "period_cutoff_error",
+      "period_cutoff_error"
+    ]
+  },
+  "scenarios": [
+    {
+      "group": "G1",
+      "scenario": "duplicate_cutoff"
+    }
+  ],
+  "schema_version": "1.0",
+  "secret_used": false,
+  "seed": 2009
+}

@@ -57,7 +57,7 @@ def test_variants_present_across_seeds(cfg):
     for need in [("missing_or_partial_allocation", "missing"), ("missing_or_partial_allocation", "partial"),
                  ("fx_wrong_date_or_rate", "naive_date"), ("fx_wrong_date_or_rate", "shifted_date"),
                  ("period_cutoff_error", "next_period_booked"), ("period_cutoff_error", "prior_period_booked"),
-                 ("duplicate_invoice", "in_period_copy")]:
+                 ("duplicate_invoice", "in_period_copy"), ("period_cutoff_error", "next_period_payment_booked")]:
         assert need in seen, need
 
 
@@ -256,7 +256,9 @@ def _mi_bits(counter):
 
 def test_categorical_fields_carry_no_label_signal(cfg):
     """Взаимная информация «поле документа ↔ затронут ошибкой» мала на 200 seed, и ни одно частое
-    значение поля не является «гарантированно безопасным» (0 ошибок при ≥100 появлениях)."""
+    значение заметки не является «безопасным» (доля ошибок < 1/5 средней при ≥200 появлениях).
+    Структурные исключения законны: у предоплаты нет remittance-строк, поэтому allocation-ошибки
+    у неё невозможны по определению; это учитывается только через общий порог MI."""
     from collections import Counter
     from auditenv.common.drbg import DRBG
     rng = DRBG(b"mi-test")
@@ -280,7 +282,39 @@ def test_categorical_fields_carry_no_label_signal(cfg):
                 fields["has_po"][(bool(d["po_number"]), lab)] += 1
     for name, c in fields.items():
         assert _mi_bits(c) < 0.01, (name, _mi_bits(c))
-        if name == "note_fx" or name == "note":
+        if name == "note":
+            overall = sum(v for (x, y), v in c.items() if y) / sum(c.values())
             for v in {x for x, _ in c}:
-                if c[(v, True)] + c[(v, False)] >= 100:
-                    assert c[(v, True)] > 0, (name, v)  # нет «безопасной» заметки
+                n = c[(v, True)] + c[(v, False)]
+                if n >= 200:  # нет «безопасной» заметки: доля ошибок не ниже 1/5 средней
+                    assert c[(v, True)] / n >= 0.2 * overall, (name, v, c[(v, True)], n)
+
+
+def test_minute_offsets_and_jpy_base(cfg):
+    """P2: компании со смещением с минутами (+05:30/+05:45/-09:30) и base=JPY (экспонента 0) корректны."""
+    seen = set()
+    for seed in range(120):
+        ep = generate_episode(40_000 + seed, cfg)
+        tz = json.loads(ep.public["manifest.json"])["timezone"]
+        if tz[-2:] != "00":
+            seen.add(tz)
+            assert validate_episode(ep.public, ep.truth, ep.provenance)["ok"]
+    assert seen, "нет ни одной компании со смещением с минутами"
+    dev = json.loads((ROOT / "configs" / "splits" / "dev.json").read_text())
+    assert any(e["overrides"].get("currencies", {}).get("base") == ["JPY"] for e in dev["episodes"])
+    jp = [e for e in json.loads((ROOT / "episodes" / "dev" / "index.json").read_text())
+          if json.loads((ROOT / "episodes" / e["ref"] / "manifest.json").read_text())["base_currency"] == "JPY"]
+    assert jp
+
+
+def test_payment_cutoff_variant_validates(cfg):
+    c = only(cfg, period_cutoff_error=3)
+    hits = 0
+    for seed in range(30):
+        ep = generate_episode(seed, c)
+        pays = [m for m in ep.provenance["mutations"] if m["variant"].startswith("next_period_payment_booked")]
+        hits += len(pays)
+        for m in pays:
+            assert m["issue"]["affected_ids"][0].startswith("PAY-")
+        assert validate_episode(ep.public, ep.truth, ep.provenance)["ok"]
+    assert hits > 0

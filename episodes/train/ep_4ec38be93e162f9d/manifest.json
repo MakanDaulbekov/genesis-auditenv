@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Nord Systems Co",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 125,
+    "fx_rows": 565,
+    "invoices": 61,
+    "ledger_rows": 659,
+    "payments": 64
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_4ec38be93e162f9d",
+  "files": {
+    "documents.jsonl": "ed7b9403cbad1f899f721e62584d046671be9a8cb4932c437c63642ac30f9d11",
+    "fx.csv": "f341b2d6eca6906f05e5f044fbb6ff75a38db2e9310792b8982ebf12a3355e62",
+    "invoices.jsonl": "fbc690efec4d4d3131297be886b4c5cf4b8c7f2c537291d43008c0402ca75cba",
+    "ledger.csv": "3549e2ef6341dfa7e0bccc60df08b9343251d1f27bb3631abc0aa9e20eb4d337",
+    "payments.jsonl": "31117d0f9fcef49e330e97fbd5ceafb1c4eadc5522a1a7a2160eaa01ffdbb3cb",
+    "policy.json": "b0afcb97d6f017fc109e95fc61e7d0bc674684899f7857b11261ec2e66a3f1db"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-02-28",
+  "period_start": "2033-02-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-05:00"
+}

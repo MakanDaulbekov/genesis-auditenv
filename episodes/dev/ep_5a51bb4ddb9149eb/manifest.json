@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Riviera Energy JSC",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 82,
+    "fx_rows": 580,
+    "invoices": 46,
+    "ledger_rows": 547,
+    "payments": 36
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_5a51bb4ddb9149eb",
+  "files": {
+    "documents.jsonl": "f4d2fcccc17d83ba8e3dd592fac805404ace08c62d3f9c2a26a6ace9802d7e2c",
+    "fx.csv": "2047291a13d9a3fa46be876efddb8379d30a24704399b473c8be99202b5a4b00",
+    "invoices.jsonl": "9721a40d193759efd6f08810def277e649828ec8b0ade1ae8ace213e99c19da6",
+    "ledger.csv": "72803dd49b8702397764d9a68ca42cba5d2c8264f0be7a68c3b23616cd1c328f",
+    "payments.jsonl": "eaef3fb8a7d9e6bafd3e3ab2f1d1cc1ea955b8e4bfb140f6624994c12edb7011",
+    "policy.json": "f9a6bbc05f51b050999699348e47a1c0d103db23d8482b39a03076aff0f8f390"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-01-31",
+  "period_start": "2031-01-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+05:45"
+}

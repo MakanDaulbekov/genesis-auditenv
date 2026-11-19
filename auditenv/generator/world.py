@@ -32,7 +32,8 @@ POLICY_VERSION = "1.0"
 
 USD_VALUE = {"USD": "1", "EUR": "1.085", "GBP": "1.27", "CHF": "1.12", "KZT": "0.0021", "JPY": "0.0067"}
 PRICE_MULT = {"USD": 1, "EUR": 1, "GBP": 1, "CHF": 1, "KZT": 480, "JPY": 150}
-OFFSETS = ["+05:00", "+06:00", "+03:00", "+01:00", "+00:00", "-03:00", "-05:00", "+09:00", "+04:00", "-08:00"]
+OFFSETS = ["+05:00", "+06:00", "+03:00", "+01:00", "+00:00", "-03:00", "-05:00", "+09:00", "+04:00", "-08:00",
+           "+05:30", "+05:45", "-09:30"]  # смещения с минутами — частая ловушка cutoff
 EXPENSE_ACCOUNTS = ["expense:rent", "expense:salaries", "expense:utilities", "expense:software",
                     "expense:travel", "expense:office"]
 LINE_DESCRIPTIONS = ["Consulting hours", "Cloud hosting plan", "Support subscription", "Hardware lease",
@@ -450,6 +451,21 @@ def build_world(key: bytes, cfg: dict) -> dict:
         world["distractors"].append({"kind": "prepayment" if len(ids_) == 1 else "prepayment_refunded",
                                      "ids": sorted(ids_)})
 
+    # --- отвлекающее: предоплаты, полученные уже в СЛЕДУЮЩЕМ периоде (видны, но в книгу не проводятся);
+    #     часть из них «наивно» датирована последним днём периода
+    for _ in range(_rand_range(rng, cfg["distractors"].get("next_prepayments", 0))):
+        for _try in range(40):
+            eid = rng.choice(customers)
+            ent = world["entities"][eid]
+            t = rand_instant(end_dt + timedelta(minutes=1), end_dt + timedelta(hours=14))
+            if rng.randint(0, 1) == 0 or naive_date(format_ts(t, ent["offset"])) <= p_end:
+                ccy = ent["currency"]
+                e = CURRENCY_EXPONENTS[ccy]
+                amt = rng.randint(100 * PRICE_MULT[ccy] * 10**e, 6000 * PRICE_MULT[ccy] * 10**e)
+                pid = new_payment(eid, t, ccy, amt, None, [], "Advance payment under contract", "next_prepayment")
+                world["distractors"].append({"kind": "next_period_prepayment_not_booked", "ids": [pid]})
+                break
+
     # --- расходы (шум книги)
     for n in range(_rand_range(rng, size["n_expenses"])):
         vid = rng.choice(vendors)
@@ -550,6 +566,8 @@ def post_all(world: dict) -> list[dict]:
         bk = world["bookings"]["payment"].get(pid, {})
         if bk.get("post_as", "post") == "skip":
             continue
+        if p["_kind"] == "next_prepayment" and bk.get("post_as") != "post":
+            continue  # поступление следующего периода в книгу этого периода не проводится
         ts = bk.get("ledger_ts") or format_ts(parse_ts(p["timestamp"]), tz)
         own_d = local_date(p["timestamp"], tz)
         eid = p["payer_entity_id"]

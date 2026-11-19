@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Helio Textiles S.A.",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 109,
+    "fx_rows": 575,
+    "invoices": 63,
+    "ledger_rows": 700,
+    "payments": 46
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_7c609c9a4771e31a",
+  "files": {
+    "documents.jsonl": "2331012679d63ce6d90c3681db451b6b3f183abefa86680420487f1a2342af75",
+    "fx.csv": "4effb5d0a96466e42698c0de91130db647e6bd40268a8bdfb662c92edd8caf71",
+    "invoices.jsonl": "6a6d0ac56f49ea8710502869738c65d41e8ab5a4faf04e5257e77613005aadb3",
+    "ledger.csv": "d085356963aa90e9d7b8298f7b5da56c5a5456f63a840b1fd16839450f423959",
+    "payments.jsonl": "23bfcef5a7ca31d3a3019200cdc98c63fdf36b79e7ecc060c1c522faeb8d6176",
+    "policy.json": "ebc207bba3b5f2119a5817fee1be35ff4abd5e5c706dc6136ddac7f394b2c712"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-09-30",
+  "period_start": "2034-09-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+03:00"
+}

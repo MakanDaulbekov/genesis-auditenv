@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Ember Build Co",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 136,
+    "fx_rows": 580,
+    "invoices": 74,
+    "ledger_rows": 711,
+    "payments": 62
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_eafb9ec40f59df66",
+  "files": {
+    "documents.jsonl": "ad235e3e168713422b1c72ab53634237d28a26814d885bc68fd1eedf9d72e528",
+    "fx.csv": "2949db24b4c97a7490c1711252fe7c470b142ea08d331c6df2d71413bb665aab",
+    "invoices.jsonl": "d632bd36236160759d0e18aabcb22e7ffb8899121500abc0acc10dcd9e389212",
+    "ledger.csv": "4944011936a6bf205d5f25b0b041a4263a19e9fd7eb966fee2fda19b82db4eb8",
+    "payments.jsonl": "919516a68d443b4de7cb4beb674bdc0032e4d5987ad5a01bf9ebb57e69decdb9",
+    "policy.json": "8501ed549d74a8e427fae7d0d2e466500ff29b37406f1f62b884580ae23f6404"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-01-31",
+  "period_start": "2031-01-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+03:00"
+}

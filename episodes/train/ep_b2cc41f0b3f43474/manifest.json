@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Helio Build GmbH",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 99,
+    "fx_rows": 580,
+    "invoices": 50,
+    "ledger_rows": 536,
+    "payments": 49
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_b2cc41f0b3f43474",
+  "files": {
+    "documents.jsonl": "e25f0ff0c1a4076c2ad42434c5377132f069df09f4330ac4cd1860591a535db4",
+    "fx.csv": "8f050a64dffc8de1f7d042492f05d727ae917ad4a3557d19b72deaec4e78eb38",
+    "invoices.jsonl": "38206beb27d08d47f478512f96a7c3b73b0f75ea54087604717c6e250c95641c",
+    "ledger.csv": "c4d96359955daf29e3addc07468b40c342007a808a28d208c08809a2ff066181",
+    "payments.jsonl": "f82c11fc1e3277b7e4d6305dbe791bb18741ea6545f4c35d297055c8bef2c521",
+    "policy.json": "b207052cad8ce1c5ad726bbd382299937a6d87f4e29db60fc936d30bab29ba8c"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-07-31",
+  "period_start": "2034-07-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+05:00"
+}

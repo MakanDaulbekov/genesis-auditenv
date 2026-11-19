@@ -253,14 +253,18 @@ def fx_wrong_date_or_rate(world: dict, rng: DRBG, params: dict) -> dict:
 # ----------------------------------------------------------------------------- cutoff
 
 def period_cutoff_error(world: dict, rng: DRBG, params: dict) -> dict:
-    """Документ другого периода проведён в этом (момент документа вне периода по времени компании)."""
+    """Документ другого периода проведён в этом (момент документа вне периода по времени компании).
+
+    Варианты: счёт следующего периода; счёт прошлого периода, проведённый как новый; поступление
+    (предоплата) следующего периода, проведённое в этом.
+    """
     tz = world["company"]["timezone"]
     base = world["company"]["base_currency"]
     start, end = _period(world)
     touched = _touched(world)
     excl = touched  # отвлекающие случаи у границы периода тоже могут стать ошибкой
     only = params.get("only_invoice_id")
-    variants = params.get("variants") or ["next_period_booked", "prior_period_booked"]
+    variants = params.get("variants") or ["next_period_booked", "prior_period_booked", "next_period_payment_booked"]
     cands = []
     for iid in sorted(world["invoices"]):
         inv = world["invoices"][iid]
@@ -273,31 +277,52 @@ def period_cutoff_error(world: dict, rng: DRBG, params: dict) -> dict:
                 cands.append(("next_period_booked", iid))
         elif inv["_kind"] == "prior" and "prior_period_booked" in variants:
             cands.append(("prior_period_booked", iid))
+    if not only and "next_period_payment_booked" in variants:
+        for pid in sorted(world["payments"]):
+            if world["payments"][pid]["_kind"] == "next_prepayment" and pid not in excl:
+                cands.append(("next_period_payment_booked", pid))
     if not cands:
         raise GenerationError("no cutoff candidates")
+
+    def doc_ts(c):
+        return world["payments"][c[1]]["timestamp"] if c[0] == "next_period_payment_booked" \
+            else world["invoices"][c[1]]["issued_at"]
+
     # в половине случаев предпочитаем ловушку часового пояса: наивная дата документа внутри периода
-    tz_trap = [c for c in cands if start <= datetime.fromisoformat(world["invoices"][c[1]]["issued_at"][:19] + tz) < end]
+    tz_trap = [c for c in cands if start <= datetime.fromisoformat(doc_ts(c)[:19] + tz) < end]
     pool = tz_trap if tz_trap and rng.randint(0, 1) == 1 else cands
-    variant, iid = rng.choice(pool)
-    inv = world["invoices"][iid]
-    t = parse_ts(inv["issued_at"])
+    variant, ident = rng.choice(pool)
+    ts = doc_ts((variant, ident))
     # «наивная» интерпретация: настенное время документа считается временем компании
-    naive = datetime.fromisoformat(inv["issued_at"][:19] + tz)
+    naive = datetime.fromisoformat(ts[:19] + tz)
     if start <= naive < end:
         ledger_t = naive
         how = "timezone_ignored"
-    elif variant == "next_period_booked":
+    elif variant != "prior_period_booked":
         ledger_t = end - timedelta(seconds=rng.randint(60, 6 * 3600))
         how = "accrued_at_period_close"
     else:
         ledger_t = start + timedelta(seconds=rng.randint(60, 6 * 3600))
         how = "booked_at_period_open"
     ledger_ts = format_ts(ledger_t, tz)
+    touched.add(ident)
+    if variant == "next_period_payment_booked":
+        p = world["payments"][ident]
+        before = deepcopy(world["bookings"]["payment"].get(ident, {}))
+        world["bookings"]["payment"][ident] = dict(before, post_as="post", ledger_ts=ledger_ts)
+        amount = to_base(world, abs(p["amount_minor"]), p["currency"], local_date(ts, tz))
+        issue = _issue(world, "period_cutoff_error", [ident], amount, base,
+                       [[ident, rid(world, ident, "bank")]], params.get("group"))
+        return {"type": "period_cutoff_error", "variant": f"{variant}:{how}",
+                "cause": {"payment_id": ident, "document_instant": ts, "before": {"posting": None},
+                          "after": {"posting": "receipt", "ledger_timestamp": ledger_ts}},
+                "issue": issue}
+    iid = ident
+    inv = world["invoices"][iid]
     before = deepcopy(world["bookings"]["invoice"].get(iid, {}))
     world["bookings"]["invoice"][iid] = dict(before, post_as="issue", ledger_ts=ledger_ts)
     amount = booked_base(world, inv["total_minor"], inv["currency"], world["bookings"]["invoice"][iid],
                          local_date(inv["issued_at"], tz))
-    touched.add(iid)
     issue = _issue(world, "period_cutoff_error", [iid], amount, base,
                    [[iid, rid(world, iid, "ar")], [iid, rid(world, iid, "rev")]], params.get("group"))
     return {"type": "period_cutoff_error", "variant": f"{variant}:{how}",

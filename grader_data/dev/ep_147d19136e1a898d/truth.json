@@ -1,0 +1,218 @@
+{
+  "episode_id": "ep_147d19136e1a898d",
+  "interactions": [
+    {
+      "group": "G1",
+      "issue_ids": [
+        "ISS-6V52GE4S",
+        "ISS-X9SPZLC8"
+      ],
+      "n_issues": 2,
+      "scenario": "duplicate_cutoff"
+    }
+  ],
+  "issues": [
+    {
+      "affected_ids": [
+        "INV-NB97HSJ",
+        "PAY-KD5R28B"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-NB97HSJ",
+          "PAY-KD5R28B",
+          "R-XWWQCYTQ7"
+        ]
+      ],
+      "expected_amount_minor": 1339200000,
+      "interaction_group": null,
+      "issue_id": "ISS-2KZP2K7V",
+      "type": "missing_or_partial_allocation"
+    },
+    {
+      "affected_ids": [
+        "INV-DKC75PS"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-DKC75PS",
+          "R-3JJXXNBM2",
+          "fx:2031-07-27:USD:KZT"
+        ],
+        [
+          "INV-DKC75PS",
+          "R-YAR5QFF6X",
+          "fx:2031-07-27:USD:KZT"
+        ]
+      ],
+      "expected_amount_minor": 1852395,
+      "interaction_group": null,
+      "issue_id": "ISS-5FEDDB4E",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-2HSD6QX"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-2HSD6QX",
+          "R-H9VJYFVUK"
+        ],
+        [
+          "INV-2HSD6QX",
+          "R-XHE2Y6EAZ"
+        ]
+      ],
+      "expected_amount_minor": 440478356,
+      "interaction_group": "G1",
+      "issue_id": "ISS-6V52GE4S",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "PAY-MSMPLA5"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "PAY-MSMPLA5",
+          "R-68L7LF73Q",
+          "fx:2031-07-27:EUR:KZT"
+        ]
+      ],
+      "expected_amount_minor": 1305511870,
+      "interaction_group": null,
+      "issue_id": "ISS-ESVSAQPY",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-HVV79DS",
+        "INV-KQWMYYV"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-HVV79DS",
+          "INV-KQWMYYV",
+          "R-94VYQDDXN"
+        ],
+        [
+          "INV-HVV79DS",
+          "INV-KQWMYYV",
+          "R-KA43KBGK7"
+        ],
+        [
+          "INV-HVV79DS",
+          "INV-KQWMYYV",
+          "R-KH5SNR7DZ"
+        ],
+        [
+          "INV-HVV79DS",
+          "INV-KQWMYYV",
+          "R-ZJHMJWD24"
+        ]
+      ],
+      "expected_amount_minor": 2666894,
+      "interaction_group": null,
+      "issue_id": "ISS-FLEBPGJZ",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-YYGM4QJ"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-YYGM4QJ",
+          "R-CPSYUD53J"
+        ],
+        [
+          "INV-YYGM4QJ",
+          "R-WDQDM8XFK"
+        ]
+      ],
+      "expected_amount_minor": 1936469796,
+      "interaction_group": null,
+      "issue_id": "ISS-GHB9FWBK",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "INV-NXS7WCX",
+        "PAY-QDABVWE"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-NXS7WCX",
+          "PAY-QDABVWE",
+          "R-GYZA9U9W9"
+        ]
+      ],
+      "expected_amount_minor": 1134103916,
+      "interaction_group": null,
+      "issue_id": "ISS-KYHBGAC9",
+      "type": "missing_or_partial_allocation"
+    },
+    {
+      "affected_ids": [
+        "INV-4V3B4FW"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-4V3B4FW",
+          "R-WYVXV3PHQ"
+        ],
+        [
+          "INV-4V3B4FW",
+          "R-Z9GV5SKXW"
+        ]
+      ],
+      "expected_amount_minor": 2647734504,
+      "interaction_group": null,
+      "issue_id": "ISS-V2XXCSY9",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "INV-2HSD6QX",
+        "INV-TAFEYJB"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-2HSD6QX",
+          "INV-TAFEYJB",
+          "R-AXLWUGZH7"
+        ],
+        [
+          "INV-2HSD6QX",
+          "INV-TAFEYJB",
+          "R-H9VJYFVUK"
+        ],
+        [
+          "INV-2HSD6QX",
+          "INV-TAFEYJB",
+          "R-XHE2Y6EAZ"
+        ],
+        [
+          "INV-2HSD6QX",
+          "INV-TAFEYJB",
+          "R-Z8XT3E84W"
+        ]
+      ],
+      "expected_amount_minor": 865050,
+      "interaction_group": "G1",
+      "issue_id": "ISS-X9SPZLC8",
+      "type": "duplicate_invoice"
+    }
+  ],
+  "schema_version": "1.0"
+}

@@ -1,0 +1,200 @@
+{
+  "episode_id": "ep_eafb9ec40f59df66",
+  "interactions": [
+    {
+      "group": "G1",
+      "issue_ids": [
+        "ISS-6KNQLNHR",
+        "ISS-XDBHEE46"
+      ],
+      "n_issues": 2,
+      "scenario": "duplicate_cutoff"
+    },
+    {
+      "group": "G2",
+      "issue_ids": [
+        "ISS-2PZ68EWH",
+        "ISS-866HGAH7"
+      ],
+      "n_issues": 2,
+      "scenario": "partial_fx_boundary"
+    }
+  ],
+  "issues": [
+    {
+      "affected_ids": [
+        "INV-ZTKKHNA",
+        "PAY-5Q7REMY"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-ZTKKHNA",
+          "PAY-5Q7REMY",
+          "R-QJ92NG5JJ"
+        ]
+      ],
+      "expected_amount_minor": 397080,
+      "interaction_group": "G2",
+      "issue_id": "ISS-2PZ68EWH",
+      "type": "missing_or_partial_allocation"
+    },
+    {
+      "affected_ids": [
+        "INV-ESPUFJK",
+        "INV-P27DGWB"
+      ],
+      "currency": "CHF",
+      "evidence_sets": [
+        [
+          "INV-ESPUFJK",
+          "INV-P27DGWB",
+          "R-5CGGKJN22"
+        ],
+        [
+          "INV-ESPUFJK",
+          "INV-P27DGWB",
+          "R-5M7RG9B8N"
+        ],
+        [
+          "INV-ESPUFJK",
+          "INV-P27DGWB",
+          "R-NYTBPVT2L"
+        ],
+        [
+          "INV-ESPUFJK",
+          "INV-P27DGWB",
+          "R-SPTPF7J6U"
+        ]
+      ],
+      "expected_amount_minor": 4939519,
+      "interaction_group": null,
+      "issue_id": "ISS-5378BWPW",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-55DJY63"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-55DJY63",
+          "R-CCKX6BJ67"
+        ],
+        [
+          "INV-55DJY63",
+          "R-NRHW5KV5V"
+        ]
+      ],
+      "expected_amount_minor": 2887722,
+      "interaction_group": "G1",
+      "issue_id": "ISS-6KNQLNHR",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "PAY-5Q7REMY"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "PAY-5Q7REMY",
+          "R-DV8Z8YC6V",
+          "fx:2031-01-31:EUR:USD"
+        ]
+      ],
+      "expected_amount_minor": 4069,
+      "interaction_group": "G2",
+      "issue_id": "ISS-866HGAH7",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-623Q8NB",
+        "INV-HZJFF49"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-623Q8NB",
+          "INV-HZJFF49",
+          "R-93U9LJLV2"
+        ],
+        [
+          "INV-623Q8NB",
+          "INV-HZJFF49",
+          "R-9YEAZLMKF"
+        ],
+        [
+          "INV-623Q8NB",
+          "INV-HZJFF49",
+          "R-BTK99C22P"
+        ],
+        [
+          "INV-623Q8NB",
+          "INV-HZJFF49",
+          "R-CBCNGYCRB"
+        ]
+      ],
+      "expected_amount_minor": 2714854,
+      "interaction_group": null,
+      "issue_id": "ISS-VKUZ4HS4",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-55DJY63",
+        "INV-8WTRZR4"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-55DJY63",
+          "INV-8WTRZR4",
+          "R-7FL6CMRU7"
+        ],
+        [
+          "INV-55DJY63",
+          "INV-8WTRZR4",
+          "R-CCKX6BJ67"
+        ],
+        [
+          "INV-55DJY63",
+          "INV-8WTRZR4",
+          "R-NRHW5KV5V"
+        ],
+        [
+          "INV-55DJY63",
+          "INV-8WTRZR4",
+          "R-PVLCJKET2"
+        ]
+      ],
+      "expected_amount_minor": 2887722,
+      "interaction_group": "G1",
+      "issue_id": "ISS-XDBHEE46",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-2QWR8N8"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-2QWR8N8",
+          "R-3J9KECGZ6"
+        ],
+        [
+          "INV-2QWR8N8",
+          "R-FNMLF2UBZ"
+        ]
+      ],
+      "expected_amount_minor": 1639895,
+      "interaction_group": null,
+      "issue_id": "ISS-Y74CSQAP",
+      "type": "period_cutoff_error"
+    }
+  ],
+  "schema_version": "1.0"
+}

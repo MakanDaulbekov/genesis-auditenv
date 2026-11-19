@@ -254,3 +254,26 @@ def test_invalid_findings_logged_by_grader(grader, cfg):
     env.step(act("submit", findings={"episode_id": "wrong", "findings": []}))
     lines = [json.loads(l) for l in grader.log_path.read_text(encoding="utf-8").splitlines()]
     assert any(l["event"] == "invalid_findings" and l["error"] == "episode_id mismatch" for l in lines)
+
+
+def test_list_records_defaults_documented_and_work(env, cfg):
+    """P2: cursor и limit необязательны (с начала, 50 строк); лишние аргументы отклоняются."""
+    obs, _ = env.reset(seed=5, config=cfg)
+    tool = next(t for t in obs["result"]["tools"] if t["action"] == "list_records")
+    assert "по умолчанию 50" in tool["args"]["limit"] and "с начала" in tool["args"]["cursor"]
+    o, *_ = env.step(act("list_records", table="ledger"))
+    o2, *_ = env.step(act("list_records", table="ledger", cursor=None, limit=50))
+    assert o["error"] is None and len(o["result"]["records"]) == 50 and o["result"] == o2["result"]
+    o3, *_ = env.step(act("list_records", table="ledger", offset=10))
+    assert o3["error"]["code"] == "invalid_arguments"
+
+
+def test_fx_records_carry_fx_id(env, cfg):
+    """P2: каждая строка fx из инструментов содержит fx_id — готовый ID доказательства."""
+    env.reset(seed=5, config=cfg)
+    o, *_ = env.step(act("list_records", table="fx", limit=10))
+    for r in o["result"]["records"]:
+        assert check(r, "fx_record") == []
+        assert r["fx_id"] == f"fx:{r['date']}:{r['source_currency']}:{r['target_currency']}"
+        o2, *_ = env.step(act("get_record", table="fx", id=r["fx_id"]))
+        assert o2["result"]["record"] == r

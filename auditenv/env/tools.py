@@ -27,9 +27,11 @@ ACTION_ARGS = {
 }
 
 TOOLS_DESCRIPTION = [
-    {"action": "list_records", "args": {"table": "ledger|invoices|payments|fx", "cursor": "str|null",
-                                        "limit": "int 1..50 (default 50)"},
-     "returns": "{table, records, next_cursor}"},
+    {"action": "list_records", "args": {"table": "ledger|invoices|payments|fx (обязателен)",
+                                        "cursor": "str|null — необязателен; null/нет = с начала таблицы",
+                                        "limit": "int 1..50 — необязателен; по умолчанию 50"},
+     "returns": "{table, records, next_cursor}; next_cursor=null — конец таблицы; строки fx содержат fx_id",
+     "notes": "лишние аргументы -> invalid_arguments"},
     {"action": "get_record", "args": {"table": "ledger|invoices|payments|fx",
                                       "id": "row_id | invoice_id/doc_id | payment_id/doc_id | fx:<date>:<src>:<tgt>"},
      "returns": "{table, record}"},

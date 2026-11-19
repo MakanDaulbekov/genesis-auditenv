@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Orbita Energy Co",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 83,
+    "fx_rows": 575,
+    "invoices": 43,
+    "ledger_rows": 354,
+    "payments": 40
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_1652303e9d2ccb94",
+  "files": {
+    "documents.jsonl": "f4d6765c1448018cb9e7c865eb879b3d3e8bceb4228f0471a0af262b1a1004e3",
+    "fx.csv": "60cdf6354dfba2a3cb3181d75d74d91ac10c679fea081362316e71462da0635d",
+    "invoices.jsonl": "a759f402bfa94f89b8911f3301df9168e8bd666e282a84d603241ff4aeea3995",
+    "ledger.csv": "8b0c400d02e4a24f1983e53e28693ef4431c10e78938c7446f4dd318e132c372",
+    "payments.jsonl": "6c9cbe744d12257f60fb8bbcd602277fe9e596b177eef6166151fbcfbd67d85c",
+    "policy.json": "678f666fa203a69bd5e2ee9ec65b4123603a41e0456c603babd25b96b9672db0"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-11-30",
+  "period_start": "2034-11-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+05:00"
+}
