@@ -1,0 +1,95 @@
+{
+  "episode_id": "ep_2b4302dff5754794",
+  "interactions": [],
+  "issues": [
+    {
+      "affected_ids": [
+        "PAY-PV9B57R"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "PAY-PV9B57R",
+          "R-RZAPNWLLY",
+          "fx:2031-11-26:EUR:USD"
+        ]
+      ],
+      "expected_amount_minor": 892,
+      "interaction_group": null,
+      "issue_id": "ISS-8362BRCF",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-MYED2FF",
+        "INV-WMZBYC3"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-MYED2FF",
+          "INV-WMZBYC3",
+          "R-4UZK6US6K"
+        ],
+        [
+          "INV-MYED2FF",
+          "INV-WMZBYC3",
+          "R-JCNPC8QW6"
+        ],
+        [
+          "INV-MYED2FF",
+          "INV-WMZBYC3",
+          "R-R6E5H2EP9"
+        ],
+        [
+          "INV-MYED2FF",
+          "INV-WMZBYC3",
+          "R-U9M29K6ZL"
+        ]
+      ],
+      "expected_amount_minor": 494301,
+      "interaction_group": null,
+      "issue_id": "ISS-JFYAAZFG",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-WBM9GUG"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-WBM9GUG",
+          "R-5L7ZG4KLL"
+        ],
+        [
+          "INV-WBM9GUG",
+          "R-9PXLEVFDG"
+        ]
+      ],
+      "expected_amount_minor": 4480831,
+      "interaction_group": null,
+      "issue_id": "ISS-MKWP9GTV",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "INV-WZQ9T4J",
+        "PAY-ULXCRZC"
+      ],
+      "currency": "USD",
+      "evidence_sets": [
+        [
+          "INV-WZQ9T4J",
+          "PAY-ULXCRZC",
+          "R-YRC24M9TF"
+        ]
+      ],
+      "expected_amount_minor": 3339642,
+      "interaction_group": null,
+      "issue_id": "ISS-TSKL74H7",
+      "type": "missing_or_partial_allocation"
+    }
+  ],
+  "schema_version": "1.0"
+}

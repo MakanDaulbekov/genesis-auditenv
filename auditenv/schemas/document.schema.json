@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "customer_name": {
+          "type": "string"
+        },
+        "doc_id": {
+          "$ref": "#/$defs/id"
+        },
+        "doc_type": {
+          "const": "invoice"
+        },
+        "memo": {
+          "type": "string"
+        },
+        "po_number": {
+          "type": "string"
+        },
+        "record": {
+          "additionalProperties": false,
+          "properties": {
+            "currency": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            "doc_id": {
+              "$ref": "#/$defs/id"
+            },
+            "due_at": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+              "type": "string"
+            },
+            "entity_id": {
+              "$ref": "#/$defs/id"
+            },
+            "invoice_id": {
+              "$ref": "#/$defs/id"
+            },
+            "issued_at": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+              "type": "string"
+            },
+            "line_items": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_minor": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "description": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "service_period_end": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "type": "string"
+                  },
+                  "service_period_start": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "type": "string"
+                  },
+                  "unit_price_minor": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "description",
+                  "quantity",
+                  "unit_price_minor",
+                  "amount_minor",
+                  "service_period_start",
+                  "service_period_end"
+                ],
+                "type": "object"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            },
+            "total_minor": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "doc_id",
+            "invoice_id",
+            "entity_id",
+            "issued_at",
+            "due_at",
+            "currency",
+            "total_minor",
+            "line_items"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "doc_type",
+        "doc_id",
+        "record",
+        "customer_name",
+        "po_number",
+        "memo"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "bank_reference": {
+          "type": "string"
+        },
+        "doc_id": {
+          "$ref": "#/$defs/id"
+        },
+        "doc_type": {
+          "const": "payment"
+        },
+        "payer_entity_id": {
+          "$ref": "#/$defs/id"
+        },
+        "payer_name": {
+          "type": "string"
+        },
+        "record": {
+          "additionalProperties": false,
+          "properties": {
+            "amount_minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            "doc_id": {
+              "$ref": "#/$defs/id"
+            },
+            "invoice_refs": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "amount_minor": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "invoice_id": {
+                        "$ref": "#/$defs/id"
+                      }
+                    },
+                    "required": [
+                      "invoice_id",
+                      "amount_minor"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 10,
+                  "minItems": 1,
+                  "type": "array"
+                }
+              ]
+            },
+            "payment_id": {
+              "$ref": "#/$defs/id"
+            },
+            "timestamp": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "doc_id",
+            "payment_id",
+            "timestamp",
+            "currency",
+            "amount_minor",
+            "invoice_refs"
+          ],
+          "type": "object"
+        },
+        "refund_of": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/id"
+            }
+          ]
+        },
+        "remittance": {
+          "additionalProperties": false,
+          "properties": {
+            "lines": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_minor": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "invoice_id": {
+                    "$ref": "#/$defs/id"
+                  }
+                },
+                "required": [
+                  "invoice_id",
+                  "amount_minor"
+                ],
+                "type": "object"
+              },
+              "maxItems": 10,
+              "type": "array"
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "lines",
+            "note"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "doc_type",
+        "doc_id",
+        "record",
+        "payer_entity_id",
+        "payer_name",
+        "bank_reference",
+        "remittance",
+        "refund_of"
+      ],
+      "type": "object"
+    }
+  ]
+}

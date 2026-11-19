@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Lumen Media Ltd",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 114,
+    "fx_rows": 580,
+    "invoices": 62,
+    "ledger_rows": 467,
+    "payments": 52
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_a98ba95e78452fd4",
+  "files": {
+    "documents.jsonl": "b51b86ffe30d64e2e01b74a9a9e237d149f5e38e08d77fc105ca84ae829cfebd",
+    "fx.csv": "0be4deebe168fbd5bd8503f278c7f6bed3af292ce5f86957fa1882d5ab22ce78",
+    "invoices.jsonl": "f20edf55b06bad126d19050018b26b6407a5d8ef0da022cf2bed77cfd9c53442",
+    "ledger.csv": "f63dc952d0fbfa70b8d328ad00c7d6ab9307b655eb2e2622630d8bc88033142b",
+    "payments.jsonl": "61e887df8ff3b1a8fd99635ee263b4eecf60c67816da49770f09f4d044c0f730",
+    "policy.json": "c9fa46a40d99476c5987fc270d636ae3e5adb9bbc7f6cc5e91454be68a1d388c"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-05-31",
+  "period_start": "2033-05-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-05:00"
+}

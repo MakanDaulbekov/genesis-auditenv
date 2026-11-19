@@ -1,0 +1,67 @@
+{
+  "$defs": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "amount_minor": {
+      "type": "integer"
+    },
+    "currency": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "doc_id": {
+      "$ref": "#/$defs/id"
+    },
+    "invoice_refs": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "amount_minor": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "invoice_id": {
+                "$ref": "#/$defs/id"
+              }
+            },
+            "required": [
+              "invoice_id",
+              "amount_minor"
+            ],
+            "type": "object"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "type": "array"
+        }
+      ]
+    },
+    "payment_id": {
+      "$ref": "#/$defs/id"
+    },
+    "timestamp": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "doc_id",
+    "payment_id",
+    "timestamp",
+    "currency",
+    "amount_minor",
+    "invoice_refs"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Saryn Pharma Inc",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 114,
+    "fx_rows": 580,
+    "invoices": 66,
+    "ledger_rows": 513,
+    "payments": 48
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_cc500baf524c2b8b",
+  "files": {
+    "documents.jsonl": "48c3c4fbbc5b7e3386b7091d6f26ec0a588ed93b27576bb05e582872a5def01b",
+    "fx.csv": "d1b2a22f9f13381518ebfc7d6c8c0cb2532a8535c6cac985f11d03b801b351a0",
+    "invoices.jsonl": "33cafdf32e45c7ef0fb6c7b3158a59996d45ff8a11d3de6402672feefd55a1cd",
+    "ledger.csv": "ea5de2386d2c309672c11ef9531326a215c9a3cedd696470944ee7e1ddd60c12",
+    "payments.jsonl": "b72d22a616be86c85880b056fc73477ad7abc6218de055ddd3c17b8b6fa23921",
+    "policy.json": "2be8c94eb2e880bf4b778a2df8dfee30f32ae2f9a9a9627f5d3ca7f3812f8826"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-10-31",
+  "period_start": "2031-10-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+04:00"
+}

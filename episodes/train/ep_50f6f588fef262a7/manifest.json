@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Altyn Labs Co",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 124,
+    "fx_rows": 575,
+    "invoices": 70,
+    "ledger_rows": 635,
+    "payments": 54
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_50f6f588fef262a7",
+  "files": {
+    "documents.jsonl": "c8a6b9a8be27ad43d729af169f2516790a0c54820e1eee9c1f255efc4f0ce88b",
+    "fx.csv": "ca210d88142c856b105397387d8c659472a76d07f6bfe6a43fa57ad9da96e5e5",
+    "invoices.jsonl": "0e82d377332136f27d7c4dc949fe7790c4a07a732ad4f6464d87281bbf2afe07",
+    "ledger.csv": "cc75d1a8e1dc75c4c0ebe419a5ed7d208b8e62ee530a212fa39118240d52a7b7",
+    "payments.jsonl": "7901d36cba6ee1bff914dcd0b9561d7c81f564f17d2fc0f945815f644cbb0c28",
+    "policy.json": "0986f284439a263eda2c838f4c5df85b343342d9e1934596eed42e500cbe32eb"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2030-04-30",
+  "period_start": "2030-04-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+01:00"
+}

@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Zhibek Systems S.A.",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 95,
+    "fx_rows": 580,
+    "invoices": 52,
+    "ledger_rows": 391,
+    "payments": 43
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_06155a7267fcb1c8",
+  "files": {
+    "documents.jsonl": "d7fb839def092333683ab7be21f2f1d30d3612c22078f9e82748afd2667991ec",
+    "fx.csv": "4ee5b8534832d360fd5e9661ab8f488481e16754860b0ef6daa3120a1f296951",
+    "invoices.jsonl": "9174161b8811ecaf8ff447186685a29133dd769b6a5d82895ace75d0bdecbdd4",
+    "ledger.csv": "2da3dd3b5526f92c4b466a6f7dbb12e402b37d76874d43c1e51b5c974e7f9df7",
+    "payments.jsonl": "68ffe28dabd8a395e74b7fb6ca78f60b94b82078cd5a1e250357a84f1a620dee",
+    "policy.json": "9e7ed89b10f8cd985d0ced917e19d04ba92c275c11c79310621ac3b9b0e53f7c"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-05-31",
+  "period_start": "2034-05-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+00:00"
+}

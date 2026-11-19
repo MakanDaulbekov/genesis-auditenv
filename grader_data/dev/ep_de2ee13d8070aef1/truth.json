@@ -1,0 +1,87 @@
+{
+  "episode_id": "ep_de2ee13d8070aef1",
+  "interactions": [
+    {
+      "group": "G1",
+      "issue_ids": [
+        "ISS-FEVTN9R3",
+        "ISS-M4SXNJQS"
+      ],
+      "n_issues": 2,
+      "scenario": "duplicate_cutoff"
+    }
+  ],
+  "issues": [
+    {
+      "affected_ids": [
+        "PAY-487DQHZ"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "PAY-487DQHZ",
+          "R-YG74RR88W",
+          "fx:2033-09-23:USD:KZT"
+        ]
+      ],
+      "expected_amount_minor": 4522682,
+      "interaction_group": null,
+      "issue_id": "ISS-45SLX4FM",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-88573S3",
+        "INV-Y72RBD9"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-88573S3",
+          "INV-Y72RBD9",
+          "R-HGXBQZHP8"
+        ],
+        [
+          "INV-88573S3",
+          "INV-Y72RBD9",
+          "R-KBH6CHNJ7"
+        ],
+        [
+          "INV-88573S3",
+          "INV-Y72RBD9",
+          "R-NFFXRHZQV"
+        ],
+        [
+          "INV-88573S3",
+          "INV-Y72RBD9",
+          "R-P2V2PNCY3"
+        ]
+      ],
+      "expected_amount_minor": 3178039144,
+      "interaction_group": "G1",
+      "issue_id": "ISS-FEVTN9R3",
+      "type": "duplicate_invoice"
+    },
+    {
+      "affected_ids": [
+        "INV-88573S3"
+      ],
+      "currency": "KZT",
+      "evidence_sets": [
+        [
+          "INV-88573S3",
+          "R-HGXBQZHP8"
+        ],
+        [
+          "INV-88573S3",
+          "R-NFFXRHZQV"
+        ]
+      ],
+      "expected_amount_minor": 3178039144,
+      "interaction_group": "G1",
+      "issue_id": "ISS-M4SXNJQS",
+      "type": "period_cutoff_error"
+    }
+  ],
+  "schema_version": "1.0"
+}

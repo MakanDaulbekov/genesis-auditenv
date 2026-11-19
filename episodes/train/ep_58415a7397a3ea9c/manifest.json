@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Altyn Textiles Co",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 82,
+    "fx_rows": 575,
+    "invoices": 45,
+    "ledger_rows": 642,
+    "payments": 37
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_58415a7397a3ea9c",
+  "files": {
+    "documents.jsonl": "ad217b8d5986b4c4f1a01fbc63c2a58cd4e3cf56ecd70db9a6a763b2cc02cb8f",
+    "fx.csv": "b153f1ab537aef641a1975e9a1dd41b6e3dbfaca54830c33956e753e1f13fb75",
+    "invoices.jsonl": "54155a3aa8760c0141c27d521f6b335ceb7d956275fea86ca2e0427b851c4f40",
+    "ledger.csv": "33b5c19afc5368ac24d3b99042364db078692094fe12d6730d9a32735c764fbb",
+    "payments.jsonl": "7844b2ecfcac82c954271f0cb6d0af1d3a8b51d83b6bc14a5a8d80a55545ca53",
+    "policy.json": "3855a4537e8455f6f8ca822cfe25618b2b6943fed4b0464dbcf20f6edc3980ad"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2030-11-30",
+  "period_start": "2030-11-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+09:00"
+}

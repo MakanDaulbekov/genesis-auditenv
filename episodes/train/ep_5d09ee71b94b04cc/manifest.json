@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Ember Data JSC",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 155,
+    "fx_rows": 580,
+    "invoices": 78,
+    "ledger_rows": 614,
+    "payments": 77
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_5d09ee71b94b04cc",
+  "files": {
+    "documents.jsonl": "8f28e05bd587722c018b53cfce8eb44a87dd1ad836ca8b1cfe0806738137d335",
+    "fx.csv": "ba2b5fb0b4447e76fb3bcb22d400ee792e6e85579fd04ebb3f384240ee718956",
+    "invoices.jsonl": "08b50154c7111ecc07e848cd5ecd0cb582703852098de51812910654dc0fe268",
+    "ledger.csv": "b23dca30ee75afbe22798936e93c5990922addedd63edbb60fcbb0f7cdf7b4b9",
+    "payments.jsonl": "9a80050c8034a47418f0e0422c2862404acc75d4598300e0155f44c80bd2c3a2",
+    "policy.json": "5ac1587ad418af4c49df6e78008aecfebc83afef0397447a73a434c070351165"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2032-08-31",
+  "period_start": "2032-08-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+01:00"
+}

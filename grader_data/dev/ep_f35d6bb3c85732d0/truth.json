@@ -1,0 +1,112 @@
+{
+  "episode_id": "ep_f35d6bb3c85732d0",
+  "interactions": [
+    {
+      "group": "G1",
+      "issue_ids": [
+        "ISS-7MVQEL6V",
+        "ISS-KBG2577C"
+      ],
+      "n_issues": 2,
+      "scenario": "partial_fx_boundary"
+    }
+  ],
+  "issues": [
+    {
+      "affected_ids": [
+        "INV-A7LMS5S",
+        "PAY-VHQ2LK2"
+      ],
+      "currency": "JPY",
+      "evidence_sets": [
+        [
+          "INV-A7LMS5S",
+          "PAY-VHQ2LK2",
+          "R-RV9WPTH33"
+        ]
+      ],
+      "expected_amount_minor": 979025,
+      "interaction_group": "G1",
+      "issue_id": "ISS-7MVQEL6V",
+      "type": "missing_or_partial_allocation"
+    },
+    {
+      "affected_ids": [
+        "INV-UDMRF8N",
+        "PAY-XFD6YJ7"
+      ],
+      "currency": "GBP",
+      "evidence_sets": [
+        [
+          "INV-UDMRF8N",
+          "PAY-XFD6YJ7",
+          "R-6NF48KLTV"
+        ]
+      ],
+      "expected_amount_minor": 4319954,
+      "interaction_group": null,
+      "issue_id": "ISS-9DUNDWYM",
+      "type": "missing_or_partial_allocation"
+    },
+    {
+      "affected_ids": [
+        "INV-DAYZLJG"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-DAYZLJG",
+          "R-72FRHRHMR"
+        ],
+        [
+          "INV-DAYZLJG",
+          "R-XAN8TXJ9V"
+        ]
+      ],
+      "expected_amount_minor": 3120000,
+      "interaction_group": null,
+      "issue_id": "ISS-9TAGTV94",
+      "type": "period_cutoff_error"
+    },
+    {
+      "affected_ids": [
+        "PAY-VHQ2LK2"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "PAY-VHQ2LK2",
+          "R-P5FHVM2JL",
+          "fx:2033-08-31:JPY:EUR"
+        ]
+      ],
+      "expected_amount_minor": 2571,
+      "interaction_group": "G1",
+      "issue_id": "ISS-KBG2577C",
+      "type": "fx_wrong_date_or_rate"
+    },
+    {
+      "affected_ids": [
+        "INV-MDTEQRL"
+      ],
+      "currency": "EUR",
+      "evidence_sets": [
+        [
+          "INV-MDTEQRL",
+          "R-FQR87V9QF",
+          "fx:2033-08-11:JPY:EUR"
+        ],
+        [
+          "INV-MDTEQRL",
+          "R-LQMEWFBWN",
+          "fx:2033-08-11:JPY:EUR"
+        ]
+      ],
+      "expected_amount_minor": 2570,
+      "interaction_group": null,
+      "issue_id": "ISS-XGFY7Q8J",
+      "type": "fx_wrong_date_or_rate"
+    }
+  ],
+  "schema_version": "1.0"
+}

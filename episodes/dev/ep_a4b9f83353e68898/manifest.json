@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Aster Retail Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 112,
+    "fx_rows": 580,
+    "invoices": 61,
+    "ledger_rows": 525,
+    "payments": 51
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_a4b9f83353e68898",
+  "files": {
+    "documents.jsonl": "a1968efa68fa9c2661e1b9eee25922b6940d4619a24d4e795a55dcedb1e51beb",
+    "fx.csv": "b73259e5454dc7a799a1ce58dd7c37d8542fa14f906a87ccf48289b24b42c30d",
+    "invoices.jsonl": "d3718fb3fbd084766a3dfc6fde204d184ab1029949175cf4ca49478d6ebb8527",
+    "ledger.csv": "d31ca6535711f3a1795f77ee716140f81dd1340c148dc026ee6eb4d783cfb873",
+    "payments.jsonl": "42ed16ce28716486a1f10912eb7602480a2a4987bd94ad07b6de51d25c205ee4",
+    "policy.json": "2c03231f27d498cb90eed26e291c79d23c3a549eeff4310a5fa7c640e6cb8ca8"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-01-31",
+  "period_start": "2034-01-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-05:00"
+}

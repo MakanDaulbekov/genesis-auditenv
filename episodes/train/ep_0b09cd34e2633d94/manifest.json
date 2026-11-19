@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Corvid Agro Ltd",
+  "config_version": "train-1.0.0",
+  "counts": {
+    "documents": 92,
+    "fx_rows": 575,
+    "invoices": 47,
+    "ledger_rows": 366,
+    "payments": 45
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_0b09cd34e2633d94",
+  "files": {
+    "documents.jsonl": "971a92dcbba5a10f20b34dc36644d3c863440fc7decfbc043c0a1cc05ace750f",
+    "fx.csv": "60c67df184072d99eecadb617534911a28e0d7a48e3b878d1de8da455364e72e",
+    "invoices.jsonl": "bf0278855cce6dcffe80afd0f471aca19c708369f1f4a1522f0e02050d77ca1d",
+    "ledger.csv": "8d659ba27d74ce543d3aa945078bbf20802fe8191d598abd803a9a52956147f3",
+    "payments.jsonl": "e2f749f2f8837c104066984ff3ea992bd5165dc510f70404df8f87079f018e3b",
+    "policy.json": "a2c4b57f87cbc1a574fbddf0361cb87f235e7463f532bd3fae2cb0f6827abce7"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2030-06-30",
+  "period_start": "2030-06-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+06:00"
+}

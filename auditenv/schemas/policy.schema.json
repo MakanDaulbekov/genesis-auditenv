@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allocation": {
+      "type": "object"
+    },
+    "base_currency": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "currency_exponents": {
+      "additionalProperties": {
+        "maximum": 4,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "duplicates": {
+      "type": "object"
+    },
+    "fx": {
+      "type": "object"
+    },
+    "ledger": {
+      "type": "object"
+    },
+    "matching": {
+      "type": "object"
+    },
+    "period": {
+      "type": "object"
+    },
+    "policy_version": {
+      "type": "string"
+    },
+    "rounding": {
+      "type": "object"
+    },
+    "timezone": {
+      "pattern": "^[+-]\\d{2}:\\d{2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_version",
+    "base_currency",
+    "timezone",
+    "currency_exponents",
+    "fx",
+    "period",
+    "rounding",
+    "allocation",
+    "duplicates",
+    "matching",
+    "ledger"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,13 @@
+[project]
+name = "auditenv"
+version = "1.0.0"
+description = "Воспроизводимая RL-среда для ИИ-аудитора (GENESIS Hackathon, FinTech)"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.4"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Granit Foods JSC",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 115,
+    "fx_rows": 575,
+    "invoices": 60,
+    "ledger_rows": 737,
+    "payments": 55
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_de2ee13d8070aef1",
+  "files": {
+    "documents.jsonl": "fde05e6e7a1bcdd37d1d087695676ef079418ad88277c9355c361113b906e3a4",
+    "fx.csv": "17792a6d44523665de5ebd82b7c9056443d5317735fbda907c9db6f95b06bcfc",
+    "invoices.jsonl": "085510bd614d3e687eebd776a537f21629b84974e2077e860ba208384304227f",
+    "ledger.csv": "a1d969db2805098edaf620c9aa67223be2bfb9244c412755ea61c226dc66ef36",
+    "payments.jsonl": "6a8b54141d445e70f2af4920e396b01d965aefdd2bcb2ea37e5f3f19b8d3d256",
+    "policy.json": "6e393ef2730961587be85470ed73493578d52333c3f0f33df3eac55f52e28fc5"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-09-30",
+  "period_start": "2033-09-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-05:00"
+}

@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Ember Agro S.A.",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 141,
+    "fx_rows": 575,
+    "invoices": 79,
+    "ledger_rows": 700,
+    "payments": 62
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_b07318389426ab05",
+  "files": {
+    "documents.jsonl": "01dd0e2110e59dcfe262a5774cbd5af957d277e63e5b0d914ea2aad3ac1b3ae2",
+    "fx.csv": "8f493d4e581f9cde52d8de6eeabecaa99f7709c69f988b4cdb76672a6b0963cb",
+    "invoices.jsonl": "1fadf5fc3d85ccd7a99051b869cd2240a6c51c40e5b1cf6bdce39b674d59b696",
+    "ledger.csv": "d18ca124f93f8d2d3ad756e76916729b73ca2c5411db40481221145418dc1b0a",
+    "payments.jsonl": "3e870389d751bd2b152cce60632233081db3442b42a982f8f3a38d0e5bd46cb7",
+    "policy.json": "7c64b69faa7bbb741f404a64c548585664f27ba08becf6b3e3ee990c0d560457"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2030-04-30",
+  "period_start": "2030-04-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+04:00"
+}

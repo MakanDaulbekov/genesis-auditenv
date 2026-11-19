@@ -1,0 +1,39 @@
+{
+  "base_currency": "KZT",
+  "company_name": "Kestrel Works Ltd",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 121,
+    "fx_rows": 575,
+    "invoices": 64,
+    "ledger_rows": 619,
+    "payments": 57
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_14895d87873b93bd",
+  "files": {
+    "documents.jsonl": "6d7a0fcba2a5a95997b479dd44084d92a049fb48f1d42719e121928c07d164b2",
+    "fx.csv": "d542e7af8d42fd66e4ef82f36d9dace84922438d19e516894444af7e9ac16734",
+    "invoices.jsonl": "cfd1cc1f71ac5b016f131694746bf7ae1217b4b2d199b2918b52bcd3578fc834",
+    "ledger.csv": "58c838404cd3a2df6a32c6a1c41555407250b916d6937be73c0fa6963c8f4972",
+    "payments.jsonl": "4ff692c54115748ecca1a551cb65479c7602f373545a7faf9bd4176953feb38c",
+    "policy.json": "8265abda1ca76b1129dc0092e7981866680fb2963af02f889c41c05bf02cea0d"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-09-30",
+  "period_start": "2033-09-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+00:00"
+}

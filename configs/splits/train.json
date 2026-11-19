@@ -1,0 +1,68 @@
+{
+  "split": "train",
+  "config_version": "train-1.0.0",
+  "generator_config": "configs/default.json",
+  "episodes": [
+    {
+      "seed": 1001,
+      "overrides": {
+        "clean": true
+      }
+    },
+    {
+      "seed": 1002,
+      "overrides": {
+        "clean": true
+      }
+    },
+    {
+      "seed": 1003,
+      "overrides": {
+        "clean": true
+      }
+    },
+    {
+      "seed": 1004,
+      "overrides": {
+        "interactions": {
+          "partial_fx_boundary": 1,
+          "duplicate_cutoff": 0
+        }
+      }
+    },
+    {
+      "seed": 1005,
+      "overrides": {
+        "interactions": {
+          "partial_fx_boundary": 0,
+          "duplicate_cutoff": 1
+        }
+      }
+    },
+    {
+      "seed": 1006,
+      "overrides": {
+        "interactions": {
+          "partial_fx_boundary": 1,
+          "duplicate_cutoff": 1
+        }
+      }
+    },
+    {
+      "seed": 1007,
+      "overrides": {}
+    },
+    {
+      "seed": 1008,
+      "overrides": {}
+    },
+    {
+      "seed": 1009,
+      "overrides": {}
+    },
+    {
+      "seed": 1010,
+      "overrides": {}
+    }
+  ]
+}

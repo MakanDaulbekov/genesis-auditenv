@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "list_records",
+        "get_record",
+        "get_document",
+        "calculator",
+        "submit"
+      ],
+      "type": "string"
+    },
+    "args": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "action",
+    "args"
+  ],
+  "type": "object"
+}

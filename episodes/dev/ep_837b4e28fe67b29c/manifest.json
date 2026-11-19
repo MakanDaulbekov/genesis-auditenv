@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Riviera Data Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 127,
+    "fx_rows": 575,
+    "invoices": 66,
+    "ledger_rows": 637,
+    "payments": 61
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_837b4e28fe67b29c",
+  "files": {
+    "documents.jsonl": "2c45fd0444427ef5a074776f4d0759d6cff53d54a53e7df0fcc90c5fa6cd414c",
+    "fx.csv": "fc424a820cfd902de877b011963c9cf1fcb4cb5fe8a8725358faba1ca05ccf52",
+    "invoices.jsonl": "2e7d3e6a5d2046d53bc1f70167bd6ad571387678c7ba13cea8e2f5fe0cce77d4",
+    "ledger.csv": "8c6dcde4bab27394af72a4b6a0c8c80c7603238abde6605a99509cb31f4f1616",
+    "payments.jsonl": "1109f72c56a19d0b2c863d8649ebc4b9b935e6cf5c1681335eb82fe177b0257c",
+    "policy.json": "1cacdeb994a2cf061fcf270d29b3a69f97dee9822d7386e98713264fe9973dd2"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2032-11-30",
+  "period_start": "2032-11-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+05:00"
+}

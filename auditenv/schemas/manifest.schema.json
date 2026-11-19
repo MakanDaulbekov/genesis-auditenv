@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "base_currency": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "config_version": {
+      "type": "string"
+    },
+    "counts": {
+      "additionalProperties": false,
+      "properties": {
+        "documents": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fx_rows": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "invoices": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ledger_rows": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "payments": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ledger_rows",
+        "invoices",
+        "payments",
+        "fx_rows",
+        "documents"
+      ],
+      "type": "object"
+    },
+    "currency_exponents": {
+      "additionalProperties": {
+        "maximum": 4,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "type": "object"
+    },
+    "episode_id": {
+      "$ref": "#/$defs/id"
+    },
+    "files": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "generator_version": {
+      "type": "string"
+    },
+    "period_end": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "type": "string"
+    },
+    "period_start": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "type": "string"
+    },
+    "rounding": {
+      "additionalProperties": false,
+      "properties": {
+        "fx_rate_date": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "ROUND_HALF_EVEN",
+            "ROUND_HALF_UP"
+          ],
+          "type": "string"
+        },
+        "tolerance_minor": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mode",
+        "fx_rate_date",
+        "tolerance_minor"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "timezone": {
+      "pattern": "^[+-]\\d{2}:\\d{2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "config_version",
+    "generator_version",
+    "episode_id",
+    "company_name",
+    "base_currency",
+    "period_start",
+    "period_end",
+    "timezone",
+    "rounding",
+    "currency_exponents",
+    "counts",
+    "files"
+  ],
+  "type": "object"
+}

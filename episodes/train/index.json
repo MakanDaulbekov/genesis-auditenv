@@ -1,0 +1,42 @@
+[
+  {
+    "ref": "train/ep_58415a7397a3ea9c",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_823ead030cd59b4b",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_482bb86f4333e345",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_06155a7267fcb1c8",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_a98ba95e78452fd4",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_cc500baf524c2b8b",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_0b09cd34e2633d94",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_50f6f588fef262a7",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_9a35b58774e71181",
+    "config_version": "train-1.0.0"
+  },
+  {
+    "ref": "train/ep_5d09ee71b94b04cc",
+    "config_version": "train-1.0.0"
+  }
+]

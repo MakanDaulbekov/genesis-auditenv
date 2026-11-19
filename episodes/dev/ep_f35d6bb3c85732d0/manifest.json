@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Aster Pharma S.A.",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 126,
+    "fx_rows": 580,
+    "invoices": 70,
+    "ledger_rows": 510,
+    "payments": 56
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_f35d6bb3c85732d0",
+  "files": {
+    "documents.jsonl": "1bb171ee323d17ad931b2e383c8e4a1fe79a257b58696b73a83a59d3520a385b",
+    "fx.csv": "86c72ead941096acd3c6df1708fe9c95d518ed3ff921ab40abcdaa3c6f593804",
+    "invoices.jsonl": "b1f10517d4f7d05f508261b33ebd184f8c1052dd3708b7d61bf6f57176033b22",
+    "ledger.csv": "06d56117cd86ff478af02eba74dc2f7b2920a59b45c18fe901fa7d4abea30e39",
+    "payments.jsonl": "73a996d4eff87cc51e4eba6887176132a057263522b4c66904219cffeb9f1874",
+    "policy.json": "de118300bac8f2cc06f39d783253c9568b20baa52a313a29a8e3df3c41d39996"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-08-31",
+  "period_start": "2033-08-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-03:00"
+}

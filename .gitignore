@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+grader_data/grader_log.jsonl
+grader_data/run_summary.json
+.venv/

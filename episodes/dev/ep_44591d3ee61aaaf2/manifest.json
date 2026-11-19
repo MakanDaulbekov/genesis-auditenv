@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Miras Motors Inc",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 139,
+    "fx_rows": 580,
+    "invoices": 70,
+    "ledger_rows": 518,
+    "payments": 69
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_44591d3ee61aaaf2",
+  "files": {
+    "documents.jsonl": "91da18ebec2b4b7e60580ffbcad8ae55864c08fecd59d8ce40e1b495d7752982",
+    "fx.csv": "65b4398d819dbc6cd9531fd45d0e1769fb51f8a8602a77bc2e05179fc0981d77",
+    "invoices.jsonl": "c998df4a72158a27745c5d9ed81083119432f983168d006a2b24eff0005f0f65",
+    "ledger.csv": "1e18a4ade4f7979a2572c14aa1a5ccc82930b60cbcec6d2e52e9a6c55523a73e",
+    "payments.jsonl": "4959589063705d7f09f4566ae620248794dcdea2ae0279398c7cc4e2b1a4ac2b",
+    "policy.json": "192586436cf6fab022a765b21bde7cad4feb04e7bcdf8020ca58b528bb71491c"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2033-12-31",
+  "period_start": "2033-12-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "+04:00"
+}

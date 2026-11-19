@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "currency": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "doc_id": {
+      "$ref": "#/$defs/id"
+    },
+    "due_at": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+      "type": "string"
+    },
+    "entity_id": {
+      "$ref": "#/$defs/id"
+    },
+    "invoice_id": {
+      "$ref": "#/$defs/id"
+    },
+    "issued_at": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}$",
+      "type": "string"
+    },
+    "line_items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "amount_minor": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "description": {
+            "maxLength": 200,
+            "type": "string"
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "service_period_end": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          "service_period_start": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          "unit_price_minor": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "description",
+          "quantity",
+          "unit_price_minor",
+          "amount_minor",
+          "service_period_start",
+          "service_period_end"
+        ],
+        "type": "object"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "type": "array"
+    },
+    "total_minor": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "doc_id",
+    "invoice_id",
+    "entity_id",
+    "issued_at",
+    "due_at",
+    "currency",
+    "total_minor",
+    "line_items"
+  ],
+  "type": "object"
+}

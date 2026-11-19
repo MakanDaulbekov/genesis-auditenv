@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "error": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "result": {},
+    "steps_remaining": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "result",
+    "error",
+    "steps_remaining"
+  ],
+  "type": "object"
+}

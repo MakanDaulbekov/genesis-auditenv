@@ -1,0 +1,39 @@
+{
+  "base_currency": "USD",
+  "company_name": "Miras Labs Ltd",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 145,
+    "fx_rows": 575,
+    "invoices": 75,
+    "ledger_rows": 836,
+    "payments": 70
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_2b4302dff5754794",
+  "files": {
+    "documents.jsonl": "980a2a1ce728edea160e4cd0535cd169795960d3c97e081dabd8fa938b03d157",
+    "fx.csv": "e62b66ece7271d0c0c53131d45b49aef3ecf89dad34bc43cd879bec82d365a47",
+    "invoices.jsonl": "d52b15f0fbee47a6083b7ac36f795e4fc21cb389fc4a88f99c604bfb7b789f67",
+    "ledger.csv": "f881c828f6bcd80a230b910b15375cf903d8099034f0fb7bb33068467557422a",
+    "payments.jsonl": "554ef080fa18f3b145aab04d389f929cdcc055047b2c419c5fa62f9d1d67836b",
+    "policy.json": "14c1e13c374c2a0447c9ad750f3b2dd68c79148af0ee33a844dd3d07328e706a"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2031-11-30",
+  "period_start": "2031-11-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-03:00"
+}
