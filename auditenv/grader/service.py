@@ -55,7 +55,9 @@ class GraderCore:
 
     # ------------------------------------------------------------------ ops
     def op_open(self, mode: str, seed=None, config=None, ref=None, closed_index=None) -> dict:
+        from ..generator.config import ConfigError, resolve_config
         from ..generator.episode import generate_episode
+        from ..generator.world import GenerationError
         from ..env.store import parse_jsonl
 
         if self.finalized:
@@ -76,7 +78,7 @@ class GraderCore:
                 return {"error": "closed_already_opened"}
             self.closed_opened.add(closed_index)
             spec = self.closed[closed_index]
-            ep = generate_episode(spec["seed"], spec["config"], self.secret)
+            ep = generate_episode(spec["seed"], resolve_config(spec.get("config")), self.secret)
             public, truth = ep.public, ep.truth
         elif ref is not None:
             if not isinstance(ref, str) or not REF_RE.match(ref):
@@ -87,9 +89,17 @@ class GraderCore:
             public = {n: (pdir / n).read_bytes() for n in PUBLIC_FILES}
             truth = json.loads((gdir / "truth.json").read_text(encoding="utf-8"))
         else:
-            if isinstance(seed, bool) or not isinstance(seed, int) or not isinstance(config, dict):
-                return {"error": "bad_seed_or_config"}
-            ep = generate_episode(seed, config, self.secret)
+            if isinstance(seed, bool) or not isinstance(seed, int):
+                return {"error": "bad_seed", "detail": "seed: ожидается целое число"}
+            try:
+                cfg = resolve_config(config)
+            except ConfigError as e:
+                return {"error": "bad_config", "detail": str(e)[:500]}
+            try:
+                ep = generate_episode(seed, cfg, self.secret)
+            except GenerationError:
+                return {"error": "generation_failed",
+                        "detail": "не удалось построить эпизод с этим config (слишком мало кандидатов для ошибок)"}
             public, truth = ep.public, ep.truth
         from ..grader.matcher import alias_map_from_tables
         alias = alias_map_from_tables(parse_jsonl(public["invoices.jsonl"]), parse_jsonl(public["payments.jsonl"]))

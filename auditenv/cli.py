@@ -16,14 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def deep_merge(base: dict, over: dict) -> dict:
-    out = copy.deepcopy(base)
-    for k, v in over.items():
-        if isinstance(v, dict) and isinstance(out.get(k), dict):
-            out[k] = deep_merge(out[k], v)
-        else:
-            out[k] = copy.deepcopy(v)
-    return out
+from .generator.config import deep_merge  # noqa: E402  (реэкспорт для тестов/жюри)
 
 
 def split_configs(split_file: str) -> tuple[dict, list[tuple[int, dict]]]:
@@ -48,7 +41,9 @@ def cmd_generate(args) -> int:
             shutil.rmtree(d)
         d.mkdir(parents=True)
     index = []
+    from .generator.config import validate_config
     for seed, cfg in items:
+        validate_config(cfg)
         ep = generate_episode(seed, cfg)
         (pub_root / ep.episode_id).mkdir()
         (prv_root / ep.episode_id).mkdir()

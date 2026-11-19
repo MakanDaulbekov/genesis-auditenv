@@ -36,6 +36,10 @@ TASK_TEXT = (
 )
 
 
+class EpisodeOpenError(ValueError):
+    """reset не смог открыть эпизод; сообщение называет причину (поле config, seed, ref)."""
+
+
 class AuditEnv:
     metadata = {"render_modes": []}
 
@@ -49,6 +53,7 @@ class AuditEnv:
         self.time_limit_s = time_limit_s
         self._clock = clock
         self._policy_name = policy_name
+        self._auto_seed = 0
         self._reset_state()
 
     def _reset_state(self) -> None:
@@ -74,9 +79,22 @@ class AuditEnv:
 
     # ------------------------------------------------------------------ API
     def reset(self, seed: int | None = None, config: dict | None = None, options: dict | None = None):
-        """config: dict генератора ИЛИ {"episode_ref": "dev/ep_..."} ИЛИ {"closed_index": i}."""
+        """Открыть эпизод.
+
+        config:
+          * None или {} — configs/default.json (config_version default-1.0.0);
+          * частичный dict генератора — глубоко мержится поверх дефолта ({"clean": true} и т.п.);
+          * {"episode_ref": "dev/ep_..."} — готовый эпизод с диска оценщика;
+          * {"closed_index": i} — i-й закрытый эпизод (только eval).
+        seed: int. Если None — берётся счётчик этого объекта среды (0, 1, 2, …): поведение
+        детерминировано, но для воспроизводимости лучше передавать seed явно.
+        Ошибки: EpisodeOpenError (подкласс ValueError) с причиной — какое поле и что ожидалось.
+        """
         self._reset_state()
         cfg = config if config is not None else (options or {}).get("config")
+        if seed is None and not (isinstance(cfg, dict) and ({"episode_ref", "closed_index"} & set(cfg))):
+            seed = self._auto_seed
+            self._auto_seed += 1
         if isinstance(cfg, dict) and "episode_ref" in cfg:
             out = self.__grader.call("open", mode=self.mode, ref=cfg["episode_ref"])
         elif isinstance(cfg, dict) and "closed_index" in cfg:
@@ -84,7 +102,7 @@ class AuditEnv:
         else:
             out = self.__grader.call("open", mode=self.mode, seed=seed, config=cfg)
         if "error" in out:
-            raise ValueError("episode could not be opened")
+            raise EpisodeOpenError(f"эпизод не открыт: {out.get('detail') or out['error']}")
         self._store = ReadOnlyStore(decode_files(out["files"]))
         self._token = out["token"]
         manifest = json.loads(self._store.manifest)
