@@ -113,7 +113,8 @@ def cmd_run(args) -> int:
     from .runner import run_policies
     summary = run_policies(policies=args.policies, splits=args.splits, episodes_root=args.episodes_root,
                            grader_root=args.grader_root, trajectories=args.trajectories,
-                           grader_log=args.grader_log, mode=args.mode)
+                           grader_log=args.grader_log, mode=args.mode, trusted=args.trusted,
+                           truth_dir=args.truth_dir)
     print(json.dumps(summary["aggregate"], indent=2, ensure_ascii=False))
     if args.summary:
         Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -126,7 +127,7 @@ CHECK_STEPS = [
     ("validate episodes", ["-m", "auditenv.cli", "validate", "--splits", "train", "dev"]),
     ("validate 300 random seeds", ["-m", "auditenv.cli", "validate-seeds", "--n", "300"]),
     ("pytest", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]),
-    ("run 4 baseline policies", ["-m", "auditenv.cli", "run"]),
+    ("run baseline policies (+competent)", ["-m", "auditenv.cli", "run"]),
     ("trajectory leak scan", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_policies.py", "-k",
                               "committed_trajectories"]),
     ("determinism (2 processes, PYTHONHASHSEED)", ["-m", "auditenv.checks", "determinism"]),
@@ -179,7 +180,11 @@ def main(argv=None) -> int:
     vs.add_argument("--n", type=int, default=300)
     vs.set_defaults(fn=cmd_validate_seeds)
     r = sub.add_parser("run")
-    r.add_argument("--policies", nargs="+", default=["random_explorer", "simple_reconciler", "flag_all", "oracle"])
+    r.add_argument("--policies", "--policy", nargs="+",
+                   default=["random_explorer", "simple_reconciler", "competent_reconciler", "flag_all", "oracle"],
+                   help="встроенные имена и/или module.path:factory")
+    r.add_argument("--trusted", action="store_true", help="доверенный режим: разрешает oracle_from_truth")
+    r.add_argument("--truth-dir", default=None, help="каталог эталона для oracle_from_truth (по умолчанию grader-root)")
     r.add_argument("--splits", nargs="+", default=["train", "dev"])
     r.add_argument("--mode", default="train", choices=["train", "eval"])
     r.add_argument("--episodes-root", default="episodes")

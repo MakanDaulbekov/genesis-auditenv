@@ -221,9 +221,154 @@ def flag_all(first: dict):
     yield act("submit", findings={"episode_id": man["episode_id"], "findings": findings})
 
 
+
+
+# ----------------------------------------------------------------------------- competent_reconciler
+
+def competent_reconciler(first: dict):
+    """Компетентная скриптовая сверка — доказательство решаемости по открытым данным за ≤100 шагов.
+
+    Честно читает данные через инструменты и применяет правила policy:
+      * время переводится в часовой пояс компании (граница периода и дата курса);
+      * дубли — по полной сути счёта, включая периоды услуг в line_items;
+      * remittance advice (get_document) — только для платежей с нераспределённым остатком;
+      * курсы: дешевле из «прочитать fx постранично» и «get_record по нужным fx-ключам».
+    Эталон не используется.
+    """
+    from ..common.timeutil import in_period, local_date
+
+    res = first["result"]
+    man, pol = res["manifest"], res["policy"]
+    base, mode, tz = pol["base_currency"], pol["rounding"]["mode"], pol["timezone"]
+    ps, pe = pol["period"]["start"], pol["period"]["end"]
+    invoices = yield from _read_table("invoices", budget_floor=0)
+    payments = yield from _read_table("payments", budget_floor=0)
+    ledger = yield from _read_table("ledger", budget_floor=0)
+
+    rows_inv, rows_pay = defaultdict(list), defaultdict(list)
+    for r in ledger:
+        if r["payment_id"]:
+            rows_pay[r["payment_id"]].append(r)
+        elif r["invoice_id"]:
+            rows_inv[r["invoice_id"]].append(r)
+
+    def ar_row(iid):
+        x = [r for r in rows_inv[iid] if r["account"] == "accounts_receivable" and r["debit_minor"] > 0]
+        return x[0] if x else None
+
+    def bank_row(pid):
+        x = [r for r in rows_pay[pid] if r["account"] == "bank"]
+        return x[0] if len(x) == 1 else None
+
+    # --- какие курсы нужны
+    need = set()
+    for inv in invoices:
+        if inv["currency"] != base and ar_row(inv["invoice_id"]):
+            need.add((local_date(inv["issued_at"], tz).isoformat(), inv["currency"]))
+    for p in payments:
+        if p["currency"] != base and bank_row(p["payment_id"]):
+            need.add((local_date(p["timestamp"], tz).isoformat(), p["currency"]))
+    fx = {}
+    pages = -(-man["counts"]["fx_rows"] // 50)
+    if len(need) <= pages:
+        for d, c in sorted(need):
+            o = yield act("get_record", table="fx", id=f"fx:{d}:{c}:{base}")
+            if o["error"] is None:
+                fx[(d, c)] = o["result"]["record"]["rate"]
+    else:
+        for r in (yield from _read_table("fx", budget_floor=0)):
+            fx[(r["date"], r["source_currency"])] = r["rate"]
+
+    def conv(amount, ccy, d):
+        if ccy == base:
+            return amount
+        rate = fx.get((d.isoformat(), ccy))
+        return None if rate is None else convert_minor(amount, ccy, base, rate, mode)
+
+    findings = []
+    # --- дубли: полная суть счёта (контрагент, валюта, сумма, все поля строк вкл. периоды услуг)
+    groups = defaultdict(list)
+    for inv in invoices:
+        if ar_row(inv["invoice_id"]):
+            key = (inv["entity_id"], inv["currency"], inv["total_minor"],
+                   tuple(sorted(tuple(sorted(li.items())) for li in inv["line_items"])))
+            groups[key].append(inv)
+    for g in groups.values():
+        if len(g) == 2:
+            a, b = sorted(g, key=lambda x: x["invoice_id"])
+            findings.append({"type": "duplicate_invoice", "affected_ids": [a["invoice_id"], b["invoice_id"]],
+                             "claimed_amount_minor": a["total_minor"], "currency": a["currency"],
+                             "evidence_ids": [a["invoice_id"], b["invoice_id"], ar_row(b["invoice_id"])["row_id"]],
+                             "explanation": "identical invoice (entity, lines, service periods) posted twice"})
+
+    # --- cutoff и FX по счетам (время компании)
+    for inv in invoices:
+        ar = ar_row(inv["invoice_id"])
+        if ar is None:
+            continue
+        is_issue = any(r["account"] == "revenue" for r in rows_inv[inv["invoice_id"]])
+        if is_issue and not in_period(inv["issued_at"], ps, pe, tz):
+            findings.append({"type": "period_cutoff_error", "affected_ids": [inv["invoice_id"]],
+                             "claimed_amount_minor": ar["debit_minor"], "currency": base,
+                             "evidence_ids": [inv["invoice_id"], ar["row_id"]],
+                             "explanation": "invoice instant is outside the period in company time but booked in it"})
+        if inv["currency"] != base:
+            d = local_date(inv["issued_at"], tz)
+            exp = conv(inv["total_minor"], inv["currency"], d)
+            if exp is not None and exp != ar["debit_minor"]:
+                findings.append({"type": "fx_wrong_date_or_rate", "affected_ids": [inv["invoice_id"]],
+                                 "claimed_amount_minor": abs(exp - ar["debit_minor"]), "currency": base,
+                                 "evidence_ids": [inv["invoice_id"], ar["row_id"], f"fx:{d}:{inv['currency']}:{base}"],
+                                 "explanation": "posting differs from conversion at the policy rate date"})
+    # --- платежи: cutoff, FX
+    for p in payments:
+        bank = bank_row(p["payment_id"])
+        if bank is None:
+            continue
+        got = bank["debit_minor"] or bank["credit_minor"]
+        if not in_period(p["timestamp"], ps, pe, tz):
+            findings.append({"type": "period_cutoff_error", "affected_ids": [p["payment_id"]],
+                             "claimed_amount_minor": got, "currency": base,
+                             "evidence_ids": [p["payment_id"], bank["row_id"]],
+                             "explanation": "payment instant is outside the period but booked in it"})
+        if p["currency"] != base:
+            d = local_date(p["timestamp"], tz)
+            exp = conv(abs(p["amount_minor"]), p["currency"], d)
+            if exp is not None and exp != got:
+                findings.append({"type": "fx_wrong_date_or_rate", "affected_ids": [p["payment_id"]],
+                                 "claimed_amount_minor": abs(exp - got), "currency": base,
+                                 "evidence_ids": [p["payment_id"], bank["row_id"], f"fx:{d}:{p['currency']}:{base}"],
+                                 "explanation": "bank posting differs from conversion at the policy rate date"})
+    # --- распределение по remittance advice
+    for p in payments:
+        if p["amount_minor"] <= 0:
+            continue
+        booked = defaultdict(int)
+        for r in p["invoice_refs"] or []:
+            booked[r["invoice_id"]] += r["amount_minor"]
+        if sum(booked.values()) >= p["amount_minor"]:
+            continue
+        o = yield act("get_document", doc_id=p["doc_id"])
+        if o["error"] is not None:
+            continue
+        adv = [r for r in rows_pay[p["payment_id"]] if r["account"] == "customer_advances"]
+        for line in o["result"]["document"]["remittance"]["lines"]:
+            gap = line["amount_minor"] - booked[line["invoice_id"]]
+            if gap > 0 and adv:
+                findings.append({"type": "missing_or_partial_allocation",
+                                 "affected_ids": [line["invoice_id"], p["payment_id"]],
+                                 "claimed_amount_minor": gap, "currency": p["currency"],
+                                 "evidence_ids": [line["invoice_id"], p["payment_id"], adv[0]["row_id"]],
+                                 "explanation": "remittance advice names the invoice but the amount went to advances"})
+        if o["steps_remaining"] <= 1:
+            break
+    yield act("submit", findings={"episode_id": man["episode_id"], "findings": findings[:30]})
+
+
 POLICIES = {
     "random_explorer": random_explorer,
     "simple_reconciler": simple_reconciler,
+    "competent_reconciler": competent_reconciler,
     "flag_all": flag_all,
     "oracle": None,  # исполняется процессом оценщика
 }

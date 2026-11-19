@@ -177,6 +177,11 @@ def main(argv=None) -> int:
     ap.add_argument("--agent-stderr", default="grader_data/agent_stderr.log")
     ap.add_argument("--grader-log", default="grader_data/agent_host_log.jsonl")
     a = ap.parse_args(argv)
+    if a.policy in ("oracle", "oracle_from_truth"):
+        print("ОШИБКА: oracle работает только в процессе оценщика / доверенном режиме "
+              "(python -m auditenv.cli run --trusted --policies oracle_from_truth), не во внешнем агенте.",
+              file=sys.stderr)
+        return 4
     if a.policy:
         agent_cmd = shlex.join([sys.executable, "-m", "auditenv.policies.process_adapter", "--policy", a.policy])
         extra_env = {"PYTHONPATH": os.pathsep.join([os.getcwd(), str(Path(__file__).resolve().parents[1])])}

@@ -116,7 +116,7 @@ def main() -> int:
     L.append("| политика | возврат (средний) | P (ср.) | R (ср.) | F1 (ср.) | micro P / R / F1 | TP/FP/FN | шаги (ср.) | "
              "время эпизода, мс (ср. / макс.) | возврат на чистых | неверных submit |")
     L.append("|---|---|---|---|---|---|---|---|---|---|---|")
-    for pol in ("oracle", "simple_reconciler", "random_explorer", "flag_all"):
+    for pol in ("oracle", "competent_reconciler", "simple_reconciler", "random_explorer", "flag_all"):
         a = agg[pol]
         m = a["micro"]
         L.append(f"| {pol} | {_f(a['mean_return'])} | {_f(a['mean_precision'])} | {_f(a['mean_recall'])} | "
