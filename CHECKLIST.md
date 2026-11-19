@@ -1,37 +1,45 @@
-# CHECKLIST: требование PDF → файл/тест → статус
+# CHECKLIST: требование PDF → файл → тест → статус
 
-| Раздел PDF | Требование | Где реализовано | Тест | Статус |
+## Раздел 09 «Сдача» — материалы
+
+| Материал (PDF 09) | Что требуется | Файл(ы) | Тест / проверка | Статус |
 |---|---|---|---|---|
-| 02 | 4 независимо настраиваемых типа ошибок | `generator/mutations.py`, `configs/default.json:errors` | `test_each_error_type_independently_configurable`, `test_variants_present_across_seeds` | ✅ |
-| 02 | 2 сценария взаимодействующих ошибок | `mutations.py: SCENARIOS` | `test_interaction_scenarios` (+валидатор) | ✅ |
-| 02 | Чистые компании + отвлекающие случаи (9 видов) | `world.py` | `test_clean_companies_have_distractors`, валидатор п.5 | ✅ |
-| 02 | Сначала история, потом документы, потом ошибки | `world.build_world → render → mutations → post_all → render` | — | ✅ |
-| 03 | manifest с schema_version, episode_id, base, период, tz, счётчики, округление | `render.public_files`, `schemas/manifest.schema.json` | `test_reset_signature_and_first_observation` | ✅ |
-| 03 | ledger/invoices/payments/fx/policy ровно по схеме | `render.py`, `schemas/*.schema.json` | `test_step_signature_and_json` | ✅ |
-| 03 | деньги int minor, FX — десятичные строки, ISO-8601 со смещением, явные null | `common/money.py`, `common/timeutil.py` | схемы | ✅ |
-| 03 | truth/provenance закрыты, вне каталога среды; эталон не утекает через наблюдения, пути, ошибки, debug, объяснение награды | `grader_data/`, `grader/service.py`, `agent_host.py` | `tests/test_isolation.py` (16 тестов), jury c19–c20 | ✅ |
-| 04 | reset(seed, config) -> (obs, info); step -> 5-tuple | `env/core.py` | `test_contract.py` | ✅ |
-| 04 | 5 действий, страница ≤50, стабильные курсоры | `env/tools.py`, `env/store.py` | `test_pagination_*`, `test_cursor_*`, `test_list_limit_bounds` | ✅ |
-| 04 | калькулятор только арифметика | `env/calculator.py` | `test_calculator_*` | ✅ |
-| 04 | неизвестный ID/действие → ограниченная ошибка, шаг расходуется | `env/tools.py: ERRORS` | `test_unknown_ids_tables_actions` | ✅ |
-| 04 | 100 шагов включая submit; truncated → пустой ответ | `env/core.py` | `test_truncation_*`, `test_submit_as_100th_step_terminates`, `test_time_limit_truncates` | ✅ |
-| 04 | промежуточная награда 0; eval скрывает награду | `env/core.py` | `test_eval_mode_hides_reward` | ✅ |
-| 05 | findings.json, лимиты 30/10/1000, неверная структура → −1 + журнал | `grader/matcher.py`, `schemas/findings.schema.json` | `test_invalid_*`, `test_invalid_findings_logged_by_grader` | ✅ |
-| 05 | взаимно-однозначное сопоставление, TP-условия, дубли → FP | `grader/matcher.py` | `test_duplicate_findings_give_no_gain`, `test_findings_order_invariance` | ✅ |
-| 05 | P/R/F1, краевые случаи, общая награда | `grader/reward.py` | `test_metric_edge_cases`, `test_step_cost_small` | ✅ |
-| 05 | 5 свойств награды + атаки | — | `test_reward.py` (16 групп, fuzz 800 ответов) | ✅ |
-| 06 | 4 базовые политики | `policies/baselines.py`, `runner.py`, oracle — `grader/service.py:op_oracle` | `tests/test_policies.py` | ✅ |
-| 07 | траектории без эталона | `trajectories.jsonl`, `runner.py` | `test_trajectory_fields_and_no_truth`, `test_committed_trajectories_have_no_truth` | ✅ |
-| 07 | Контейнер + единая команда | `Makefile: check` → `auditenv/cli.py check`, `Dockerfile` | `make check` (в чистом clone + venv) | ✅ (образ не собран в песочнице: Docker Hub закрыт) |
-| 10 | детерминизм seed/config/version | `common/drbg.py`, `checks.py` | `make determinism` (2 процесса, разный PYTHONHASHSEED) | ✅ |
-| 10 | перестановки и смена ID сохраняют ответ oracle и награду | `transforms.py` | `tests/test_paired.py` (24 пары + env-уровень), jury paired 20/20 | ✅ |
-| 06/10 | Независимая проверка эталона и доказательств | `generator/validate.py` (не импортирует генератор) | `make validate`, `make validate-seeds` (300 seed × 6 сочетаний), `test_validator_detects_corruption` | ✅ |
-| 02 | Анти-трюки: позиция, порядок ID, круглые суммы | `render.py` (порядок по ключевому хешу), `common/drbg.py` | `test_position_heuristic_*`, `test_id_order_*`, `test_round_amounts_*` | ✅ |
-| 06 | Oracle только для оценщика | `grader/service.py:op_oracle` (`allow_oracle`), `runner.py` | `test_oracle_disabled_for_agent_runs` | ✅ |
-| 09 | README с инструкциями контейнера и единой командой | `README.md` | — | ✅ |
-| 09 | Записка о дизайне | `DESIGN.md` (Assumptions, Честные ограничения) | jury engineering | ✅ |
-| 09 | Демо (скриптовая политика) | `make demo` → `auditenv/demo.py` | — | ✅ |
-| 09 | 10 train + 10 dev эпизодов | `episodes/{train,dev}`, `configs/splits/*.json` | `test_committed_episodes_validate` | ✅ |
-| 10 | P, R, F1, возврат, шаги, время агентов как диагностика | `REPORT.md` ← `auditenv/report.py` | `make check` | ✅ |
-| 10 | Теневое жюри 4×20 + прогноз | `tests/jury/run_jury.py` | `make jury` | ✅ |
-| 12 | Всё вымышлено, без сети | генератор из словарей, `--network none` | — | ✅ |
+| Исходный код | исходники с лицензией и зафиксированными зависимостями: генератор и среда | `auditenv/`, `LICENSE` (MIT), `pyproject.toml`, `requirements-dev.lock` (версии + SHA-256), `vendor/wheels` | `make check`; офлайн-установка `pip --no-index --require-hashes` | ✅ |
+| README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none …` на локальной базе Python 3.11 | ✅ (официальный `python:3.11-slim` — собрать командой, см. README) |
+| Matcher и награда | общий код сопоставления и награды, схемы и политики | `auditenv/grader/matcher.py`, `reward.py`, `auditenv/schemas/*.schema.json`, `policy.json → matching` | `tests/test_reward.py`, самопроверка reward 20/20 | ✅ |
+| Эпизоды | 10 открытых train и 10 dev | `episodes/{train,dev}` (10+10; в dev есть base=JPY), эталон — `grader_data/{train,dev}`, конфиги — `configs/splits/*.json` | `test_committed_episodes_validate`, `make validate` | ✅ |
+| Тесты | тесты среды, сопоставления и награды | `tests/` (≈190 тестов): контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run | `make test` | ✅ |
+| Базовые политики | четыре адаптера базовых политик | `auditenv/policies/api.py` (`Policy`, `load_policy`), `baselines.py`: `random_explorer`, `simple_reconciler`, `flag_all`, `oracle` (оценщик) + `competent_reconciler`, `oracle_from_truth` (`--trusted`), `process_adapter.py`; `--policy module:factory` | `tests/test_policy_api.py`, `tests/test_policies.py` | ✅ |
+| Траектории | `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated; без эталона в наблюдениях | `trajectories.jsonl` (5 политик × 20 эпизодов) | `test_committed_trajectories_have_no_truth`, `test_trajectory_fields_and_no_truth` | ✅ |
+| Записка о дизайне | краткое описание устройства среды | `DESIGN.md` (Assumptions, Честные ограничения) | — | ✅ |
+| Демо | показ работы среды скриптовой политикой | `make demo` → `auditenv/demo.py` | — | ✅ |
+
+## Остальные разделы
+
+| Раздел PDF | Требование | Файл(ы) | Тест | Статус |
+|---|---|---|---|---|
+| 02 | 4 независимо настраиваемых типа ошибок | `generator/mutations.py`, `config.errors` | `test_each_error_type_independently_configurable`, `test_variants_present_across_seeds` | ✅ |
+| 02 | 2 сценария взаимодействий | `mutations.SCENARIOS` | `test_interaction_scenarios` | ✅ |
+| 02 | Чистые компании + отвлекающие (10 видов) | `generator/world.py` | `test_clean_companies_have_distractors`, валидатор п.5 | ✅ |
+| 02 | Сначала история, потом документы, потом ошибки; эталон из причинных изменений | `world → render → mutations → truth`, `provenance.diff` | валидатор: состояние «до» чисто | ✅ |
+| 02 | Варьирование имён, ID, порядка, сумм, валют, часовых поясов (вкл. +05:30/+05:45), сочетаний | `world.py`, `render.py`, `config.py` | `test_minute_offsets_and_jpy_base`, `validate-seeds` (6 сочетаний) | ✅ |
+| 02 | Сложность против простых трюков | порядок по ключевому хешу, ГПСЧ SHA-256, кандидаты мутаций включают отвлекающие | `test_position_*`, `test_id_order_*`, `test_round_amounts_*`, `test_categorical_fields_carry_no_label_signal` | ✅ |
+| 02/10 | Решаемо по открытым данным (не «неразрешимые данные») | `competent_reconciler`, `cli solvability` | 310/310 эпизодов F1=1, ≤73 шагов; `test_competent_reconciler_solves_*` | ✅ |
+| 03 | manifest, форматы, таблицы ровно по схеме, явные null | `render.py`, `schemas/` | `test_contract.py`, валидатор п.1 | ✅ |
+| 03 | эталон и provenance закрыты, оценщик вне процесса агента | `grader/service.py` (subprocess, JSON), `agent_host.py` | `tests/test_isolation.py` | ✅ |
+| 04 | reset(seed, config) → (obs, info); config=None → дефолт; понятные ошибки | `env/core.py`, `generator/config.py` | `tests/test_reset_config.py` | ✅ |
+| 04 | 5 действий, страница ≤50, стабильные курсоры, дефолты list_records, fx_id | `env/tools.py`, `env/store.py` | `test_pagination_*`, `test_list_records_defaults_*`, `test_fx_records_carry_fx_id` | ✅ |
+| 04 | калькулятор, ограниченные ошибки, лимиты 100 шагов/60 с, truncated → пустой ответ, eval скрывает награду | `env/` | `test_contract.py`, самопроверка contract 20/20 | ✅ |
+| 05 | findings, лимиты, −1 за структуру, взаимно-однозначное сопоставление, P/R/F1, общая награда, атаки | `grader/` | `test_reward.py`, `test_hedging_attack_*` | ✅ |
+| 06 | 4 политики организаторов на 20 скрытых эпизодах (5 чистых, 5 со взаимодействиями) + 20 парных проверок | `make jury-run` → `auditenv/jury_run.py` | `tests/test_jury_run.py`; пример `examples/closed_split_example.json` | ✅ |
+| 06 | закрытые seed и новые сочетания без правки кода; секрет | `--split`, `--secret-file`, `--closed-episodes-file` | `test_jury_run_without_secret_warns_and_differs`, `test_closed_episodes_eval_only_and_single_open` | ✅ |
+| 07 | официальная проверка без сети, платных API, GPU | stdlib, `vendor/wheels`, `--network none` | — | ✅ |
+| 10 | воспроизводимость: seed/действия, перестановка и смена ID | `common/drbg.py`, `transforms.py`, `checks.py` | `tests/test_paired.py`, `make determinism`, самопроверка paired 20/20 | ✅ |
+| 10 | P, R, F1, возврат, шаги, время (p50/p95/max), пик RSS по политикам | `REPORT.md` ← `report.py`, `cli run` (политики в отдельных процессах) | `make check` | ✅ |
+| 10 | измеренный разбор сбоев, честные ограничения | `REPORT.md` (разделы 2–3), `DESIGN.md` §7 | — | ✅ |
+| 12 | всё вымышлено, без реальных данных | генератор из словарей | — | ✅ |
+
+## Что команде сделать руками
+
+1. Выполнить `make docker-pin && make docker-check` на машине с доступом к Docker Hub, закоммитить `docker/base-image.txt` и вставить вывод в README («Проверено командой»).
+2. Отправить ссылку на репозиторий/архив в форму сдачи (ссылку организаторы сообщат отдельно).

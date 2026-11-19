@@ -1,35 +1,100 @@
 # auditenv — воспроизводимая RL-среда для ИИ-аудитора
 
-GENESIS Hackathon // FinTech. Генератор синтетических компаний с внедрёнными финансовыми ошибками, контракт `reset/step` в стиле Gymnasium, узкие инструменты расследования, открытый matcher и общая награда, оценщик в отдельном процессе, 4 базовые политики, траектории, тесты.
-
-* Python 3.11, рантайм — только стандартная библиотека; dev-зависимость — `pytest==8.3.4` (`requirements-dev.lock`). Лицензия MIT.
-* Без сети, без платных API, без GPU. Полная проверка занимает ≈ 1 минуту на 2 CPU; эпизод — десятки миллисекунд.
-* Устройство и допущения описаны в [DESIGN.md](DESIGN.md), измеренный разбор сбоев — в [REPORT.md](REPORT.md), соответствие требованиям PDF — в [CHECKLIST.md](CHECKLIST.md).
-
-## Запуск одной командой
+Среда генерирует синтетические компании с внедрёнными финансовыми ошибками. Агент расследует их через `reset/step` (5 узких инструментов) и отправляет findings с доказательствами. Оценщик работает в отдельном процессе и выдаёт общую награду раздела 05. Python 3.11, только stdlib, без сети и GPU.
 
 ```bash
-make check                 # или без make: python3.11 -m auditenv.cli check
+make check                        # без make: python3.11 -m auditenv.cli check   (≈2 мин, 2 CPU)
 ```
-Шаги проверки:
-1. генерирует 10 train + 10 dev эпизодов;
-2. валидирует их независимым валидатором;
-3. прогоняет 300 случайных seed × 6 сочетаний параметров;
-4. запускает все тесты;
-5. гоняет 4 базовые политики и пишет `trajectories.jsonl`;
-6. проверяет траектории на утечки;
-7. сравнивает SHA-256 генерации в двух процессах с разным `PYTHONHASHSEED`;
-8. запускает теневое жюри 4×20;
-9. пишет `REPORT.md`.
+Команда печатает по строке `[OK]/[FAIL]` на шаг и в конце `== check: OK ==`; при любом провале выход ненулевой. Шаги:
+1. генерация 10 train + 10 dev эпизодов;
+2. независимый валидатор;
+3. 300 случайных seed;
+4. ≈190 тестов;
+5. 5 политик и `trajectories.jsonl`;
+6. решаемость на 310 эпизодах;
+7. детерминизм в 2 процессах;
+8. самопроверка 80/80;
+9. `REPORT.md`.
 
-При любом провале выход ненулевой.
+| Что | Где |
+|---|---|
+| эпизоды: открытая часть / эталон оценщика | `episodes/{train,dev}/<id>/` / `grader_data/{train,dev}/<id>/` |
+| метрики, решаемость, разбор сбоев | [REPORT.md](REPORT.md) |
+| устройство, допущения, честные ограничения | [DESIGN.md](DESIGN.md) |
+| требование PDF → файл → тест | [CHECKLIST.md](CHECKLIST.md) |
+| режим жюри на ваших seed и политиках | `make jury-run` (ниже) |
 
-Контейнер:
+---
+
+## Для жюри: как подключить свои политики
+
+**Интерфейс** (`auditenv/policies/api.py`):
+```python
+class Policy(Protocol):
+    def reset(self, observation: dict) -> None   # первое наблюдение эпизода (результат env.reset)
+    def act(self, observation: dict) -> dict     # текущее наблюдение -> {"action": ..., "args": {...}}
+```
+Цикл: `reset(obs0)`, затем `a = act(obs0)`, `obs = env.step(a)[0]`, `a = act(obs)` и так далее до `terminated` или `truncated`.
+
+**Пример** (`examples/my_policy.py`):
+```python
+class SilentAuditor:
+    def reset(self, observation):
+        self.episode_id = observation["result"]["manifest"]["episode_id"]
+        self.pages = 0
+
+    def act(self, observation):
+        res = observation["result"] or {}
+        if self.pages and res.get("next_cursor") is None or self.pages >= 3:
+            return {"action": "submit", "args": {"findings": {"episode_id": self.episode_id, "findings": []}}}
+        cursor = res.get("next_cursor") if self.pages else None
+        self.pages += 1
+        return {"action": "list_records", "args": {"table": "invoices", "cursor": cursor, "limit": 50}}
+```
+
+**Запуск одной командой:**
 ```bash
-docker build -t auditenv .
-docker run --rm --network none auditenv          # = python -m auditenv.cli check
+# 1) в процессе среды (factory() -> объект с reset/act; модуль ищется и в текущем каталоге)
+python -m auditenv.cli run --policies your.module:YourPolicy --splits dev
+# 2) отдельным процессом (жёсткая граница: у политики нет дескриптора оценщика)
+python -m auditenv.agent_host --policy your.module:YourPolicy --split dev
+python -m auditenv.agent_host --agent-cmd "python your_agent.py" --split dev   # любой язык, JSON stdin/stdout
+# 3) полный режим жюри на 20 ваших скрытых эпизодах (см. следующий раздел)
+make jury-run SPLIT=closed_split.json SECRET=secret.txt POLICY="your.module:A your.module:B"
 ```
-Другие цели: `make demo` (один эпизод с логом шагов), `make jury`, `make report`, `make test`.
+* Встроенные политики: `random_explorer`, `simple_reconciler`, `competent_reconciler`, `flag_all`, `oracle`. Ответ `oracle` строит процесс оценщика.
+* **Свой oracle по нашему эталону:** `python -m auditenv.cli run --trusted --policies oracle_from_truth --truth-dir grader_data/dev --splits dev`. Он читает `truth.json` с диска и отправляет ответ обычным `submit`. Разрешён только с `--trusted`, а в `agent_host` запрещён.
+* **Протокол `agent_host`** (по строке JSON):
+  * в агента приходит `{"type":"observation","observation","reward","terminated","truncated","info"}`, в конце прогона — `{"type":"close"}`;
+  * агент отвечает действием.
+* **Как ведёт себя `agent_host`:**
+  * агент запускается в текущем каталоге, поэтому относительные пути работают; `python` в начале команды заменяется текущим интерпретатором;
+  * stderr агента пишется в `grader_data/agent_stderr.log`;
+  * если агент упал, текущий и оставшиеся эпизоды оцениваются пустым ответом, выход — код 2 с сообщением;
+  * если оценённых эпизодов меньше, чем конфигов, выход — код 3.
+
+## Режим жюри: ваши seed, параметры, секрет и политики
+
+```bash
+make jury-run SPLIT=closed_split.json [SECRET=secret.txt] [POLICY="your.module:Factory ..."]
+# = python -m auditenv.jury_run --split closed_split.json --secret-file secret.txt --policies ...
+```
+`closed_split.json` (пример — `examples/closed_split_example.json`, 20 эпизодов: 5 чистых, 5 со взаимодействиями):
+```json
+{"split": "hidden", "config_version": "hidden-1.0.0",
+ "episodes": [{"seed": 123456789, "overrides": {"clean": true}},
+              {"seed": 42, "overrides": {"interactions": {"partial_fx_boundary": 1}, "currencies": {"base": ["JPY"]}}}]}
+```
+`overrides` — любой частичный config (поля `configs/default.json`), который мержится с дефолтом. Неверное поле даёт понятную ошибку с его именем.
+
+Шаги внутри:
+1. генерация: открытые записи пишутся в `jury_out/episodes/`, **эталон — в `jury_out/grader/`**, отдельный корень, чтобы вы могли независимо проверить эталон и доказательства по записям;
+2. независимый валидатор;
+3. политики в режиме eval, `oracle` добавляется всегда;
+4. 20 парных проверок: повтор seed/действий побайтово, перестановка и смена ID через `auditenv.transforms`;
+5. таблица P/R/F1/возврат/шаги/время по политикам — для всех, чистых и взаимодействующих эпизодов. Она пишется в `jury_out/jury_report.md`.
+
+**Секрет.** Генератор открыт, поэтому без секрета маленькие закрытые seed можно перебрать и получить эталон. Секрет входит в ключ эпизода, и это закрывает перебор. Без `--secret-file` выводится предупреждение и используется открытый детерминированный секрет по умолчанию, так что повтор seed остаётся точным.
 
 ## Контракт среды
 
@@ -38,57 +103,67 @@ from auditenv.grader.service import GraderClient   # оценщик = отдел
 from auditenv.env.core import AuditEnv
 
 with GraderClient() as grader:
-    env = AuditEnv(grader, mode="train")            # "eval": награда и диагностика скрыты до finalize
-    obs, info = env.reset(seed=42, config=cfg)      # или config={"episode_ref": "dev/ep_..."}
-    obs, reward, terminated, truncated, info = env.step(
-        {"action": "list_records", "args": {"table": "ledger", "cursor": None, "limit": 50}})
+    env = AuditEnv(grader, mode="train")            # "eval": награда/диагностика скрыты до finalize
+    obs, info = env.reset(seed=42)                  # config=None -> configs/default.json; частичный config мержится
+    obs, reward, terminated, truncated, info = env.step({"action": "list_records", "args": {"table": "ledger"}})
 ```
-* Наблюдение: `{"result": ..., "error": null | {"code", "message"}, "steps_remaining": int}`. Все значения JSON-совместимы.
-* Действия:
-  * `list_records(table, cursor, limit≤50)`;
-  * `get_record(table, id)`;
-  * `get_document(doc_id)`;
-  * `calculator(expression)`;
-  * `submit(findings)`.
-  Таблицы: `ledger`, `invoices`, `payments`, `fx`.
-* Лимиты: 100 шагов включая submit и 60 с на эпизод. Промежуточная награда всегда 0. При truncation оценивается пустой ответ.
-* `findings.json`: `{episode_id, findings: [{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}`. Лимиты: ≤30 выводов, ≤10 ID доказательств, explanation ≤1000 символов. Неверная структура → −1.
-* Награда: `clip(2*F1 − 1 − 0.002*inspection_steps, −1, 1)`. Правила сопоставления и допуски записаны в `policy.matching` каждого эпизода и в `grader/matcher.py`.
+**Наблюдение и `reset`:**
+* наблюдение всегда имеет вид `{"result", "error": null | {"code", "message"}, "steps_remaining"}`;
+* `config` для `reset` может быть: `None` / `{}` / частичный dict / `{"episode_ref": "dev/ep_…"}` / `{"closed_index": i}`. Ошибка открытия — `EpisodeOpenError` с причиной.
 
-## Данные эпизода
+**Действия:**
+* `list_records(table, cursor=None, limit=50)` — `cursor` и `limit` необязательны, лишние аргументы дают `invalid_arguments`;
+* `get_record(table, id)`;
+* `get_document(doc_id)`;
+* `calculator(expression)`;
+* `submit(findings)`.
 
-`episodes/<split>/<episode_id>/` — открытая часть: `manifest.json`, `policy.json`, `ledger.csv`, `invoices.jsonl`, `payments.jsonl`, `fx.csv`, `documents.jsonl`. Деньги хранятся только как целые minor units, курсы — десятичными строками, время — ISO-8601 со смещением, отсутствующие ссылки — `null`. Схемы лежат в `auditenv/schemas/`.
+Таблицы: `ledger`, `invoices`, `payments`, `fx`. В каждой строке `fx` есть вычисляемое поле `fx_id` = `fx:<date>:<src>:<tgt>`: это ID доказательства. Сам `fx.csv` не меняется.
 
-`grader_data/<split>/<episode_id>/` — закрытая часть: `truth.json`, `provenance.json`. Среда её не видит.
+**Лимиты и награда:**
+* 100 шагов включая submit и 60 с на эпизод; промежуточная награда 0; при truncation оценивается пустой ответ;
+* `findings`: ≤30 выводов, ≤10 ID доказательств, explanation ≤1000 символов; неверная структура даёт −1;
+* награда — `clip(2*F1 − 1 − 0.002*inspection_steps, −1, 1)`;
+* сопоставление и допуски описаны в `grader/matcher.py` и в `policy.matching` каждого эпизода.
 
-## Как организаторам подставить закрытые seed и новые сочетания параметров (без правки кода)
+## Docker
 
-1. Создайте `closed.json` — список `{"seed": <int>, "config": {...}}`. `config` — любой вариант `configs/default.json`: включение и счётчики типов ошибок, сценарии взаимодействий, `clean`, размеры, валюты, доли отвлекающих случаев. Также укажите `config_version`.
-2. Создайте файл секрета, доступный только оценщику (без него маленькие seed перебираются открытым генератором).
-3. Запуск внешнего агента отдельным процессом (только JSON через stdin/stdout):
-   ```bash
-   python -m auditenv.agent_host --closed-episodes-file closed.json --secret-file secret.txt \
-       --mode eval --agent-cmd "python my_agent.py"
-   ```
-   или из своего кода: `GraderClient(closed_episodes_file=..., secret_file=...)` и `env.reset(config={"closed_index": i})`.
-4. Безвредные преобразования делаются через `auditenv.transforms.transform_episode(public, truth, provenance, seed)`: перестановка строк и биективная смена всех ID, согласованно в эталоне.
+```bash
+make docker-pin      # docker pull python:3.11-slim; закрепляет digest в docker/base-image.txt (закоммитьте)
+make docker-check    # docker build --build-arg PYTHON_IMAGE=<digest> + docker run --network none --cpus 2 --memory 4g
+# без make:
+docker build --build-arg PYTHON_IMAGE="$(cat docker/base-image.txt)" -t auditenv .
+docker run --rm --network none --cpus 2 --memory 4g auditenv      # CMD = python -m auditenv.cli check
+```
+* pytest и его зависимости лежат в `vendor/wheels` и ставятся по SHA-256 из `requirements-dev.lock` с `--no-index`, так что сборке нужна сеть только для базового образа.
+* В образе нет `make`: `CMD` вызывает проверку напрямую.
+* Чтобы обновить digest, выполните `make docker-pin` (по умолчанию тег `python:3.11-slim`; другой тег — `sh docker/pin_base_image.sh python:3.11.X-slim`).
 
-Пример внешнего агента — `examples/stdin_agent.py`.
+### Проверено командой (заполнить после реальной сборки)
+```
+дата: ____-__-__   машина: ______   docker --version: ______
+digest: python:3.11-slim@sha256:________________
+$ make docker-check
+... (вставьте последние ~15 строк вывода, включая "== check: OK ==")
+```
 
-## Базовые политики
-
-`random_explorer` (фиксированный seed), `simple_reconciler` (честная скриптовая сверка), `flag_all` (атака) и `oracle`, ответ которого строится только в процессе оценщика. Результаты — в REPORT.md.
+### Проверено в песочнице разработки
+SANDBOX_CHECK_OUTPUT
 
 ## Структура
 
 ```
 auditenv/common     деньги (Decimal), время, ГПСЧ SHA-256, ID, мини-валидатор JSON Schema
-auditenv/schemas    JSON Schema: manifest, records, document, action, observation, findings, truth, policy
-auditenv/generator  world → render → mutations → truth; validate.py — независимый валидатор
+auditenv/schemas    JSON Schema: manifest, records, fx_record, document, action, observation, findings, truth, policy
+auditenv/generator  config (дефолт/слияние/валидация) → world → render → mutations → truth; validate.py — независимый валидатор
 auditenv/env        AuditEnv, read-only store и курсоры, инструменты, калькулятор
 auditenv/grader     matcher, reward, процесс оценщика
-auditenv/policies   базовые политики
-auditenv/transforms.py, runner.py, agent_host.py, report.py, demo.py, cli.py, checks.py
+auditenv/policies   api.py (Policy, load_policy, oracle_from_truth), baselines.py, process_adapter.py
+auditenv/{transforms,runner,agent_host,jury_run,report,demo,cli,checks}.py
 configs/            default.json + splits/{train,dev}.json (config_version)
-tests/              контракт, награда/атаки, данные, парные, изоляция, политики; tests/jury — теневое жюри 4×20
+examples/           my_policy.py, stdin_agent.py, closed_split_example.json
+tests/              контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run
+tests/jury          самопроверка 4×20 (зеркало раздела 10; не оценка жюри)
+vendor/wheels       pytest + зависимости (офлайн-установка)
 ```
+Лицензия MIT.
