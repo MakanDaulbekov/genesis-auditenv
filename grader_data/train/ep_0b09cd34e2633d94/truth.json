@@ -34,17 +34,22 @@
     },
     {
       "affected_ids": [
-        "PAY-J69SAC3"
+        "INV-X7Q6KCX"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "PAY-J69SAC3",
-          "R-SMRCT5GZX",
-          "fx:2030-06-27:KZT:EUR"
+          "INV-X7Q6KCX",
+          "R-N5T9ZF8LD",
+          "fx:2030-06-01:USD:EUR"
+        ],
+        [
+          "INV-X7Q6KCX",
+          "R-V84UMRHTB",
+          "fx:2030-06-01:USD:EUR"
         ]
       ],
-      "expected_amount_minor": 5922,
+      "expected_amount_minor": 248275,
       "interaction_group": null,
       "issue_id": "ISS-MPNYB6CL",
       "type": "fx_wrong_date_or_rate"

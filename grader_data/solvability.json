@@ -2,18 +2,18 @@
   "episodes": 310,
   "perfect": 310,
   "max_steps": 70,
-  "mean_steps": 40.93,
+  "mean_steps": 40.71,
   "steps_histogram": {
-    "20-29": 13,
-    "30-39": 174,
-    "40-49": 62,
-    "50-59": 31,
+    "20-29": 11,
+    "30-39": 183,
+    "40-49": 56,
+    "50-59": 30,
     "60-69": 29,
     "70-79": 1
   },
-  "max_ledger_rows": 1895,
+  "max_ledger_rows": 1892,
   "max_documents": 202,
-  "tp": 1977,
+  "tp": 1963,
   "fp": 0,
   "fn": 0,
   "by_variant": {
@@ -35,7 +35,7 @@
     "12_errors": {
       "n": 50,
       "perfect": 50,
-      "max_steps": 51
+      "max_steps": 49
     },
     "large": {
       "n": 50,

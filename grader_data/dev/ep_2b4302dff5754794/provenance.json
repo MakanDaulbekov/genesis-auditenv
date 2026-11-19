@@ -120,36 +120,36 @@
       "updated": [
         {
           "before": {
-            "bank_reference": "BR1833002195",
-            "doc_id": "D-RUXW3UZAW",
+            "bank_reference": "BR3063454226",
+            "doc_id": "D-U68Y8P6U8",
             "doc_type": "payment",
-            "payer_entity_id": "E-K9M38U",
-            "payer_name": "Polar Agro LLP",
+            "payer_entity_id": "E-AXA7FA",
+            "payer_name": "Zhibek Data GmbH",
             "record": {
-              "amount_minor": 3339642,
+              "amount_minor": 1297164,
               "currency": "USD",
-              "doc_id": "D-RUXW3UZAW",
+              "doc_id": "D-U68Y8P6U8",
               "invoice_refs": [
                 {
-                  "amount_minor": 3339642,
-                  "invoice_id": "INV-WZQ9T4J"
+                  "amount_minor": 1297164,
+                  "invoice_id": "INV-9DT24R3"
                 }
               ],
-              "payment_id": "PAY-ULXCRZC",
-              "timestamp": "2031-11-24T22:14:53+01:00"
+              "payment_id": "PAY-VBH3GSK",
+              "timestamp": "2031-11-23T08:33:01+04:00"
             },
             "refund_of": null,
             "remittance": {
               "lines": [
                 {
-                  "amount_minor": 3339642,
-                  "invoice_id": "INV-WZQ9T4J"
+                  "amount_minor": 1297164,
+                  "invoice_id": "INV-9DT24R3"
                 }
               ],
-              "note": "Settlement"
+              "note": ""
             }
           },
-          "id": "D-RUXW3UZAW"
+          "id": "D-U68Y8P6U8"
         }
       ]
     },
@@ -163,52 +163,76 @@
     "ledger": {
       "deleted": [
         {
-          "account": "accounts_receivable",
-          "credit_minor": 3339642,
+          "account": "opening_balance_equity",
+          "credit_minor": 1304662,
           "currency": "USD",
           "debit_minor": 0,
-          "entity_id": "E-K9M38U",
-          "invoice_id": "INV-WZQ9T4J",
-          "payment_id": "PAY-ULXCRZC",
-          "row_id": "R-72S2M7V6J",
-          "timestamp": "2031-11-24T18:14:53-03:00"
+          "entity_id": "E-KNA2AR",
+          "invoice_id": "INV-PCFLYLL",
+          "payment_id": null,
+          "row_id": "R-3N27FP9XH",
+          "timestamp": "2031-11-01T00:00:00-03:00"
+        },
+        {
+          "account": "accounts_receivable",
+          "credit_minor": 1297164,
+          "currency": "USD",
+          "debit_minor": 0,
+          "entity_id": "E-AXA7FA",
+          "invoice_id": "INV-9DT24R3",
+          "payment_id": "PAY-VBH3GSK",
+          "row_id": "R-NKXWMR96Y",
+          "timestamp": "2031-11-23T01:33:01-03:00"
         }
       ],
       "inserted": [
         "R-4UZK6US6K",
-        "R-5L7ZG4KLL",
-        "R-9PXLEVFDG",
         "R-R6E5H2EP9",
-        "R-YRC24M9TF"
+        "R-T5WAVH9ZH",
+        "R-X2P43H5YF"
       ],
       "updated": [
         {
           "before": {
-            "account": "fx_gain_loss",
+            "account": "accounts_receivable",
             "credit_minor": 0,
             "currency": "USD",
-            "debit_minor": 26974,
-            "entity_id": "E-2LHB5A",
-            "invoice_id": null,
-            "payment_id": "PAY-PV9B57R",
-            "row_id": "R-L32F3Y9Q7",
-            "timestamp": "2031-11-26T16:45:28-03:00"
+            "debit_minor": 1304662,
+            "entity_id": "E-KNA2AR",
+            "invoice_id": "INV-PCFLYLL",
+            "payment_id": null,
+            "row_id": "R-9EDSV6RSC",
+            "timestamp": "2031-11-01T00:00:00-03:00"
           },
-          "id": "R-L32F3Y9Q7"
+          "id": "R-9EDSV6RSC"
         },
         {
           "before": {
-            "account": "bank",
+            "account": "revenue",
+            "credit_minor": 251517,
+            "currency": "USD",
+            "debit_minor": 0,
+            "entity_id": "E-BBD3F9",
+            "invoice_id": "INV-YGC766H",
+            "payment_id": null,
+            "row_id": "R-BSPMCHXQ6",
+            "timestamp": "2031-11-04T08:01:27-03:00"
+          },
+          "id": "R-BSPMCHXQ6"
+        },
+        {
+          "before": {
+            "account": "accounts_receivable",
             "credit_minor": 0,
             "currency": "USD",
-            "debit_minor": 1529742,
-            "entity_id": "E-2LHB5A",
-            "invoice_id": null,
-            "payment_id": "PAY-PV9B57R",
-            "row_id": "R-RZAPNWLLY",
-            "timestamp": "2031-11-26T16:45:28-03:00"
+            "debit_minor": 251517,
+            "entity_id": "E-BBD3F9",
+            "invoice_id": "INV-YGC766H",
+            "payment_id": null,
+            "row_id": "R-ZBMRF3GUP",
+            "timestamp": "2031-11-04T08:01:27-03:00"
           },
-          "id": "R-RZAPNWLLY"
+          "id": "R-ZBMRF3GUP"
         }
       ]
     },
@@ -218,19 +242,19 @@
       "updated": [
         {
           "before": {
-            "amount_minor": 3339642,
+            "amount_minor": 1297164,
             "currency": "USD",
-            "doc_id": "D-RUXW3UZAW",
+            "doc_id": "D-U68Y8P6U8",
             "invoice_refs": [
               {
-                "amount_minor": 3339642,
-                "invoice_id": "INV-WZQ9T4J"
+                "amount_minor": 1297164,
+                "invoice_id": "INV-9DT24R3"
               }
             ],
-            "payment_id": "PAY-ULXCRZC",
-            "timestamp": "2031-11-24T22:14:53+01:00"
+            "payment_id": "PAY-VBH3GSK",
+            "timestamp": "2031-11-23T08:33:01+04:00"
           },
-          "id": "PAY-ULXCRZC"
+          "id": "PAY-VBH3GSK"
         }
       ]
     }
@@ -491,41 +515,41 @@
       "cause": {
         "after": {
           "invoice_id": "INV-MYED2FF",
-          "issued_at": "2031-12-01T04:08:19+06:00"
+          "issued_at": "2031-11-30T08:32:47+01:00"
         },
         "before": null,
         "duplicate_invoice_id": "INV-MYED2FF",
-        "original_invoice_id": "INV-WMZBYC3"
+        "original_invoice_id": "INV-WZQ9T4J"
       },
       "issue": {
         "affected_ids": [
           "INV-MYED2FF",
-          "INV-WMZBYC3"
+          "INV-WZQ9T4J"
         ],
-        "currency": "EUR",
+        "currency": "USD",
         "evidence_sets": [
           [
             "INV-MYED2FF",
-            "INV-WMZBYC3",
+            "INV-WZQ9T4J",
             "R-4UZK6US6K"
           ],
           [
             "INV-MYED2FF",
-            "INV-WMZBYC3",
-            "R-JCNPC8QW6"
+            "INV-WZQ9T4J",
+            "R-95RJWQDQL"
           ],
           [
             "INV-MYED2FF",
-            "INV-WMZBYC3",
+            "INV-WZQ9T4J",
+            "R-L748X6QQJ"
+          ],
+          [
+            "INV-MYED2FF",
+            "INV-WZQ9T4J",
             "R-R6E5H2EP9"
-          ],
-          [
-            "INV-MYED2FF",
-            "INV-WMZBYC3",
-            "R-U9M29K6ZL"
           ]
         ],
-        "expected_amount_minor": 494301,
+        "expected_amount_minor": 3339642,
         "interaction_group": null,
         "type": "duplicate_invoice"
       },
@@ -538,28 +562,28 @@
         "after": null,
         "before": [
           {
-            "amount_minor": 3339642,
-            "invoice_id": "INV-WZQ9T4J"
+            "amount_minor": 1297164,
+            "invoice_id": "INV-9DT24R3"
           }
         ],
         "field": "invoice_refs",
-        "invoice_id": "INV-WZQ9T4J",
-        "payment_id": "PAY-ULXCRZC"
+        "invoice_id": "INV-9DT24R3",
+        "payment_id": "PAY-VBH3GSK"
       },
       "issue": {
         "affected_ids": [
-          "INV-WZQ9T4J",
-          "PAY-ULXCRZC"
+          "INV-9DT24R3",
+          "PAY-VBH3GSK"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "INV-WZQ9T4J",
-            "PAY-ULXCRZC",
-            "R-YRC24M9TF"
+            "INV-9DT24R3",
+            "PAY-VBH3GSK",
+            "R-T5WAVH9ZH"
           ]
         ],
-        "expected_amount_minor": 3339642,
+        "expected_amount_minor": 1297164,
         "interaction_group": null,
         "type": "missing_or_partial_allocation"
       },
@@ -570,31 +594,36 @@
     {
       "cause": {
         "after": {
-          "base_amount_minor": 1530634,
-          "rate_date": "2031-11-28"
+          "base_amount_minor": 249558,
+          "rate_date": "2031-11-06"
         },
         "before": {
-          "base_amount_minor": 1529742,
-          "rate": "1.080911",
+          "base_amount_minor": 251517,
+          "rate": "1.101722",
           "rate_currency": "EUR",
-          "rate_date": "2031-11-26"
+          "rate_date": "2031-11-04"
         },
-        "document_id": "PAY-PV9B57R",
-        "document_kind": "payment"
+        "document_id": "INV-YGC766H",
+        "document_kind": "invoice"
       },
       "issue": {
         "affected_ids": [
-          "PAY-PV9B57R"
+          "INV-YGC766H"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "PAY-PV9B57R",
-            "R-RZAPNWLLY",
-            "fx:2031-11-26:EUR:USD"
+            "INV-YGC766H",
+            "R-BSPMCHXQ6",
+            "fx:2031-11-04:EUR:USD"
+          ],
+          [
+            "INV-YGC766H",
+            "R-ZBMRF3GUP",
+            "fx:2031-11-04:EUR:USD"
           ]
         ],
-        "expected_amount_minor": 892,
+        "expected_amount_minor": 1959,
         "interaction_group": null,
         "type": "fx_wrong_date_or_rate"
       },
@@ -605,37 +634,37 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2031-11-30T22:14:29-03:00",
+          "ledger_timestamp": "2031-11-01T05:37:33-03:00",
           "posting": "issue"
         },
         "before": {
-          "posting": null
+          "posting": "opening"
         },
-        "document_instant": "2031-12-01T06:51:58-03:00",
-        "invoice_id": "INV-WBM9GUG"
+        "document_instant": "2031-09-24T20:09:36+03:00",
+        "invoice_id": "INV-PCFLYLL"
       },
       "issue": {
         "affected_ids": [
-          "INV-WBM9GUG"
+          "INV-PCFLYLL"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "INV-WBM9GUG",
-            "R-5L7ZG4KLL"
+            "INV-PCFLYLL",
+            "R-9EDSV6RSC"
           ],
           [
-            "INV-WBM9GUG",
-            "R-9PXLEVFDG"
+            "INV-PCFLYLL",
+            "R-X2P43H5YF"
           ]
         ],
-        "expected_amount_minor": 4480831,
+        "expected_amount_minor": 1304662,
         "interaction_group": null,
         "type": "period_cutoff_error"
       },
       "issue_id": "ISS-MKWP9GTV",
       "type": "period_cutoff_error",
-      "variant": "next_period_booked:accrued_at_period_close"
+      "variant": "prior_period_booked:booked_at_period_open"
     }
   ],
   "plan": {

@@ -23,17 +23,17 @@
   "issues": [
     {
       "affected_ids": [
-        "PAY-MUA7J63"
+        "PAY-V386LX5"
       ],
       "currency": "KZT",
       "evidence_sets": [
         [
-          "PAY-MUA7J63",
-          "R-L8TD7G8DQ",
-          "fx:2031-10-26:CHF:KZT"
+          "PAY-V386LX5",
+          "R-5768TRBNF",
+          "fx:2031-10-07:EUR:KZT"
         ]
       ],
-      "expected_amount_minor": 247832175,
+      "expected_amount_minor": 10595799,
       "interaction_group": null,
       "issue_id": "ISS-73UGR4RQ",
       "type": "fx_wrong_date_or_rate"
@@ -53,7 +53,7 @@
           "R-NSJZJFFWP"
         ]
       ],
-      "expected_amount_minor": 1597072104,
+      "expected_amount_minor": 2475295231,
       "interaction_group": "G1",
       "issue_id": "ISS-7RPNFHYM",
       "type": "period_cutoff_error"
@@ -78,65 +78,65 @@
     {
       "affected_ids": [
         "INV-K75NXJV",
-        "INV-LH8RM3N"
+        "INV-N62VTKS"
       ],
-      "currency": "KZT",
+      "currency": "CHF",
       "evidence_sets": [
         [
           "INV-K75NXJV",
-          "INV-LH8RM3N",
-          "R-D7B7SX8L5"
+          "INV-N62VTKS",
+          "R-7JA9PP2AX"
         ],
         [
           "INV-K75NXJV",
-          "INV-LH8RM3N",
-          "R-GR4LMZPPK"
-        ],
-        [
-          "INV-K75NXJV",
-          "INV-LH8RM3N",
+          "INV-N62VTKS",
           "R-NMP5CEXEV"
         ],
         [
           "INV-K75NXJV",
-          "INV-LH8RM3N",
+          "INV-N62VTKS",
           "R-NSJZJFFWP"
+        ],
+        [
+          "INV-K75NXJV",
+          "INV-N62VTKS",
+          "R-T35K24DKJ"
         ]
       ],
-      "expected_amount_minor": 1597072104,
+      "expected_amount_minor": 4798768,
       "interaction_group": "G1",
       "issue_id": "ISS-NEXQGTFH",
       "type": "duplicate_invoice"
     },
     {
       "affected_ids": [
-        "INV-BUVFVA6",
-        "INV-QR2F6AU"
+        "INV-QR2F6AU",
+        "INV-X8NAK3L"
       ],
-      "currency": "KZT",
+      "currency": "CHF",
       "evidence_sets": [
         [
-          "INV-BUVFVA6",
           "INV-QR2F6AU",
-          "R-368YLXGKN"
+          "INV-X8NAK3L",
+          "R-2P2BWG9VX"
         ],
         [
-          "INV-BUVFVA6",
           "INV-QR2F6AU",
+          "INV-X8NAK3L",
           "R-8JBSGNT3G"
         ],
         [
-          "INV-BUVFVA6",
           "INV-QR2F6AU",
-          "R-FLVYQJRMS"
+          "INV-X8NAK3L",
+          "R-L2J2X8GG5"
         ],
         [
-          "INV-BUVFVA6",
           "INV-QR2F6AU",
-          "R-L2J2X8GG5"
+          "INV-X8NAK3L",
+          "R-YNFBHKBCD"
         ]
       ],
-      "expected_amount_minor": 1113670216,
+      "expected_amount_minor": 8478293,
       "interaction_group": null,
       "issue_id": "ISS-NVH74LK2",
       "type": "duplicate_invoice"
@@ -161,22 +161,17 @@
     },
     {
       "affected_ids": [
-        "INV-9VFP69N"
+        "PAY-WBE8ADG"
       ],
       "currency": "KZT",
       "evidence_sets": [
         [
-          "INV-9VFP69N",
-          "R-LLEVJXEWY",
-          "fx:2031-10-15:EUR:KZT"
-        ],
-        [
-          "INV-9VFP69N",
-          "R-SBBHR6M66",
-          "fx:2031-10-15:EUR:KZT"
+          "PAY-WBE8ADG",
+          "R-FTUSU3R3B",
+          "fx:2031-10-31:CHF:KZT"
         ]
       ],
-      "expected_amount_minor": 17281650,
+      "expected_amount_minor": 39946,
       "interaction_group": null,
       "issue_id": "ISS-P8AF552W",
       "type": "fx_wrong_date_or_rate"

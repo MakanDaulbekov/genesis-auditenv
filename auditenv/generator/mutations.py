@@ -72,10 +72,10 @@ def duplicate_invoice(world: dict, rng: DRBG, params: dict) -> dict:
     """Повторно проведённый счёт: копия с новым doc_id/invoice_id/датой, та же суть."""
     start, end = _period(world)
     touched = _touched(world)
-    excl = touched | _distractor_ids(world)
+    excl = touched
     want_out_of_period = params.get("copy_out_of_period", False)
     cands = sorted(iid for iid, inv in world["invoices"].items()
-                   if inv["_kind"] == "regular" and iid not in excl
+                   if inv["_kind"] in ("regular", "recurring") and iid not in excl
                    and parse_ts(inv["issued_at"]) < end - timedelta(days=2))
     if not cands:
         raise GenerationError("no duplicate candidates")
@@ -122,41 +122,37 @@ def duplicate_invoice(world: dict, rng: DRBG, params: dict) -> dict:
 def missing_or_partial_allocation(world: dict, rng: DRBG, params: dict) -> dict:
     """Платёж по remittance advice предназначен счёту I, но в книге не распределён или
     распределён частично; остаток ошибочно отнесён на customer_advances."""
+    # Кандидаты — ЛЮБЫЕ поступления с remittance advice (полные, разбитые, частичные, пакетные,
+    # с переплатой): иначе заметка платежа («Partial…», «Batch…») стала бы бесплатным признаком.
     touched = _touched(world)
-    excl = touched | (_distractor_ids(world) - set(params.get("allow_ids", [])))
-    by_inv = _payments_by_invoice(world)
     only = params.get("only_payment_id")
     cands = []
     for pid in sorted(world["payments"]):
         p = world["payments"][pid]
         if only and pid != only:
             continue
-        if p["_kind"] != "receipt" or pid in excl or p["invoice_refs"] is None:
+        if p["_kind"] != "receipt" or pid in touched or p["invoice_refs"] is None:
             continue
-        lines = p["remittance"]["lines"]
-        if len(lines) != 1 or len(p["invoice_refs"]) != 1:
-            continue
-        iid = lines[0]["invoice_id"]
-        if iid in excl or by_inv.get(iid) != [pid]:
-            continue
-        r = lines[0]["amount_minor"]
-        if p["invoice_refs"][0] != lines[0] or p["amount_minor"] != r or r < 10:
-            continue
-        cands.append(pid)
+        booked = {r["invoice_id"]: r["amount_minor"] for r in p["invoice_refs"]}
+        for line in p["remittance"]["lines"]:
+            iid, r = line["invoice_id"], line["amount_minor"]
+            if iid not in touched and booked.get(iid) == r and r >= 10:
+                cands.append((pid, iid))
     if not cands:
         raise GenerationError("no allocation candidates")
-    pid = rng.choice(cands)
+    pid, iid = rng.choice(cands)
     p = world["payments"][pid]
-    iid = p["remittance"]["lines"][0]["invoice_id"]
-    r = p["remittance"]["lines"][0]["amount_minor"]
+    r = next(l["amount_minor"] for l in p["remittance"]["lines"] if l["invoice_id"] == iid)
     variant = params.get("variant") or rng.choice(["missing", "partial"])
     before = deepcopy(p["invoice_refs"])
+    others = [ref for ref in p["invoice_refs"] if ref["invoice_id"] != iid]
     if variant == "missing":
-        p["invoice_refs"] = None
+        p["invoice_refs"] = others or None
         amount = r
     else:
         a = rng.randint(max(1, r // 10), r - max(1, r // 10))
-        p["invoice_refs"] = [{"invoice_id": iid, "amount_minor": a}]
+        p["invoice_refs"] = [dict(ref, amount_minor=a) if ref["invoice_id"] == iid else ref
+                             for ref in p["invoice_refs"]]
         amount = r - a
     touched.update([pid, iid])
     issue = _issue(world, "missing_or_partial_allocation", [iid, pid], amount, p["currency"],
@@ -194,26 +190,27 @@ def _fx_wrong_choice(world: dict, rng: DRBG, ccy: str, ts: str, due: str | None,
 
 def fx_wrong_date_or_rate(world: dict, rng: DRBG, params: dict) -> dict:
     """Конвертация по курсу не той даты (нарушение policy.fx.rate_date) или по чужому курсу."""
+    # Кандидаты — все иностранные счета в периоде (оплаченные тоже: погашение AR идёт по верному
+    # историческому курсу) и все иностранные движения денег: поступления, разбитые/частичные/пакетные,
+    # предоплаты и возвраты. Отвлекающие случаи не исключаются — иначе вид записи был бы признаком.
     tz = world["company"]["timezone"]
     base = world["company"]["base_currency"]
     touched = _touched(world)
-    excl = touched | (_distractor_ids(world) - set(params.get("allow_ids", [])))
-    by_inv = _payments_by_invoice(world)
     targets = []
     only = params.get("only_payment_id")
     if not only:
         for iid in sorted(world["invoices"]):
             inv = world["invoices"][iid]
-            if inv["currency"] == base or iid in excl or inv["_kind"] != "regular":
+            if inv["currency"] == base or iid in touched or inv["_kind"] not in ("regular", "recurring"):
                 continue
-            if invoice_posting_kind(world, inv) != "issue" or by_inv.get(iid):
+            if invoice_posting_kind(world, inv) != "issue":
                 continue
             targets.append(("invoice", iid))
     for pid in sorted(world["payments"]):
         p = world["payments"][pid]
         if only and pid != only:
             continue
-        if p["currency"] == base or pid in excl or p["_kind"] != "receipt":
+        if p["currency"] == base or pid in touched or p["_kind"] not in ("receipt", "prepayment", "refund"):
             continue
         targets.append(("payment", pid))
     rng.shuffle(targets)
@@ -224,7 +221,7 @@ def fx_wrong_date_or_rate(world: dict, rng: DRBG, params: dict) -> dict:
             ts, due, amt = doc["issued_at"], doc["due_at"], doc["total_minor"]
         else:
             doc = world["payments"][ident]
-            ts, due, amt = doc["timestamp"], None, doc["amount_minor"]
+            ts, due, amt = doc["timestamp"], None, abs(doc["amount_minor"])
         ccy = doc["currency"]
         correct_d = local_date(ts, tz)
         correct = to_base(world, amt, ccy, correct_d)
@@ -261,8 +258,7 @@ def period_cutoff_error(world: dict, rng: DRBG, params: dict) -> dict:
     base = world["company"]["base_currency"]
     start, end = _period(world)
     touched = _touched(world)
-    excl = touched | (_distractor_ids(world) - set(params.get("allow_ids", [])))
-    by_inv = _payments_by_invoice(world)
+    excl = touched  # отвлекающие случаи у границы периода тоже могут стать ошибкой
     only = params.get("only_invoice_id")
     variants = params.get("variants") or ["next_period_booked", "prior_period_booked"]
     cands = []
@@ -270,7 +266,7 @@ def period_cutoff_error(world: dict, rng: DRBG, params: dict) -> dict:
         inv = world["invoices"][iid]
         if only and iid != only:
             continue
-        if iid in excl or by_inv.get(iid):
+        if iid in excl:
             continue
         if inv["_kind"] in ("next", "duplicate") and "next_period_booked" in variants:
             if parse_ts(inv["issued_at"]) >= end:

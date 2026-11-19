@@ -23,18 +23,18 @@
   "issues": [
     {
       "affected_ids": [
-        "INV-LW6Q8KX",
-        "PAY-8VH2MBQ"
+        "INV-PMEAJYV",
+        "PAY-C4M9URF"
       ],
       "currency": "KZT",
       "evidence_sets": [
         [
-          "INV-LW6Q8KX",
-          "PAY-8VH2MBQ",
-          "R-BLCC9PAS5"
+          "INV-PMEAJYV",
+          "PAY-C4M9URF",
+          "R-N9YK7RJAD"
         ]
       ],
-      "expected_amount_minor": 1552632492,
+      "expected_amount_minor": 451651461,
       "interaction_group": null,
       "issue_id": "ISS-J99ALHHJ",
       "type": "missing_or_partial_allocation"
@@ -54,7 +54,7 @@
           "R-ZG735CUDA"
         ]
       ],
-      "expected_amount_minor": 81525686,
+      "expected_amount_minor": 380157476,
       "interaction_group": "G1",
       "issue_id": "ISS-JCY5D6PB",
       "type": "period_cutoff_error"
@@ -72,106 +72,106 @@
           "R-5YZ7HH9BJ"
         ]
       ],
-      "expected_amount_minor": 1833871,
+      "expected_amount_minor": 1090660,
       "interaction_group": "G2",
       "issue_id": "ISS-JJ4FWAY2",
       "type": "missing_or_partial_allocation"
     },
     {
       "affected_ids": [
-        "INV-FJ26RAN",
+        "INV-U4H8MZV",
         "INV-V6C6JLA"
       ],
-      "currency": "JPY",
+      "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-FJ26RAN",
-          "INV-V6C6JLA",
-          "R-6ENG7RJ7D"
-        ],
-        [
-          "INV-FJ26RAN",
+          "INV-U4H8MZV",
           "INV-V6C6JLA",
           "R-6JJ4TPG3S"
         ],
         [
-          "INV-FJ26RAN",
+          "INV-U4H8MZV",
           "INV-V6C6JLA",
-          "R-M4HF37JPR"
+          "R-PEL7HAEJV"
         ],
         [
-          "INV-FJ26RAN",
+          "INV-U4H8MZV",
+          "INV-V6C6JLA",
+          "R-TDMATVUZX"
+        ],
+        [
+          "INV-U4H8MZV",
           "INV-V6C6JLA",
           "R-ZG735CUDA"
         ]
       ],
-      "expected_amount_minor": 254498,
+      "expected_amount_minor": 749676,
       "interaction_group": "G1",
       "issue_id": "ISS-K32JHF3B",
       "type": "duplicate_invoice"
     },
     {
       "affected_ids": [
-        "INV-SSA2WJB",
-        "INV-U4H8MZV"
+        "INV-DLQW6UB",
+        "INV-SSA2WJB"
       ],
-      "currency": "EUR",
+      "currency": "KZT",
       "evidence_sets": [
         [
+          "INV-DLQW6UB",
           "INV-SSA2WJB",
-          "INV-U4H8MZV",
+          "R-4V65GSKA5"
+        ],
+        [
+          "INV-DLQW6UB",
+          "INV-SSA2WJB",
           "R-AP4STBBZU"
         ],
         [
+          "INV-DLQW6UB",
           "INV-SSA2WJB",
-          "INV-U4H8MZV",
           "R-GZ9WPZMZU"
         ],
         [
+          "INV-DLQW6UB",
           "INV-SSA2WJB",
-          "INV-U4H8MZV",
-          "R-PEL7HAEJV"
-        ],
-        [
-          "INV-SSA2WJB",
-          "INV-U4H8MZV",
-          "R-TDMATVUZX"
+          "R-Q9L6BBWTA"
         ]
       ],
-      "expected_amount_minor": 749676,
+      "expected_amount_minor": 2603907732,
       "interaction_group": null,
       "issue_id": "ISS-NFNCCZDA",
       "type": "duplicate_invoice"
     },
     {
       "affected_ids": [
-        "INV-FWNHGVC",
+        "INV-ACSJKP7",
         "INV-P8KT9HG"
       ],
-      "currency": "JPY",
+      "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-FWNHGVC",
+          "INV-ACSJKP7",
           "INV-P8KT9HG",
-          "R-84ZN2J7GK"
+          "R-5E52Z5373"
         ],
         [
-          "INV-FWNHGVC",
+          "INV-ACSJKP7",
           "INV-P8KT9HG",
           "R-LGGE57G5Y"
         ],
         [
-          "INV-FWNHGVC",
+          "INV-ACSJKP7",
           "INV-P8KT9HG",
-          "R-YDPMKU5HG"
+          "R-QJWZTHGTP"
         ],
         [
-          "INV-FWNHGVC",
+          "INV-ACSJKP7",
           "INV-P8KT9HG",
-          "R-Z7SS3LVET"
+          "R-YDPMKU5HG"
         ]
       ],
-      "expected_amount_minor": 1915944,
+      "expected_amount_minor": 4207311,
       "interaction_group": null,
       "issue_id": "ISS-QY32FRNP",
       "type": "duplicate_invoice"

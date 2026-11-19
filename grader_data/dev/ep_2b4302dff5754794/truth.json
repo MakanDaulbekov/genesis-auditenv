@@ -4,17 +4,22 @@
   "issues": [
     {
       "affected_ids": [
-        "PAY-PV9B57R"
+        "INV-YGC766H"
       ],
       "currency": "USD",
       "evidence_sets": [
         [
-          "PAY-PV9B57R",
-          "R-RZAPNWLLY",
-          "fx:2031-11-26:EUR:USD"
+          "INV-YGC766H",
+          "R-BSPMCHXQ6",
+          "fx:2031-11-04:EUR:USD"
+        ],
+        [
+          "INV-YGC766H",
+          "R-ZBMRF3GUP",
+          "fx:2031-11-04:EUR:USD"
         ]
       ],
-      "expected_amount_minor": 892,
+      "expected_amount_minor": 1959,
       "interaction_group": null,
       "issue_id": "ISS-8362BRCF",
       "type": "fx_wrong_date_or_rate"
@@ -22,70 +27,70 @@
     {
       "affected_ids": [
         "INV-MYED2FF",
-        "INV-WMZBYC3"
+        "INV-WZQ9T4J"
       ],
-      "currency": "EUR",
+      "currency": "USD",
       "evidence_sets": [
         [
           "INV-MYED2FF",
-          "INV-WMZBYC3",
+          "INV-WZQ9T4J",
           "R-4UZK6US6K"
         ],
         [
           "INV-MYED2FF",
-          "INV-WMZBYC3",
-          "R-JCNPC8QW6"
+          "INV-WZQ9T4J",
+          "R-95RJWQDQL"
         ],
         [
           "INV-MYED2FF",
-          "INV-WMZBYC3",
+          "INV-WZQ9T4J",
+          "R-L748X6QQJ"
+        ],
+        [
+          "INV-MYED2FF",
+          "INV-WZQ9T4J",
           "R-R6E5H2EP9"
-        ],
-        [
-          "INV-MYED2FF",
-          "INV-WMZBYC3",
-          "R-U9M29K6ZL"
         ]
       ],
-      "expected_amount_minor": 494301,
+      "expected_amount_minor": 3339642,
       "interaction_group": null,
       "issue_id": "ISS-JFYAAZFG",
       "type": "duplicate_invoice"
     },
     {
       "affected_ids": [
-        "INV-WBM9GUG"
+        "INV-PCFLYLL"
       ],
       "currency": "USD",
       "evidence_sets": [
         [
-          "INV-WBM9GUG",
-          "R-5L7ZG4KLL"
+          "INV-PCFLYLL",
+          "R-9EDSV6RSC"
         ],
         [
-          "INV-WBM9GUG",
-          "R-9PXLEVFDG"
+          "INV-PCFLYLL",
+          "R-X2P43H5YF"
         ]
       ],
-      "expected_amount_minor": 4480831,
+      "expected_amount_minor": 1304662,
       "interaction_group": null,
       "issue_id": "ISS-MKWP9GTV",
       "type": "period_cutoff_error"
     },
     {
       "affected_ids": [
-        "INV-WZQ9T4J",
-        "PAY-ULXCRZC"
+        "INV-9DT24R3",
+        "PAY-VBH3GSK"
       ],
       "currency": "USD",
       "evidence_sets": [
         [
-          "INV-WZQ9T4J",
-          "PAY-ULXCRZC",
-          "R-YRC24M9TF"
+          "INV-9DT24R3",
+          "PAY-VBH3GSK",
+          "R-T5WAVH9ZH"
         ]
       ],
-      "expected_amount_minor": 3339642,
+      "expected_amount_minor": 1297164,
       "interaction_group": null,
       "issue_id": "ISS-TSKL74H7",
       "type": "missing_or_partial_allocation"

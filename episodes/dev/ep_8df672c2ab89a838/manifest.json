@@ -1,0 +1,39 @@
+{
+  "base_currency": "EUR",
+  "company_name": "Granit Motors JSC",
+  "config_version": "dev-1.0.0",
+  "counts": {
+    "documents": 126,
+    "fx_rows": 575,
+    "invoices": 69,
+    "ledger_rows": 699,
+    "payments": 57
+  },
+  "currency_exponents": {
+    "CHF": 2,
+    "EUR": 2,
+    "GBP": 2,
+    "JPY": 0,
+    "KZT": 2,
+    "USD": 2
+  },
+  "episode_id": "ep_8df672c2ab89a838",
+  "files": {
+    "documents.jsonl": "c1903e01b5a5c79c211623c694cac0e10d540a2c357edf65e70e5ab2e99fbc68",
+    "fx.csv": "65c0675ae149d85af0bfec91ccdc5a4d69c2fde5e9ed1fbbaca04a56bdf85c34",
+    "invoices.jsonl": "a6a00f6c57a4915c0ac83297e235b9ba809685dfefeed290c0cac655ef0f1866",
+    "ledger.csv": "1f18f22ab972d25e981d720ea6df11a10588cae4596858d6e7eff58f2750ea9e",
+    "payments.jsonl": "b115dc24b15ab6942b4e29acc29b61d34beb24021271352d9186c9ad3ad5a91d",
+    "policy.json": "276f53614311eb947bda2a51f105e917c0774b0f8bfa029c9048cca926b5ac73"
+  },
+  "generator_version": "1.0.0",
+  "period_end": "2034-09-30",
+  "period_start": "2034-09-01",
+  "rounding": {
+    "fx_rate_date": "local_date_of_document_instant_in_company_timezone",
+    "mode": "ROUND_HALF_EVEN",
+    "tolerance_minor": 0
+  },
+  "schema_version": "1.0",
+  "timezone": "-05:00"
+}

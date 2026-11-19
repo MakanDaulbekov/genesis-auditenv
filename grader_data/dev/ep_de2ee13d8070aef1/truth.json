@@ -14,17 +14,17 @@
   "issues": [
     {
       "affected_ids": [
-        "PAY-487DQHZ"
+        "PAY-V3UN5SJ"
       ],
       "currency": "KZT",
       "evidence_sets": [
         [
-          "PAY-487DQHZ",
-          "R-YG74RR88W",
-          "fx:2033-09-23:USD:KZT"
+          "PAY-V3UN5SJ",
+          "R-TTF8KTXSH",
+          "fx:2033-09-27:EUR:KZT"
         ]
       ],
-      "expected_amount_minor": 4522682,
+      "expected_amount_minor": 11457,
       "interaction_group": null,
       "issue_id": "ISS-45SLX4FM",
       "type": "fx_wrong_date_or_rate"
@@ -32,32 +32,32 @@
     {
       "affected_ids": [
         "INV-88573S3",
-        "INV-Y72RBD9"
+        "INV-MPEA8FG"
       ],
       "currency": "KZT",
       "evidence_sets": [
         [
           "INV-88573S3",
-          "INV-Y72RBD9",
+          "INV-MPEA8FG",
+          "R-C7GQBVSHT"
+        ],
+        [
+          "INV-88573S3",
+          "INV-MPEA8FG",
+          "R-E5M6KM8JV"
+        ],
+        [
+          "INV-88573S3",
+          "INV-MPEA8FG",
           "R-HGXBQZHP8"
         ],
         [
           "INV-88573S3",
-          "INV-Y72RBD9",
-          "R-KBH6CHNJ7"
-        ],
-        [
-          "INV-88573S3",
-          "INV-Y72RBD9",
+          "INV-MPEA8FG",
           "R-NFFXRHZQV"
-        ],
-        [
-          "INV-88573S3",
-          "INV-Y72RBD9",
-          "R-P2V2PNCY3"
         ]
       ],
-      "expected_amount_minor": 3178039144,
+      "expected_amount_minor": 1078625538,
       "interaction_group": "G1",
       "issue_id": "ISS-FEVTN9R3",
       "type": "duplicate_invoice"
@@ -77,7 +77,7 @@
           "R-NFFXRHZQV"
         ]
       ],
-      "expected_amount_minor": 3178039144,
+      "expected_amount_minor": 1078625538,
       "interaction_group": "G1",
       "issue_id": "ISS-M4SXNJQS",
       "type": "period_cutoff_error"

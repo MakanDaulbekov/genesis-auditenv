@@ -14,71 +14,71 @@
   "issues": [
     {
       "affected_ids": [
-        "INV-TWSB9DN",
+        "INV-U7FSKMW",
         "INV-Z6GVVNG"
       ],
-      "currency": "JPY",
+      "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-TWSB9DN",
-          "INV-Z6GVVNG",
-          "R-3A5SERRJZ"
-        ],
-        [
-          "INV-TWSB9DN",
+          "INV-U7FSKMW",
           "INV-Z6GVVNG",
           "R-97Y7BLFZS"
         ],
         [
-          "INV-TWSB9DN",
+          "INV-U7FSKMW",
+          "INV-Z6GVVNG",
+          "R-E7U55GTLA"
+        ],
+        [
+          "INV-U7FSKMW",
           "INV-Z6GVVNG",
           "R-KYN4MG2LQ"
         ],
         [
-          "INV-TWSB9DN",
+          "INV-U7FSKMW",
           "INV-Z6GVVNG",
-          "R-ZGJW77D7U"
+          "R-ZZ82GJFUW"
         ]
       ],
-      "expected_amount_minor": 3045000,
+      "expected_amount_minor": 3513696,
       "interaction_group": "G1",
       "issue_id": "ISS-4L6GBUM5",
       "type": "duplicate_invoice"
     },
     {
       "affected_ids": [
-        "INV-ZDF4XYW",
-        "PAY-3JJ6CTW"
+        "INV-382XLBQ",
+        "PAY-55BG6XT"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-ZDF4XYW",
-          "PAY-3JJ6CTW",
-          "R-6SAJBB6YS"
+          "INV-382XLBQ",
+          "PAY-55BG6XT",
+          "R-HUNM9TSR9"
         ]
       ],
-      "expected_amount_minor": 882918,
+      "expected_amount_minor": 36367,
       "interaction_group": null,
       "issue_id": "ISS-5DNTRBDR",
       "type": "missing_or_partial_allocation"
     },
     {
       "affected_ids": [
-        "INV-6RSLM7A"
+        "INV-C3GPLT2"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-6RSLM7A",
-          "R-7P7Y6HAUK"
+          "INV-C3GPLT2",
+          "R-K4X5XH98K"
         ],
         [
-          "INV-6RSLM7A",
-          "R-EG532TKFY"
+          "INV-C3GPLT2",
+          "R-SM557JZ4C"
         ]
       ],
-      "expected_amount_minor": 671199,
+      "expected_amount_minor": 540000,
       "interaction_group": null,
       "issue_id": "ISS-79TVR4ZW",
       "type": "period_cutoff_error"
@@ -95,7 +95,7 @@
           "fx:2033-05-28:JPY:EUR"
         ]
       ],
-      "expected_amount_minor": 312459622,
+      "expected_amount_minor": 2854,
       "interaction_group": null,
       "issue_id": "ISS-DXFFK3G4",
       "type": "fx_wrong_date_or_rate"
@@ -115,58 +115,58 @@
           "R-KYN4MG2LQ"
         ]
       ],
-      "expected_amount_minor": 1909917,
+      "expected_amount_minor": 3513696,
       "interaction_group": "G1",
       "issue_id": "ISS-KZB6EA82",
       "type": "period_cutoff_error"
     },
     {
       "affected_ids": [
-        "INV-7YFVNJB",
-        "PAY-K3Y42D4"
+        "INV-TT2NGYS",
+        "PAY-G3SNGQQ"
       ],
-      "currency": "CHF",
+      "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-7YFVNJB",
-          "PAY-K3Y42D4",
-          "R-NKYGT65LG"
+          "INV-TT2NGYS",
+          "PAY-G3SNGQQ",
+          "R-XAEECQF2A"
         ]
       ],
-      "expected_amount_minor": 1065728,
+      "expected_amount_minor": 2099293,
       "interaction_group": null,
       "issue_id": "ISS-VPKPFC6X",
       "type": "missing_or_partial_allocation"
     },
     {
       "affected_ids": [
-        "INV-K78XP9Y",
+        "INV-HVG9G53",
         "INV-KVDGGQG"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-K78XP9Y",
+          "INV-HVG9G53",
           "INV-KVDGGQG",
           "R-43G9NEP6T"
         ],
         [
-          "INV-K78XP9Y",
+          "INV-HVG9G53",
           "INV-KVDGGQG",
-          "R-JUT6U46KX"
+          "R-HLRCW2XBU"
         ],
         [
-          "INV-K78XP9Y",
+          "INV-HVG9G53",
           "INV-KVDGGQG",
           "R-MTSJU7Q9H"
         ],
         [
-          "INV-K78XP9Y",
+          "INV-HVG9G53",
           "INV-KVDGGQG",
-          "R-PYZKVNSUP"
+          "R-RVCPU5S3M"
         ]
       ],
-      "expected_amount_minor": 3500604,
+      "expected_amount_minor": 4427400,
       "interaction_group": null,
       "issue_id": "ISS-X8A6CYDS",
       "type": "duplicate_invoice"

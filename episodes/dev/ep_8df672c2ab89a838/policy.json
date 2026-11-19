@@ -5,7 +5,7 @@
     "refunds": "negative amount_minor; refund_of names the refunded receipt",
     "rule": "booked invoice_refs of a receipt must equal the remittance advice lines of its document"
   },
-  "base_currency": "USD",
+  "base_currency": "EUR",
   "currency_exponents": {
     "CHF": 2,
     "EUR": 2,
@@ -22,7 +22,7 @@
     "ar_relief": "invoice historical rate; the payment that fully settles an invoice clears its remaining AR",
     "conversion": "base_minor = round(amount_minor * rate * 10^(exp_target - exp_source))",
     "gain_loss_account": "fx_gain_loss",
-    "ledger_currency": "USD",
+    "ledger_currency": "EUR",
     "rate_date": "local_date_of_document_instant_in_company_timezone",
     "rate_definition": "1 unit of source_currency = rate units of target_currency (major units)"
   },
@@ -66,16 +66,16 @@
     "tolerance_minor": 0
   },
   "period": {
-    "end": "2030-04-30",
+    "end": "2034-09-30",
     "ledger_timestamp_rule": "posting timestamp equals the source document instant",
     "membership": "document instant in [start 00:00, end+1day 00:00) in company timezone",
     "opening_balances": "invoices issued before start and open at start are posted as opening_balance_equity at start 00:00",
-    "start": "2030-04-01"
+    "start": "2034-09-01"
   },
   "policy_version": "1.0",
   "rounding": {
     "mode": "ROUND_HALF_EVEN",
     "scope": "each conversion separately, to integer minor units"
   },
-  "timezone": "+03:00"
+  "timezone": "-05:00"
 }

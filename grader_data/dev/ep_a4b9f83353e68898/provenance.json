@@ -120,36 +120,36 @@
       "updated": [
         {
           "before": {
-            "bank_reference": "BR2914821052",
-            "doc_id": "D-4XBPHVPLU",
+            "bank_reference": "BR4782205865",
+            "doc_id": "D-KAMM7XVWF",
             "doc_type": "payment",
-            "payer_entity_id": "E-HQ872N",
-            "payer_name": "Saryn Analytics Inc",
+            "payer_entity_id": "E-4KPBTQ",
+            "payer_name": "Riviera Textiles GmbH",
             "record": {
-              "amount_minor": 6882923,
-              "currency": "GBP",
-              "doc_id": "D-4XBPHVPLU",
+              "amount_minor": 3131222,
+              "currency": "USD",
+              "doc_id": "D-KAMM7XVWF",
               "invoice_refs": [
                 {
-                  "amount_minor": 6882923,
-                  "invoice_id": "INV-A8QBNF7"
+                  "amount_minor": 3131222,
+                  "invoice_id": "INV-VYEH4FR"
                 }
               ],
-              "payment_id": "PAY-X2M8666",
-              "timestamp": "2034-01-21T22:26:24+01:00"
+              "payment_id": "PAY-SYBNSXB",
+              "timestamp": "2034-01-30T20:58:51-05:00"
             },
             "refund_of": null,
             "remittance": {
               "lines": [
                 {
-                  "amount_minor": 6882923,
-                  "invoice_id": "INV-A8QBNF7"
+                  "amount_minor": 3131222,
+                  "invoice_id": "INV-VYEH4FR"
                 }
               ],
-              "note": "Invoice payment"
+              "note": "Settlement"
             }
           },
-          "id": "D-4XBPHVPLU"
+          "id": "D-KAMM7XVWF"
         }
       ]
     },
@@ -164,116 +164,81 @@
       "deleted": [
         {
           "account": "accounts_receivable",
-          "credit_minor": 8993730,
+          "credit_minor": 3131222,
           "currency": "USD",
           "debit_minor": 0,
-          "entity_id": "E-HQ872N",
-          "invoice_id": "INV-A8QBNF7",
-          "payment_id": "PAY-X2M8666",
-          "row_id": "R-736HH6T9R",
-          "timestamp": "2034-01-21T16:26:24-05:00"
-        },
-        {
-          "account": "fx_gain_loss",
-          "credit_minor": 1789,
-          "currency": "USD",
-          "debit_minor": 0,
-          "entity_id": "E-HQ872N",
-          "invoice_id": null,
-          "payment_id": "PAY-X2M8666",
-          "row_id": "R-VYNBMVWE2",
-          "timestamp": "2034-01-21T16:26:24-05:00"
-        },
-        {
-          "account": "opening_balance_equity",
-          "credit_minor": 2302115,
-          "currency": "USD",
-          "debit_minor": 0,
-          "entity_id": "E-YQ4AF7",
-          "invoice_id": "INV-H2VDBW2",
-          "payment_id": null,
-          "row_id": "R-WZCF3YEUJ",
-          "timestamp": "2034-01-01T00:00:00-05:00"
+          "entity_id": "E-4KPBTQ",
+          "invoice_id": "INV-VYEH4FR",
+          "payment_id": "PAY-SYBNSXB",
+          "row_id": "R-M9AF56MLP",
+          "timestamp": "2034-01-30T20:58:51-05:00"
         }
       ],
       "inserted": [
+        "R-69B8K7XPX",
         "R-7G65JAREK",
         "R-8HN6TMAH6",
         "R-CBQYW6E76",
-        "R-FZHBQ4ERU",
-        "R-UXBMYVCNE",
-        "R-ZQZWWW4LP"
+        "R-LTBXJ65WN",
+        "R-ZQZWWW4LP",
+        "R-ZRCNQNXZB"
       ],
       "updated": [
+        {
+          "before": {
+            "account": "revenue",
+            "credit_minor": 1406592,
+            "currency": "USD",
+            "debit_minor": 0,
+            "entity_id": "E-YQ4AF7",
+            "invoice_id": "INV-SJGKF2V",
+            "payment_id": null,
+            "row_id": "R-38BH4BKB7",
+            "timestamp": "2034-01-08T15:15:04-05:00"
+          },
+          "id": "R-38BH4BKB7"
+        },
         {
           "before": {
             "account": "accounts_receivable",
             "credit_minor": 0,
             "currency": "USD",
-            "debit_minor": 2302115,
-            "entity_id": "E-YQ4AF7",
-            "invoice_id": "INV-H2VDBW2",
+            "debit_minor": 4030912,
+            "entity_id": "E-HQ872N",
+            "invoice_id": "INV-PQARYS6",
             "payment_id": null,
-            "row_id": "R-DU5PBUS2M",
-            "timestamp": "2034-01-01T00:00:00-05:00"
+            "row_id": "R-7LEYWKU9Y",
+            "timestamp": "2034-01-31T20:17:05-05:00"
           },
-          "id": "R-DU5PBUS2M"
+          "id": "R-7LEYWKU9Y"
         },
         {
           "before": {
-            "account": "fx_gain_loss",
-            "credit_minor": 0,
+            "account": "revenue",
+            "credit_minor": 4030912,
             "currency": "USD",
-            "debit_minor": 1089,
-            "entity_id": "E-YQ4AF7",
-            "invoice_id": null,
-            "payment_id": "PAY-LWXBXEA",
-            "row_id": "R-HQN2NNK4G",
-            "timestamp": "2034-01-31T18:57:22-05:00"
-          },
-          "id": "R-HQN2NNK4G"
-        },
-        {
-          "before": {
-            "account": "bank",
-            "credit_minor": 0,
-            "currency": "USD",
-            "debit_minor": 101627,
+            "debit_minor": 0,
             "entity_id": "E-HQ872N",
-            "invoice_id": null,
-            "payment_id": "PAY-HRXL7YY",
-            "row_id": "R-WCVHBFJ9E",
-            "timestamp": "2034-01-27T05:21:49-05:00"
+            "invoice_id": "INV-PQARYS6",
+            "payment_id": null,
+            "row_id": "R-MB7MP9F2K",
+            "timestamp": "2034-01-31T20:17:05-05:00"
           },
-          "id": "R-WCVHBFJ9E"
+          "id": "R-MB7MP9F2K"
         },
         {
           "before": {
-            "account": "fx_gain_loss",
+            "account": "accounts_receivable",
             "credit_minor": 0,
             "currency": "USD",
-            "debit_minor": 316,
-            "entity_id": "E-HQ872N",
-            "invoice_id": null,
-            "payment_id": "PAY-HRXL7YY",
-            "row_id": "R-XULSZVCJ3",
-            "timestamp": "2034-01-27T05:21:49-05:00"
-          },
-          "id": "R-XULSZVCJ3"
-        },
-        {
-          "before": {
-            "account": "bank",
-            "credit_minor": 0,
-            "currency": "USD",
-            "debit_minor": 350062,
+            "debit_minor": 1406592,
             "entity_id": "E-YQ4AF7",
-            "invoice_id": null,
-            "payment_id": "PAY-LWXBXEA",
-            "row_id": "R-Z3B7SXB46",
-            "timestamp": "2034-01-31T18:57:22-05:00"
+            "invoice_id": "INV-SJGKF2V",
+            "payment_id": null,
+            "row_id": "R-MKLWEUJBE",
+            "timestamp": "2034-01-08T15:15:04-05:00"
           },
-          "id": "R-Z3B7SXB46"
+          "id": "R-MKLWEUJBE"
         }
       ]
     },
@@ -283,19 +248,19 @@
       "updated": [
         {
           "before": {
-            "amount_minor": 6882923,
-            "currency": "GBP",
-            "doc_id": "D-4XBPHVPLU",
+            "amount_minor": 3131222,
+            "currency": "USD",
+            "doc_id": "D-KAMM7XVWF",
             "invoice_refs": [
               {
-                "amount_minor": 6882923,
-                "invoice_id": "INV-A8QBNF7"
+                "amount_minor": 3131222,
+                "invoice_id": "INV-VYEH4FR"
               }
             ],
-            "payment_id": "PAY-X2M8666",
-            "timestamp": "2034-01-21T22:26:24+01:00"
+            "payment_id": "PAY-SYBNSXB",
+            "timestamp": "2034-01-30T20:58:51-05:00"
           },
-          "id": "PAY-X2M8666"
+          "id": "PAY-SYBNSXB"
         }
       ]
     }
@@ -465,41 +430,41 @@
       "cause": {
         "after": {
           "invoice_id": "INV-79A5YPY",
-          "issued_at": "2034-02-01T10:31:14-05:00"
+          "issued_at": "2034-02-02T00:31:14+09:00"
         },
         "before": null,
         "duplicate_invoice_id": "INV-79A5YPY",
-        "original_invoice_id": "INV-TPXW2XD"
+        "original_invoice_id": "INV-XALRSYH"
       },
       "issue": {
         "affected_ids": [
           "INV-79A5YPY",
-          "INV-TPXW2XD"
+          "INV-XALRSYH"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
             "INV-79A5YPY",
-            "INV-TPXW2XD",
+            "INV-XALRSYH",
             "R-7G65JAREK"
           ],
           [
             "INV-79A5YPY",
-            "INV-TPXW2XD",
+            "INV-XALRSYH",
             "R-8HN6TMAH6"
           ],
           [
             "INV-79A5YPY",
-            "INV-TPXW2XD",
-            "R-CVWBVLQR8"
+            "INV-XALRSYH",
+            "R-ANZB6MHEU"
           ],
           [
             "INV-79A5YPY",
-            "INV-TPXW2XD",
-            "R-R939Y6SGX"
+            "INV-XALRSYH",
+            "R-PHR7K33LF"
           ]
         ],
-        "expected_amount_minor": 6138600,
+        "expected_amount_minor": 3146718,
         "interaction_group": "G1",
         "type": "duplicate_invoice"
       },
@@ -516,7 +481,7 @@
         "before": {
           "posting": "issue"
         },
-        "document_instant": "2034-02-01T10:31:14-05:00",
+        "document_instant": "2034-02-02T00:31:14+09:00",
         "invoice_id": "INV-79A5YPY"
       },
       "issue": {
@@ -534,7 +499,7 @@
             "R-8HN6TMAH6"
           ]
         ],
-        "expected_amount_minor": 6138600,
+        "expected_amount_minor": 3146718,
         "interaction_group": "G1",
         "type": "period_cutoff_error"
       },
@@ -547,28 +512,28 @@
         "after": null,
         "before": [
           {
-            "amount_minor": 6882923,
-            "invoice_id": "INV-A8QBNF7"
+            "amount_minor": 3131222,
+            "invoice_id": "INV-VYEH4FR"
           }
         ],
         "field": "invoice_refs",
-        "invoice_id": "INV-A8QBNF7",
-        "payment_id": "PAY-X2M8666"
+        "invoice_id": "INV-VYEH4FR",
+        "payment_id": "PAY-SYBNSXB"
       },
       "issue": {
         "affected_ids": [
-          "INV-A8QBNF7",
-          "PAY-X2M8666"
+          "INV-VYEH4FR",
+          "PAY-SYBNSXB"
         ],
-        "currency": "GBP",
+        "currency": "USD",
         "evidence_sets": [
           [
-            "INV-A8QBNF7",
-            "PAY-X2M8666",
-            "R-UXBMYVCNE"
+            "INV-VYEH4FR",
+            "PAY-SYBNSXB",
+            "R-69B8K7XPX"
           ]
         ],
-        "expected_amount_minor": 6882923,
+        "expected_amount_minor": 3131222,
         "interaction_group": null,
         "type": "missing_or_partial_allocation"
       },
@@ -579,31 +544,36 @@
     {
       "cause": {
         "after": {
-          "base_amount_minor": 352349,
-          "rate_date": "2034-01-29"
+          "base_amount_minor": 1396902,
+          "rate_date": "2034-01-10"
         },
         "before": {
-          "base_amount_minor": 350062,
-          "rate": "0.002058397",
+          "base_amount_minor": 1406592,
+          "rate": "0.002095126",
           "rate_currency": "KZT",
-          "rate_date": "2034-01-31"
+          "rate_date": "2034-01-08"
         },
-        "document_id": "PAY-LWXBXEA",
-        "document_kind": "payment"
+        "document_id": "INV-SJGKF2V",
+        "document_kind": "invoice"
       },
       "issue": {
         "affected_ids": [
-          "PAY-LWXBXEA"
+          "INV-SJGKF2V"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "PAY-LWXBXEA",
-            "R-Z3B7SXB46",
-            "fx:2034-01-31:KZT:USD"
+            "INV-SJGKF2V",
+            "R-38BH4BKB7",
+            "fx:2034-01-08:KZT:USD"
+          ],
+          [
+            "INV-SJGKF2V",
+            "R-MKLWEUJBE",
+            "fx:2034-01-08:KZT:USD"
           ]
         ],
-        "expected_amount_minor": 2287,
+        "expected_amount_minor": 9690,
         "interaction_group": null,
         "type": "fx_wrong_date_or_rate"
       },
@@ -614,42 +584,47 @@
     {
       "cause": {
         "after": {
-          "base_amount_minor": 84369,
-          "rate_ccy": "CHF"
+          "base_amount_minor": 4021644,
+          "rate_date": "2034-02-01"
         },
         "before": {
-          "base_amount_minor": 101627,
-          "rate": "1.302876",
+          "base_amount_minor": 4030912,
+          "rate": "1.304301",
           "rate_currency": "GBP",
-          "rate_date": "2034-01-27"
+          "rate_date": "2034-01-31"
         },
-        "document_id": "PAY-HRXL7YY",
-        "document_kind": "payment"
+        "document_id": "INV-PQARYS6",
+        "document_kind": "invoice"
       },
       "issue": {
         "affected_ids": [
-          "PAY-HRXL7YY"
+          "INV-PQARYS6"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "PAY-HRXL7YY",
-            "R-WCVHBFJ9E",
-            "fx:2034-01-27:GBP:USD"
+            "INV-PQARYS6",
+            "R-7LEYWKU9Y",
+            "fx:2034-01-31:GBP:USD"
+          ],
+          [
+            "INV-PQARYS6",
+            "R-MB7MP9F2K",
+            "fx:2034-01-31:GBP:USD"
           ]
         ],
-        "expected_amount_minor": 17258,
+        "expected_amount_minor": 9268,
         "interaction_group": null,
         "type": "fx_wrong_date_or_rate"
       },
       "issue_id": "ISS-AGLXRFGL",
       "type": "fx_wrong_date_or_rate",
-      "variant": "wrong_pair"
+      "variant": "naive_date"
     },
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2034-01-31T19:00:22-05:00",
+          "ledger_timestamp": "2034-01-31T23:28:22-05:00",
           "posting": "issue"
         },
         "before": {
@@ -684,37 +659,37 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2034-01-01T03:03:15-05:00",
+          "ledger_timestamp": "2034-01-31T22:16:54-05:00",
           "posting": "issue"
         },
         "before": {
-          "posting": "opening"
+          "posting": null
         },
-        "document_instant": "2033-11-06T11:55:40+00:00",
-        "invoice_id": "INV-H2VDBW2"
+        "document_instant": "2034-02-03T22:53:16+01:00",
+        "invoice_id": "INV-WNZWT9B"
       },
       "issue": {
         "affected_ids": [
-          "INV-H2VDBW2"
+          "INV-WNZWT9B"
         ],
         "currency": "USD",
         "evidence_sets": [
           [
-            "INV-H2VDBW2",
-            "R-DU5PBUS2M"
+            "INV-WNZWT9B",
+            "R-LTBXJ65WN"
           ],
           [
-            "INV-H2VDBW2",
-            "R-FZHBQ4ERU"
+            "INV-WNZWT9B",
+            "R-ZRCNQNXZB"
           ]
         ],
-        "expected_amount_minor": 2302115,
+        "expected_amount_minor": 5891641,
         "interaction_group": null,
         "type": "period_cutoff_error"
       },
       "issue_id": "ISS-WUX3EADU",
       "type": "period_cutoff_error",
-      "variant": "prior_period_booked:booked_at_period_open"
+      "variant": "next_period_booked:accrued_at_period_close"
     }
   ],
   "plan": {

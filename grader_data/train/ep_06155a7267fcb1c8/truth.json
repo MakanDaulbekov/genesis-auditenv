@@ -32,54 +32,59 @@
     },
     {
       "affected_ids": [
-        "PAY-DULZZPY"
+        "PAY-9QHEXW3"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "PAY-DULZZPY",
-          "R-YU46Z6Q2G",
-          "fx:2034-05-30:JPY:EUR"
+          "PAY-9QHEXW3",
+          "R-XXYZ8CS5T",
+          "fx:2034-05-31:USD:EUR"
         ]
       ],
-      "expected_amount_minor": 2455,
+      "expected_amount_minor": 6686,
       "interaction_group": null,
       "issue_id": "ISS-9TVUHDNC",
       "type": "fx_wrong_date_or_rate"
     },
     {
       "affected_ids": [
-        "INV-ZE55WUZ"
+        "INV-A9C8CWJ"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-ZE55WUZ",
-          "R-C875PA7RB"
+          "INV-A9C8CWJ",
+          "R-H5JCMTHB6"
         ],
         [
-          "INV-ZE55WUZ",
-          "R-WHWK9CXL3"
+          "INV-A9C8CWJ",
+          "R-QLLADNJWR"
         ]
       ],
-      "expected_amount_minor": 732413,
+      "expected_amount_minor": 200000,
       "interaction_group": null,
       "issue_id": "ISS-GNRNUSJV",
       "type": "period_cutoff_error"
     },
     {
       "affected_ids": [
-        "PAY-QBSAWE2"
+        "INV-K87Z32Y"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "PAY-QBSAWE2",
-          "R-ZDFC3AQC4",
-          "fx:2034-05-20:JPY:EUR"
+          "INV-K87Z32Y",
+          "R-63KJQV4CJ",
+          "fx:2034-05-16:JPY:EUR"
+        ],
+        [
+          "INV-K87Z32Y",
+          "R-9L67JRP3E",
+          "fx:2034-05-16:JPY:EUR"
         ]
       ],
-      "expected_amount_minor": 5437631,
+      "expected_amount_minor": 32060,
       "interaction_group": null,
       "issue_id": "ISS-MTM7V4MT",
       "type": "fx_wrong_date_or_rate"

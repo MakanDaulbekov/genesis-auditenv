@@ -132,28 +132,28 @@
             "account": "fx_gain_loss",
             "credit_minor": 0,
             "currency": "KZT",
-            "debit_minor": 2768828,
-            "entity_id": "E-MSRYMA",
+            "debit_minor": 157915,
+            "entity_id": "E-KC9P4H",
             "invoice_id": null,
-            "payment_id": "PAY-487DQHZ",
-            "row_id": "R-F7B7Q8Q86",
-            "timestamp": "2033-09-23T17:52:26-05:00"
+            "payment_id": "PAY-V3UN5SJ",
+            "row_id": "R-PCQC4SXF2",
+            "timestamp": "2033-09-27T21:54:28-05:00"
           },
-          "id": "R-F7B7Q8Q86"
+          "id": "R-PCQC4SXF2"
         },
         {
           "before": {
             "account": "bank",
             "credit_minor": 0,
             "currency": "KZT",
-            "debit_minor": 1961789763,
-            "entity_id": "E-MSRYMA",
+            "debit_minor": 12731079,
+            "entity_id": "E-KC9P4H",
             "invoice_id": null,
-            "payment_id": "PAY-487DQHZ",
-            "row_id": "R-YG74RR88W",
-            "timestamp": "2033-09-23T17:52:26-05:00"
+            "payment_id": "PAY-V3UN5SJ",
+            "row_id": "R-TTF8KTXSH",
+            "timestamp": "2033-09-27T21:54:28-05:00"
           },
-          "id": "R-YG74RR88W"
+          "id": "R-TTF8KTXSH"
         }
       ]
     },
@@ -372,41 +372,41 @@
       "cause": {
         "after": {
           "invoice_id": "INV-88573S3",
-          "issued_at": "2033-10-02T13:17:58+01:00"
+          "issued_at": "2033-10-01T04:41:45-03:00"
         },
         "before": null,
         "duplicate_invoice_id": "INV-88573S3",
-        "original_invoice_id": "INV-Y72RBD9"
+        "original_invoice_id": "INV-MPEA8FG"
       },
       "issue": {
         "affected_ids": [
           "INV-88573S3",
-          "INV-Y72RBD9"
+          "INV-MPEA8FG"
         ],
         "currency": "KZT",
         "evidence_sets": [
           [
             "INV-88573S3",
-            "INV-Y72RBD9",
+            "INV-MPEA8FG",
+            "R-C7GQBVSHT"
+          ],
+          [
+            "INV-88573S3",
+            "INV-MPEA8FG",
+            "R-E5M6KM8JV"
+          ],
+          [
+            "INV-88573S3",
+            "INV-MPEA8FG",
             "R-HGXBQZHP8"
           ],
           [
             "INV-88573S3",
-            "INV-Y72RBD9",
-            "R-KBH6CHNJ7"
-          ],
-          [
-            "INV-88573S3",
-            "INV-Y72RBD9",
+            "INV-MPEA8FG",
             "R-NFFXRHZQV"
-          ],
-          [
-            "INV-88573S3",
-            "INV-Y72RBD9",
-            "R-P2V2PNCY3"
           ]
         ],
-        "expected_amount_minor": 3178039144,
+        "expected_amount_minor": 1078625538,
         "interaction_group": "G1",
         "type": "duplicate_invoice"
       },
@@ -417,13 +417,13 @@
     {
       "cause": {
         "after": {
-          "ledger_timestamp": "2033-09-30T19:37:31-05:00",
+          "ledger_timestamp": "2033-09-30T18:47:18-05:00",
           "posting": "issue"
         },
         "before": {
           "posting": "issue"
         },
-        "document_instant": "2033-10-02T13:17:58+01:00",
+        "document_instant": "2033-10-01T04:41:45-03:00",
         "invoice_id": "INV-88573S3"
       },
       "issue": {
@@ -441,7 +441,7 @@
             "R-NFFXRHZQV"
           ]
         ],
-        "expected_amount_minor": 3178039144,
+        "expected_amount_minor": 1078625538,
         "interaction_group": "G1",
         "type": "period_cutoff_error"
       },
@@ -452,37 +452,37 @@
     {
       "cause": {
         "after": {
-          "base_amount_minor": 1966312445,
-          "rate_date": "2033-09-22"
+          "base_amount_minor": 12719622,
+          "rate_date": "2033-09-28"
         },
         "before": {
-          "base_amount_minor": 1961789763,
-          "rate": "471.8083",
-          "rate_currency": "USD",
-          "rate_date": "2033-09-23"
+          "base_amount_minor": 12731079,
+          "rate": "516.4738",
+          "rate_currency": "EUR",
+          "rate_date": "2033-09-27"
         },
-        "document_id": "PAY-487DQHZ",
+        "document_id": "PAY-V3UN5SJ",
         "document_kind": "payment"
       },
       "issue": {
         "affected_ids": [
-          "PAY-487DQHZ"
+          "PAY-V3UN5SJ"
         ],
         "currency": "KZT",
         "evidence_sets": [
           [
-            "PAY-487DQHZ",
-            "R-YG74RR88W",
-            "fx:2033-09-23:USD:KZT"
+            "PAY-V3UN5SJ",
+            "R-TTF8KTXSH",
+            "fx:2033-09-27:EUR:KZT"
           ]
         ],
-        "expected_amount_minor": 4522682,
+        "expected_amount_minor": 11457,
         "interaction_group": null,
         "type": "fx_wrong_date_or_rate"
       },
       "issue_id": "ISS-45SLX4FM",
       "type": "fx_wrong_date_or_rate",
-      "variant": "shifted_date"
+      "variant": "naive_date"
     }
   ],
   "plan": {

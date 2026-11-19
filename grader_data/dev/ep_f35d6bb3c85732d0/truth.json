@@ -32,38 +32,38 @@
     },
     {
       "affected_ids": [
-        "INV-UDMRF8N",
-        "PAY-XFD6YJ7"
+        "INV-8G6DC8V",
+        "PAY-UXJJFGB"
       ],
-      "currency": "GBP",
+      "currency": "JPY",
       "evidence_sets": [
         [
-          "INV-UDMRF8N",
-          "PAY-XFD6YJ7",
-          "R-6NF48KLTV"
+          "INV-8G6DC8V",
+          "PAY-UXJJFGB",
+          "R-CYJQGDMEF"
         ]
       ],
-      "expected_amount_minor": 4319954,
+      "expected_amount_minor": 264428,
       "interaction_group": null,
       "issue_id": "ISS-9DUNDWYM",
       "type": "missing_or_partial_allocation"
     },
     {
       "affected_ids": [
-        "INV-AH69MAC"
+        "INV-T8ZG2M9"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-AH69MAC",
-          "R-EXTGKDTLF"
+          "INV-T8ZG2M9",
+          "R-QMEHJXBRN"
         ],
         [
-          "INV-AH69MAC",
-          "R-LWAJYGUWV"
+          "INV-T8ZG2M9",
+          "R-S3X6C8XWW"
         ]
       ],
-      "expected_amount_minor": 1310716,
+      "expected_amount_minor": 779232,
       "interaction_group": null,
       "issue_id": "ISS-9TAGTV94",
       "type": "period_cutoff_error"
@@ -87,22 +87,22 @@
     },
     {
       "affected_ids": [
-        "INV-MDTEQRL"
+        "INV-DNJK65T"
       ],
       "currency": "EUR",
       "evidence_sets": [
         [
-          "INV-MDTEQRL",
-          "R-FQR87V9QF",
-          "fx:2033-08-11:JPY:EUR"
+          "INV-DNJK65T",
+          "R-KLX5GSEP3",
+          "fx:2033-08-16:USD:EUR"
         ],
         [
-          "INV-MDTEQRL",
-          "R-LQMEWFBWN",
-          "fx:2033-08-11:JPY:EUR"
+          "INV-DNJK65T",
+          "R-SLZSWSPRB",
+          "fx:2033-08-16:USD:EUR"
         ]
       ],
-      "expected_amount_minor": 2570,
+      "expected_amount_minor": 9382,
       "interaction_group": null,
       "issue_id": "ISS-XGFY7Q8J",
       "type": "fx_wrong_date_or_rate"

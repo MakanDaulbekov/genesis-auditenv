@@ -6,7 +6,7 @@
     "documents": 124,
     "fx_rows": 575,
     "invoices": 70,
-    "ledger_rows": 635,
+    "ledger_rows": 636,
     "payments": 54
   },
   "currency_exponents": {
@@ -19,11 +19,11 @@
   },
   "episode_id": "ep_50f6f588fef262a7",
   "files": {
-    "documents.jsonl": "c8a6b9a8be27ad43d729af169f2516790a0c54820e1eee9c1f255efc4f0ce88b",
+    "documents.jsonl": "9f8f46a29e4352c70a958f51991fef8080133c935e22283d787aa3a98578d8b9",
     "fx.csv": "ca210d88142c856b105397387d8c659472a76d07f6bfe6a43fa57ad9da96e5e5",
-    "invoices.jsonl": "0e82d377332136f27d7c4dc949fe7790c4a07a732ad4f6464d87281bbf2afe07",
-    "ledger.csv": "cc75d1a8e1dc75c4c0ebe419a5ed7d208b8e62ee530a212fa39118240d52a7b7",
-    "payments.jsonl": "7901d36cba6ee1bff914dcd0b9561d7c81f564f17d2fc0f945815f644cbb0c28",
+    "invoices.jsonl": "bf11dac2c15025e9ab87bfc8430447c1126fa8fb27773713e36d0961f4439e03",
+    "ledger.csv": "d488792f47e8e6785b1648ebe7725a7465fcb2a0624a0519304edebf4ecdc2c3",
+    "payments.jsonl": "0832a8e3db8f3e6a7832cb2da9ec8e30c436223e05df2f721ffc790267003130",
     "policy.json": "0986f284439a263eda2c838f4c5df85b343342d9e1934596eed42e500cbe32eb"
   },
   "generator_version": "1.0.0",

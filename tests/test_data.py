@@ -240,3 +240,47 @@ def test_mutated_records_same_formats(population):
             assert inv["issued_at"][19] in "+-"
         for d in dup_ids:
             assert d in {i["invoice_id"] for i in t["invoices"]}
+
+
+# ----------------------------------------------------------------------------- P1.2: категориальные поля документов
+
+def _mi_bits(counter):
+    import math
+    n = sum(counter.values())
+    px, py = {}, {}
+    for (x, y), v in counter.items():
+        px[x] = px.get(x, 0) + v
+        py[y] = py.get(y, 0) + v
+    return sum(v / n * math.log2((v / n) / (px[x] / n * py[y] / n)) for (x, y), v in counter.items() if v)
+
+
+def test_categorical_fields_carry_no_label_signal(cfg):
+    """Взаимная информация «поле документа ↔ затронут ошибкой» мала на 200 seed, и ни одно частое
+    значение поля не является «гарантированно безопасным» (0 ошибок при ≥100 появлениях)."""
+    from collections import Counter
+    from auditenv.common.drbg import DRBG
+    rng = DRBG(b"mi-test")
+    fields = {k: Counter() for k in ("note", "note_fx", "refund_of", "n_remit_lines", "memo", "has_po")}
+    for _ in range(200):
+        ep = generate_episode(rng.randint(0, 2**62), cfg)
+        aff = {x for t in ep.truth["issues"] for x in t["affected_ids"]}
+        fxaff = {x for t in ep.truth["issues"] if t["type"] == "fx_wrong_date_or_rate" for x in t["affected_ids"]}
+        for line in ep.public["documents.jsonl"].decode().splitlines():
+            d = json.loads(line)
+            r = d["record"]
+            if d["doc_type"] == "payment":
+                lab = r["payment_id"] in aff
+                fields["note"][(d["remittance"]["note"], lab)] += 1
+                fields["note_fx"][(d["remittance"]["note"], r["payment_id"] in fxaff)] += 1
+                fields["refund_of"][(d["refund_of"] is not None, lab)] += 1
+                fields["n_remit_lines"][(len(d["remittance"]["lines"]), lab)] += 1
+            else:
+                lab = r["invoice_id"] in aff
+                fields["memo"][(d["memo"], lab)] += 1
+                fields["has_po"][(bool(d["po_number"]), lab)] += 1
+    for name, c in fields.items():
+        assert _mi_bits(c) < 0.01, (name, _mi_bits(c))
+        if name == "note_fx" or name == "note":
+            for v in {x for x, _ in c}:
+                if c[(v, True)] + c[(v, False)] >= 100:
+                    assert c[(v, True)] > 0, (name, v)  # нет «безопасной» заметки

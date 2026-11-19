@@ -1,5 +1,5 @@
 {"amount_minor":4923822,"currency":"EUR","doc_id":"D-LVE3UNCNA","invoice_refs":[{"amount_minor":4923822,"invoice_id":"INV-AVAPJTY"}],"payment_id":"PAY-KUAVV4T","timestamp":"2033-08-31T01:51:19+06:00"}
-{"amount_minor":4319954,"currency":"GBP","doc_id":"D-FLF9BCDEP","invoice_refs":null,"payment_id":"PAY-XFD6YJ7","timestamp":"2033-08-26T10:51:43+06:00"}
+{"amount_minor":4319954,"currency":"GBP","doc_id":"D-FLF9BCDEP","invoice_refs":[{"amount_minor":4319954,"invoice_id":"INV-UDMRF8N"}],"payment_id":"PAY-XFD6YJ7","timestamp":"2033-08-26T10:51:43+06:00"}
 {"amount_minor":6968148,"currency":"EUR","doc_id":"D-9RYGEML4L","invoice_refs":[{"amount_minor":6968148,"invoice_id":"INV-XDJ8BHZ"}],"payment_id":"PAY-UWGT73N","timestamp":"2033-08-31T04:25:36+04:00"}
 {"amount_minor":4236557,"currency":"EUR","doc_id":"D-FKEAHFGY9","invoice_refs":[{"amount_minor":4236557,"invoice_id":"INV-SSPL9J4"}],"payment_id":"PAY-D5JYMCS","timestamp":"2033-08-25T17:53:04+06:00"}
 {"amount_minor":2136473,"currency":"JPY","doc_id":"D-T623FBBVM","invoice_refs":[{"amount_minor":1157448,"invoice_id":"INV-A7LMS5S"}],"payment_id":"PAY-VHQ2LK2","timestamp":"2033-09-01T00:38:08+04:00"}
@@ -25,7 +25,7 @@
 {"amount_minor":3466600,"currency":"USD","doc_id":"D-DBRJ57NKF","invoice_refs":[{"amount_minor":3466600,"invoice_id":"INV-DNJK65T"}],"payment_id":"PAY-PRVUPUJ","timestamp":"2033-08-28T05:55:11-05:00"}
 {"amount_minor":1506971950,"currency":"KZT","doc_id":"D-J2W245KQ9","invoice_refs":[{"amount_minor":1506971950,"invoice_id":"INV-2L344KT"}],"payment_id":"PAY-LRQ86JU","timestamp":"2033-08-22T17:40:35+04:00"}
 {"amount_minor":5378856,"currency":"USD","doc_id":"D-56CMNEG27","invoice_refs":[{"amount_minor":5378856,"invoice_id":"INV-G5JCB7B"}],"payment_id":"PAY-MVBX2ZF","timestamp":"2033-08-20T15:21:17-05:00"}
-{"amount_minor":264428,"currency":"JPY","doc_id":"D-UVWHRG75P","invoice_refs":[{"amount_minor":264428,"invoice_id":"INV-8G6DC8V"}],"payment_id":"PAY-UXJJFGB","timestamp":"2033-08-31T21:56:41+04:00"}
+{"amount_minor":264428,"currency":"JPY","doc_id":"D-UVWHRG75P","invoice_refs":null,"payment_id":"PAY-UXJJFGB","timestamp":"2033-08-31T21:56:41+04:00"}
 {"amount_minor":1441848,"currency":"EUR","doc_id":"D-FX3MUCQTS","invoice_refs":[{"amount_minor":1441848,"invoice_id":"INV-QVVYC8T"}],"payment_id":"PAY-KFR4FVR","timestamp":"2033-08-06T21:11:07+04:00"}
 {"amount_minor":4357704,"currency":"EUR","doc_id":"D-7MMB6H68C","invoice_refs":[{"amount_minor":2497711,"invoice_id":"INV-6KHCBPJ"},{"amount_minor":1859993,"invoice_id":"INV-YQUA5NP"}],"payment_id":"PAY-K3HC8G9","timestamp":"2033-08-28T10:36:59-05:00"}
 {"amount_minor":1435106,"currency":"EUR","doc_id":"D-EPX7QVZ8B","invoice_refs":[{"amount_minor":1435106,"invoice_id":"INV-EPD7KCX"}],"payment_id":"PAY-MTP6RNE","timestamp":"2033-08-20T04:22:29+04:00"}

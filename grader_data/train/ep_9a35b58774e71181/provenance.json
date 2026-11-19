@@ -118,36 +118,36 @@
       "updated": [
         {
           "before": {
-            "bank_reference": "BR4235823490",
-            "doc_id": "D-C6JRRNFMT",
+            "bank_reference": "BR5983035817",
+            "doc_id": "D-52TJ4WN7W",
             "doc_type": "payment",
-            "payer_entity_id": "E-STS74U",
-            "payer_name": "Aster Trade Inc",
+            "payer_entity_id": "E-URD9YJ",
+            "payer_name": "Helio Systems Inc",
             "record": {
-              "amount_minor": 231777474,
+              "amount_minor": 44137404,
               "currency": "KZT",
-              "doc_id": "D-C6JRRNFMT",
+              "doc_id": "D-52TJ4WN7W",
               "invoice_refs": [
                 {
-                  "amount_minor": 231777474,
-                  "invoice_id": "INV-SYGJAG7"
+                  "amount_minor": 44137404,
+                  "invoice_id": "INV-UXMBEZ7"
                 }
               ],
-              "payment_id": "PAY-5WPYA52",
-              "timestamp": "2032-03-21T16:58:52+01:00"
+              "payment_id": "PAY-7YUMEH9",
+              "timestamp": "2032-03-16T04:39:44+04:00"
             },
             "refund_of": null,
             "remittance": {
               "lines": [
                 {
-                  "amount_minor": 231777474,
-                  "invoice_id": "INV-SYGJAG7"
+                  "amount_minor": 44137404,
+                  "invoice_id": "INV-UXMBEZ7"
                 }
               ],
-              "note": ""
+              "note": "Partial settlement"
             }
           },
-          "id": "D-C6JRRNFMT"
+          "id": "D-52TJ4WN7W"
         }
       ]
     },
@@ -159,22 +159,22 @@
     "ledger": {
       "deleted": [],
       "inserted": [
-        "R-JBZCRLN4P"
+        "R-MR58NGKK7"
       ],
       "updated": [
         {
           "before": {
             "account": "accounts_receivable",
-            "credit_minor": 231777474,
+            "credit_minor": 44137404,
             "currency": "KZT",
             "debit_minor": 0,
-            "entity_id": "E-STS74U",
-            "invoice_id": "INV-SYGJAG7",
-            "payment_id": "PAY-5WPYA52",
-            "row_id": "R-YFEM2DFLM",
-            "timestamp": "2032-03-21T18:58:52+03:00"
+            "entity_id": "E-URD9YJ",
+            "invoice_id": "INV-UXMBEZ7",
+            "payment_id": "PAY-7YUMEH9",
+            "row_id": "R-P8L74JZQ2",
+            "timestamp": "2032-03-16T03:39:44+03:00"
           },
-          "id": "R-YFEM2DFLM"
+          "id": "R-P8L74JZQ2"
         }
       ]
     },
@@ -184,19 +184,19 @@
       "updated": [
         {
           "before": {
-            "amount_minor": 231777474,
+            "amount_minor": 44137404,
             "currency": "KZT",
-            "doc_id": "D-C6JRRNFMT",
+            "doc_id": "D-52TJ4WN7W",
             "invoice_refs": [
               {
-                "amount_minor": 231777474,
-                "invoice_id": "INV-SYGJAG7"
+                "amount_minor": 44137404,
+                "invoice_id": "INV-UXMBEZ7"
               }
             ],
-            "payment_id": "PAY-5WPYA52",
-            "timestamp": "2032-03-21T16:58:52+01:00"
+            "payment_id": "PAY-7YUMEH9",
+            "timestamp": "2032-03-16T04:39:44+04:00"
           },
-          "id": "PAY-5WPYA52"
+          "id": "PAY-7YUMEH9"
         }
       ]
     }
@@ -399,34 +399,34 @@
       "cause": {
         "after": [
           {
-            "amount_minor": 142921191,
-            "invoice_id": "INV-SYGJAG7"
+            "amount_minor": 34349601,
+            "invoice_id": "INV-UXMBEZ7"
           }
         ],
         "before": [
           {
-            "amount_minor": 231777474,
-            "invoice_id": "INV-SYGJAG7"
+            "amount_minor": 44137404,
+            "invoice_id": "INV-UXMBEZ7"
           }
         ],
         "field": "invoice_refs",
-        "invoice_id": "INV-SYGJAG7",
-        "payment_id": "PAY-5WPYA52"
+        "invoice_id": "INV-UXMBEZ7",
+        "payment_id": "PAY-7YUMEH9"
       },
       "issue": {
         "affected_ids": [
-          "INV-SYGJAG7",
-          "PAY-5WPYA52"
+          "INV-UXMBEZ7",
+          "PAY-7YUMEH9"
         ],
         "currency": "KZT",
         "evidence_sets": [
           [
-            "INV-SYGJAG7",
-            "PAY-5WPYA52",
-            "R-JBZCRLN4P"
+            "INV-UXMBEZ7",
+            "PAY-7YUMEH9",
+            "R-MR58NGKK7"
           ]
         ],
-        "expected_amount_minor": 88856283,
+        "expected_amount_minor": 9787803,
         "interaction_group": null,
         "type": "missing_or_partial_allocation"
       },
