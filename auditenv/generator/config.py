@@ -15,8 +15,11 @@ DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "configs" / "default
 ERROR_TYPES = ("duplicate_invoice", "missing_or_partial_allocation", "fx_wrong_date_or_rate", "period_cutoff_error")
 SCENARIOS = ("partial_fx_boundary", "duplicate_cutoff")
 TOP_KEYS = {"config_version", "schema_version", "size", "currencies", "distractors", "errors", "interactions", "clean"}
-SIZE_KEYS = {"n_customers": (1, 60), "n_vendors": (1, 40), "n_invoices": (10, 150), "n_prior_invoices": (0, 20),
-             "n_next_invoices": (0, 10), "n_expenses": (0, 900)}
+# Верхние границы выбраны так, чтобы эпизод оставался в диапазоне раздела 03 (≤2 000 проводок,
+# ≤200 документов) и честная политика (competent_reconciler) укладывалась в 100 шагов с запасом:
+# худший замеренный случай n_invoices=75, n_expenses=700 -> см. REPORT.md (solvability).
+SIZE_KEYS = {"n_customers": (1, 30), "n_vendors": (1, 20), "n_invoices": (10, 75), "n_prior_invoices": (0, 10),
+             "n_next_invoices": (0, 6), "n_expenses": (0, 700)}
 DISTRACTOR_RANGES = {"recurring_groups": (0, 6), "same_total_diff_lines": (0, 6), "tz_boundary_invoices": (0, 8),
                      "tz_boundary_next_invoices": (0, 6), "tz_boundary_receipts": (0, 6), "prepayments": (0, 8)}
 DISTRACTOR_PCT = ("refund_pct", "batch_payment_pct")

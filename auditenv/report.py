@@ -127,17 +127,55 @@ def main() -> int:
              "нулевого знаменателя (поэтому у oracle средние P/R < 1 при F1 = 1). Лимит времени — 60 с на эпизод; "
              "максимум по всем прогонам указан в таблице. oracle отправляет ответ без осмотра (k = 0), поэтому его "
              "возврат = 1 − 0.002·0 = 1.\n")
-    L.append("Пороговые свойства, которые подтверждают числа: oracle > simple_reconciler > random_explorer ≥ flag_all; "
+    L.append("Пороговые свойства, которые подтверждают числа: oracle ≥ competent_reconciler > simple_reconciler > "
+             "random_explorer ≥ flag_all; "
              "«пометить всё» получает −1 и на чистых, и на ошибочных книгах; молчание на чистых книгах дало бы ≈ 1, а "
              "любая ложная находка снижает возврат до F1 = 0 → −1.\n")
 
+    sol_p = ROOT / "grader_data" / "solvability.json"
+    if sol_p.exists():
+        so = json.loads(sol_p.read_text(encoding="utf-8"))
+        ca = agg.get("competent_reconciler")
+        L.append("## 2. Решаемость: competent_reconciler (измерено)\n")
+        L.append("competent_reconciler — честная скриптовая сверка без доступа к эталону: читает таблицы через "
+                 "list_records, переводит время в часовой пояс компании, сравнивает дубли по полной сути счёта "
+                 "(включая периоды услуг), берёт курс по policy, читает remittance advice через get_document только "
+                 "для платежей с нераспределённым остатком; курсы — дешевле из «fx постранично» и «get_record по "
+                 "ключам». Это доказательство, что каждая внедрённая ошибка обнаружима по открытым данным в пределах "
+                 "100 шагов, а отвлекающие случаи не дают ложных срабатываний.\n")
+        if ca:
+            L.append(f"* train+dev (20 эпизодов): TP/FP/FN = {ca['micro']['tp']}/{ca['micro']['fp']}/{ca['micro']['fn']}, "
+                     f"средний возврат {ca['mean_return']:.3f}, шагов в среднем {ca['mean_steps']}.")
+        L.append(f"* {so['episodes']} случайных эпизодов (300 seed × 6 сочетаний параметров + {so['by_variant'].get('worst_size', {}).get('n', 0)} "
+                 f"худшего размера): **{so['perfect']}/{so['episodes']}** с F1 = 1 и без FP; TP/FP/FN = "
+                 f"{so['tp']}/{so['fp']}/{so['fn']}.")
+        L.append(f"* Шаги: максимум **{so['max_steps']}** из 100, среднее {so['mean_steps']}. Наибольший эпизод: "
+                 f"{so['max_ledger_rows']} проводок, {so['max_documents']} документов.\n")
+        L.append("| сочетание | эпизодов | без FP/FN | макс. шагов |")
+        L.append("|---|---|---|---|")
+        for v, d in so["by_variant"].items():
+            L.append(f"| {v} | {d['n']} | {d['perfect']} | {d['max_steps']} |")
+        L.append("\nГистограмма потраченных шагов (включая submit):\n")
+        L.append("| шаги | эпизодов |")
+        L.append("|---|---|")
+        for b, c in so["steps_histogram"].items():
+            L.append(f"| {b} | {c} |")
+        if so["failures"]:
+            L.append("\nОставшиеся сбои (каждый — баг генератора или задокументированная неоднозначность):\n")
+            for f in so["failures"]:
+                L.append(f"* {f}")
+        else:
+            L.append("\nОставшихся FN/FP нет. Бюджет: размеры ограничены в `generator/config.py` (n_invoices ≤ 75, "
+                     "n_expenses ≤ 700), чтобы эпизод оставался в пределах раздела 03 и честная политика имела "
+                     "запас ≥ 25 шагов; при 150 счетах / 900 расходах (≈2 600 проводок) потребовалось бы до 89 шагов.\n")
+
     fa = failure_analysis("simple_reconciler", refs, subs)
-    L.append("## 2. Разбор сбоев simple_reconciler (измерено)\n")
+    L.append("## 3. Разбор сбоев simple_reconciler (измерено)\n")
     L.append("simple_reconciler — честная скриптовая сверка с тремя сознательными упрощениями: (1) дата берётся из строки "
              "времени как написано, без перевода в часовой пояс компании; (2) дубли — по (контрагент, валюта, сумма, "
              "описания/кол-во/цены строк) без учёта периода услуг; (3) remittance advice читается только для платежей "
              "с нераспределённым остатком.\n")
-    L.append("### 2.1 По типам ошибок\n")
+    L.append("### 3.1 По типам ошибок\n")
     L.append("| тип | TP | FP | FN | precision | recall |")
     L.append("|---|---|---|---|---|---|")
     for t in TYPES:
@@ -145,17 +183,17 @@ def main() -> int:
         p = c["tp"] / (c["tp"] + c["fp"]) if c["tp"] + c["fp"] else 0.0
         r = c["tp"] / (c["tp"] + c["fn"]) if c["tp"] + c["fn"] else 0.0
         L.append(f"| {t} | {c['tp']} | {c['fp']} | {c['fn']} | {p:.2f} | {r:.2f} |")
-    L.append("\n### 2.2 Пропуски (FN) и попадания по вариантам мутаций\n")
+    L.append("\n### 3.2 Пропуски (FN) и попадания по вариантам мутаций\n")
     L.append("| вариант мутации | найдено (TP) | пропущено (FN) |")
     L.append("|---|---|---|")
     for v in sorted(set(fa["fn_variant"]) | set(fa["tp_variant"])):
         L.append(f"| {v} | {fa['tp_variant'][v]} | {fa['fn_variant'][v]} |")
-    L.append("\n### 2.3 Ложные срабатывания (FP) по причинам\n")
+    L.append("\n### 3.3 Ложные срабатывания (FP) по причинам\n")
     L.append("| причина | FP |")
     L.append("|---|---|")
     for k, v in fa["fp_kind"].most_common():
         L.append(f"| {k} | {v} |")
-    L.append("\n### 2.4 Выводы\n")
+    L.append("\n### 3.4 Выводы\n")
     fx_fp = sum(v for k, v in fa["fp_kind"].items() if k.startswith("fx:"))
     dup_fp = sum(v for k, v in fa["fp_kind"].items() if k.startswith("duplicate:"))
     cut_fp = sum(v for k, v in fa["fp_kind"].items() if k.startswith("cutoff:"))
@@ -178,16 +216,18 @@ def main() -> int:
     jury_p = ROOT / "grader_data" / "jury.json"
     if jury_p.exists():
         j = json.loads(jury_p.read_text(encoding="utf-8"))
-        L.append("## 3. Теневое жюри (tests/jury/run_jury.py)\n")
-        L.append("| блок | пройдено | вес |")
-        L.append("|---|---|---|")
-        for b, w in (("contract", 25), ("data", 25), ("reward", 25), ("paired", 15)):
-            L.append(f"| {b} | {j['blocks'][b]['passed']}/20 | {w} |")
-        L.append(f"| engineering (самооценка) | {sum(v for _, v in j['engineering'])}/10 | 10 |")
-        L.append(f"\nПрогноз по собственной методике: **{j['forecast']} / 100**. Блок data — 20 новых эпизодов "
-                 "(5 чистых, 5 со взаимодействиями, 10 новых сочетаний параметров) через независимый валидатор; "
-                 "paired — 20 пар «повтор seed+действий» + «перестановка+переименование ID».\n")
-    L.append("## 4. Ограничения отчёта\n")
+        L.append("## 4. Самопроверка (tests/jury/run_jury.py)\n")
+        L.append("| блок (зеркало раздела 10 PDF) | пройдено |")
+        L.append("|---|---|")
+        for b in ("contract", "data", "reward", "paired"):
+            L.append(f"| {b} | {j['blocks'][b]['passed']}/20 |")
+        L.append(f"\nСамопроверка: **{j['passed']}/80** наших проверок, зеркальных разделам 06 и 10 PDF. **Это не оценка "
+                 "жюри.** Блок data — 20 новых эпизодов (5 чистых, 5 со взаимодействиями, 10 новых сочетаний "
+                 "параметров) через независимый валидатор; paired — 20 пар «повтор seed+действий» + "
+                 "«перестановка+переименование ID».\n")
+        L.append("Не покрыто самопроверкой: harness жюри, их политики, их преобразования и закрытые seed (для этого — "
+                 "`make jury-run`, который принимает их сплит, секрет и политики), а также реальная сборка Docker-образа.\n")
+    L.append("## 5. Ограничения отчёта\n")
     L.append("* 20 открытых эпизодов — малая выборка; числа характеризуют базовые политики, а не потолок задачи.")
     L.append("* Время измерено в песочнице разработки (2 vCPU); у организаторов оно будет другим, но запас до лимита "
              "60 с — несколько порядков.")

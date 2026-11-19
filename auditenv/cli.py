@@ -102,12 +102,7 @@ def cmd_validate_seeds(args) -> int:
     from .generator.validate import validate_episode
     base = json.loads((ROOT / "configs" / "default.json").read_text(encoding="utf-8"))
     rng = DRBG(b"validate-seeds")
-    variants = [{}, {"clean": True}, {"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 1}},
-                {"errors": {"duplicate_invoice": 3, "missing_or_partial_allocation": 3,
-                            "fx_wrong_date_or_rate": 3, "period_cutoff_error": 3},
-                 "interactions": {"partial_fx_boundary": 0, "duplicate_cutoff": 0}},
-                {"size": {"n_invoices": [80, 120], "n_expenses": [400, 700]}},
-                {"currencies": {"base": ["JPY", "GBP"], "foreign_customer_share_pct": 80}}]
+    variants = _variants()
     bad = 0
     stats = {"episodes": 0, "issues": 0, "clean": 0}
     for i in range(args.n):
@@ -124,6 +119,72 @@ def cmd_validate_seeds(args) -> int:
     print(f"[validate-seeds] {stats['episodes'] - bad}/{stats['episodes']} OK, issues={stats['issues']}, "
           f"clean={stats['clean']}")
     return 1 if bad else 0
+
+
+def _variants():
+    return [{}, {"clean": True}, {"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 1}},
+            {"errors": {"duplicate_invoice": 3, "missing_or_partial_allocation": 3,
+                        "fx_wrong_date_or_rate": 3, "period_cutoff_error": 3},
+             "interactions": {"partial_fx_boundary": 0, "duplicate_cutoff": 0}},
+            {"size": {"n_invoices": [65, 75], "n_expenses": [500, 700]}},
+            {"currencies": {"base": ["JPY", "GBP"], "foreign_customer_share_pct": 80}}]
+
+
+def cmd_solvability(args) -> int:
+    """Доказательство решаемости: competent_reconciler на N случайных seed × 6 сочетаний + худший размер."""
+    from .common.drbg import DRBG
+    from .env.core import AuditEnv
+    from .grader.service import GraderClient
+    from .policies.api import load_policy
+    base = json.loads((ROOT / "configs" / "default.json").read_text(encoding="utf-8"))
+    worst = deep_merge(base, {"size": {"n_invoices": [75, 75], "n_expenses": [700, 700], "n_customers": [14, 14],
+                                       "n_prior_invoices": [6, 6]},
+                              "distractors": {"prepayments": [3, 3], "recurring_groups": [2, 2]},
+                              "currencies": {"foreign_customer_share_pct": 90}})
+    rng = DRBG(b"solvability-seeds")
+    names = ["default", "clean", "interactions", "12_errors", "large", "base_JPY_GBP"]
+    jobs = [(f"{names[i % 6]}", rng.randint(0, 2**63 - 1), deep_merge(base, _variants()[i % 6])) for i in range(args.n)]
+    jobs += [("worst_size", 5_000 + i, worst) for i in range(args.worst)]
+    recs, fails = [], []
+    with GraderClient(allow_oracle=False) as g:
+        for name, seed, cfg in jobs:
+            env = AuditEnv(g, "train")
+            obs, _ = env.reset(seed=seed, config=cfg)
+            pol = load_policy("competent_reconciler")
+            pol.reset(obs)
+            a, n = pol.act(obs), 0
+            while True:
+                o, r, te, tr, info = env.step(a)
+                n += 1
+                if te or tr:
+                    break
+                a = pol.act(o)
+            m = info["metrics"]
+            c = obs["result"]["manifest"]["counts"]
+            rec = {"variant": name, "seed": seed, "steps": n, "truncated": tr, "reward": r, "f1": m["f1"],
+                   "tp": m["tp"], "fp": m["fp"], "fn": m["fn"], "ledger_rows": c["ledger_rows"],
+                   "documents": c["documents"]}
+            recs.append(rec)
+            if m["fp"] or m["fn"] or tr:
+                fails.append(rec)
+    steps = [r["steps"] for r in recs]
+    hist = {}
+    for s_ in steps:
+        b = f"{s_ // 10 * 10:02d}-{s_ // 10 * 10 + 9:02d}"
+        hist[b] = hist.get(b, 0) + 1
+    out = {"episodes": len(recs), "perfect": sum(1 for r in recs if r["fp"] == 0 and r["fn"] == 0 and not r["truncated"]),
+           "max_steps": max(steps), "mean_steps": round(sum(steps) / len(steps), 2), "steps_histogram": dict(sorted(hist.items())),
+           "max_ledger_rows": max(r["ledger_rows"] for r in recs), "max_documents": max(r["documents"] for r in recs),
+           "tp": sum(r["tp"] for r in recs), "fp": sum(r["fp"] for r in recs), "fn": sum(r["fn"] for r in recs),
+           "by_variant": {v: {"n": sum(1 for r in recs if r["variant"] == v),
+                              "perfect": sum(1 for r in recs if r["variant"] == v and not (r["fp"] or r["fn"])),
+                              "max_steps": max(r["steps"] for r in recs if r["variant"] == v)}
+                          for v in dict.fromkeys(r["variant"] for r in recs)},
+           "failures": fails}
+    Path(args.out).write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"[solvability] competent_reconciler: {out['perfect']}/{out['episodes']} эпизодов с F1=1 и без FP; "
+          f"TP={out['tp']} FP={out['fp']} FN={out['fn']}; шаги max={out['max_steps']} mean={out['mean_steps']}")
+    return 0 if out["max_steps"] < 100 else 1
 
 
 def cmd_run(args) -> int:
@@ -145,10 +206,11 @@ CHECK_STEPS = [
     ("validate 300 random seeds", ["-m", "auditenv.cli", "validate-seeds", "--n", "300"]),
     ("pytest", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]),
     ("run baseline policies (+competent)", ["-m", "auditenv.cli", "run"]),
+    ("solvability: competent_reconciler, 300 seeds + worst size", ["-m", "auditenv.cli", "solvability"]),
     ("trajectory leak scan", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_policies.py", "-k",
                               "committed_trajectories"]),
     ("determinism (2 processes, PYTHONHASHSEED)", ["-m", "auditenv.checks", "determinism"]),
-    ("shadow jury 4x20", ["tests/jury/run_jury.py"]),
+    ("self-check 4x20 (не оценка жюри)", ["tests/jury/run_jury.py"]),
     ("report", ["-m", "auditenv.report"]),
 ]
 
@@ -169,7 +231,7 @@ def cmd_check(args) -> int:
         tail = (r.stdout.strip().splitlines() or [""])[-1][:110]
         rows.append((name, ok, dt, tail))
         print(f"[{'OK' if ok else 'FAIL'}] {name:44s} {dt:6.1f}s  {tail}", flush=True)
-        if "jury" in name:
+        if "self-check" in name:
             print("\n".join("        " + l for l in r.stdout.strip().splitlines()), flush=True)
         if not ok:
             print(r.stdout[-4000:])
@@ -197,6 +259,11 @@ def main(argv=None) -> int:
     vs = sub.add_parser("validate-seeds")
     vs.add_argument("--n", type=int, default=300)
     vs.set_defaults(fn=cmd_validate_seeds)
+    so = sub.add_parser("solvability")
+    so.add_argument("--n", type=int, default=300)
+    so.add_argument("--worst", type=int, default=10)
+    so.add_argument("--out", default="grader_data/solvability.json")
+    so.set_defaults(fn=cmd_solvability)
     r = sub.add_parser("run")
     r.add_argument("--policies", "--policy", nargs="+",
                    default=["random_explorer", "simple_reconciler", "competent_reconciler", "flag_all", "oracle"],

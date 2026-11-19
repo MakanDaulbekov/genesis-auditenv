@@ -69,3 +69,23 @@ def test_competent_reconciler_solves_open_episodes(grader):
             m = r["metrics"]
             assert (m["fp"], m["fn"]) == (0, 0), (e["ref"], m)
             assert r["steps"] <= 60
+
+
+@pytest.mark.parametrize("variant", [{}, {"clean": True}, {"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 1}},
+                                     {"currencies": {"base": ["JPY"]}}])
+def test_competent_reconciler_solves_random_seeds(grader, variant):
+    """Решаемость: на новых seed честная политика находит всё без FP и укладывается в бюджет."""
+    for seed in range(5):
+        env = AuditEnv(grader, "train")
+        obs, _ = env.reset(seed=880_000 + seed, config=variant)
+        pol = load_policy("competent_reconciler")
+        pol.reset(obs)
+        a, n = pol.act(obs), 0
+        while True:
+            o, r, te, tr, info = env.step(a)
+            n += 1
+            if te or tr:
+                break
+            a = pol.act(o)
+        assert te and not tr and n < 80
+        assert (info["metrics"]["fp"], info["metrics"]["fn"]) == (0, 0), (variant, seed, info)

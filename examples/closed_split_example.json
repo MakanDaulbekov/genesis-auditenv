@@ -122,12 +122,12 @@
    "overrides": {
     "size": {
      "n_invoices": [
-      90,
-      110
+      65,
+      75
      ],
      "n_expenses": [
       400,
-      500
+      600
      ]
     }
    }

@@ -235,7 +235,7 @@ def _data_specs():
         specs.append(("interacting", rng.randint(10**9, 10**12),
                       {"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 1 if i % 2 else 0}}))
     combos = [{}, {"currencies": {"base": ["JPY"]}}, {"currencies": {"base": ["GBP", "CHF"]}},
-              {"size": {"n_invoices": [90, 130], "n_expenses": [500, 900]}},
+              {"size": {"n_invoices": [65, 75], "n_expenses": [500, 700]}},
               {"errors": {t: 3 for t in TYPES}, "interactions": {"partial_fx_boundary": 0, "duplicate_cutoff": 0}},
               {"errors": {"duplicate_invoice": 0, "missing_or_partial_allocation": 4, "fx_wrong_date_or_rate": 0,
                           "period_cutoff_error": 0}},
@@ -511,14 +511,14 @@ def main() -> int:
         res[name] = {"passed": passed, "failed": failed}
     x.g.close()
     eng = engineering()
-    score = sum(weights[b] * res[b]["passed"] / 20 for b in weights) + sum(v for _, v in eng)
-    print("| блок | пройдено | баллы |\n|---|---|---|")
+    total = sum(res[b]["passed"] for b in weights)
+    print("| блок (зеркало раздела 10 PDF) | пройдено |\n|---|---|")
     for b in weights:
-        print(f"| {b} | {res[b]['passed']}/20 | {weights[b] * res[b]['passed'] / 20:.2f} / {weights[b]} |"
-              + (f" провалы: {res[b]['failed']}" if res[b]["failed"] else ""))
-    print(f"| engineering (самооценка) | {sum(v for _, v in eng)}/10 | " + ", ".join(f"{n}={v}" for n, v in eng) + " |")
-    print(f"[jury] прогноз: {score:.1f} / 100")
-    out = {"blocks": res, "engineering": eng, "forecast": round(score, 2)}
+        print(f"| {b} | {res[b]['passed']}/20 |" + (f" провалы: {res[b]['failed']}" if res[b]["failed"] else ""))
+    print("| наличие инженерных артефактов | " + ", ".join(f"{n}: {'есть' if v else 'нет'}" for n, v in eng) + " |")
+    print(f"[self-check] Самопроверка: {total}/80 наших проверок, зеркальных разделам 06 и 10 PDF. Это не оценка жюри.")
+    print("[self-check] Не покрыто самопроверкой: harness жюри, их политики, их преобразования и закрытые seed.")
+    out = {"blocks": res, "engineering": eng, "passed": total, "of": 80}
     (ROOT / "grader_data" / "jury.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0 if all(res[b]["passed"] == 20 for b in weights) else 1
 

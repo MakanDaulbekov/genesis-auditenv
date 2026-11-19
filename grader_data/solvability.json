@@ -1,0 +1,57 @@
+{
+  "episodes": 310,
+  "perfect": 310,
+  "max_steps": 70,
+  "mean_steps": 40.93,
+  "steps_histogram": {
+    "20-29": 13,
+    "30-39": 174,
+    "40-49": 62,
+    "50-59": 31,
+    "60-69": 29,
+    "70-79": 1
+  },
+  "max_ledger_rows": 1895,
+  "max_documents": 202,
+  "tp": 1977,
+  "fp": 0,
+  "fn": 0,
+  "by_variant": {
+    "default": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 43
+    },
+    "clean": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 46
+    },
+    "interactions": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 44
+    },
+    "12_errors": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 51
+    },
+    "large": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 66
+    },
+    "base_JPY_GBP": {
+      "n": 50,
+      "perfect": 50,
+      "max_steps": 44
+    },
+    "worst_size": {
+      "n": 10,
+      "perfect": 10,
+      "max_steps": 70
+    }
+  },
+  "failures": []
+}
