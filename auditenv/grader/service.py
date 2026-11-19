@@ -43,6 +43,7 @@ class GraderCore:
             self.closed = json.loads(Path(settings["closed_episodes_file"]).read_text(encoding="utf-8"))
         self.allow_oracle = bool(settings.get("allow_oracle", False))
         self.sessions: dict[str, dict] = {}
+        self.closed_opened: set[int] = set()
         self.counter = 0
         self.results: list[dict] = []
         self.finalized = False
@@ -62,8 +63,18 @@ class GraderCore:
         if mode not in ("train", "eval"):
             return {"error": "bad_mode"}
         if closed_index is not None:
-            if not isinstance(closed_index, int) or not 0 <= closed_index < len(self.closed):
+            if isinstance(closed_index, bool) or not isinstance(closed_index, int) \
+                    or not 0 <= closed_index < len(self.closed):
                 return {"error": "bad_index"}
+            # закрытый эпизод: только eval и только один раз за прогон (нельзя переоткрыть и
+            # «прощупать» эталон повторными оценками или train-наградой)
+            if mode != "eval":
+                self.log({"event": "rejected_closed_train", "closed_index": closed_index})
+                return {"error": "closed_requires_eval"}
+            if closed_index in self.closed_opened:
+                self.log({"event": "rejected_closed_reopen", "closed_index": closed_index})
+                return {"error": "closed_already_opened"}
+            self.closed_opened.add(closed_index)
             spec = self.closed[closed_index]
             ep = generate_episode(spec["seed"], spec["config"], self.secret)
             public, truth = ep.public, ep.truth

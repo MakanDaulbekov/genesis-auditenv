@@ -30,3 +30,12 @@ determinism:
 
 clean:
 	rm -rf episodes/train episodes/dev grader_data/train grader_data/dev .pytest_cache
+
+demo:
+	$(PY) -m auditenv.demo
+
+jury:
+	$(PY) tests/jury/run_jury.py
+
+report:
+	$(PY) -m auditenv.report

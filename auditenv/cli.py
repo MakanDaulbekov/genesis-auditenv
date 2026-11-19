@@ -135,6 +135,7 @@ CHECK_STEPS = [
     ("trajectory leak scan", ["-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_policies.py", "-k",
                               "committed_trajectories"]),
     ("determinism (2 processes, PYTHONHASHSEED)", ["-m", "auditenv.checks", "determinism"]),
+    ("shadow jury 4x20", ["tests/jury/run_jury.py"]),
     ("report", ["-m", "auditenv.report"]),
 ]
 
@@ -147,8 +148,6 @@ def cmd_check(args) -> int:
     rows = []
     ok_all = True
     for name, cmd in CHECK_STEPS:
-        if cmd[1] == "auditenv.report" and not (ROOT / "auditenv" / "report.py").exists():
-            continue
         t0 = time.monotonic()
         r = subprocess.run([sys.executable] + cmd, cwd=ROOT, env=env, capture_output=True, text=True)
         dt = time.monotonic() - t0
@@ -157,6 +156,8 @@ def cmd_check(args) -> int:
         tail = (r.stdout.strip().splitlines() or [""])[-1][:110]
         rows.append((name, ok, dt, tail))
         print(f"[{'OK' if ok else 'FAIL'}] {name:44s} {dt:6.1f}s  {tail}", flush=True)
+        if "jury" in name:
+            print("\n".join("        " + l for l in r.stdout.strip().splitlines()), flush=True)
         if not ok:
             print(r.stdout[-4000:])
             print(r.stderr[-4000:])

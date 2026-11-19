@@ -271,8 +271,19 @@ def test_hanging_agent_is_truncated(cfg, tmp_path):
     closed = tmp_path / "c.json"
     closed.write_text(json.dumps([{"seed": 3, "config": cfg}]))
     with GraderClient(closed_episodes_file=str(closed)) as g:
-        res = run_agent(f"{sys.executable} {hang}", [{"closed_index": 0}], g, "train", time_limit_s=1.0)
+        res = run_agent(f"{sys.executable} {hang}", [{"closed_index": 0}], g, "eval", time_limit_s=1.0)
         g.call("finalize")
         graded = g.call("results")["results"]
     assert graded[0]["reason"] == "truncated_time" and graded[0]["n_findings"] == 0
     assert res[0]["wall_s"] < 5
+
+
+def test_closed_episodes_eval_only_and_single_open(cfg, tmp_path):
+    """Атака: переоткрыть закрытый эпизод в train-режиме или повторно, чтобы прощупать эталон наградой."""
+    closed = tmp_path / "c.json"
+    closed.write_text(json.dumps([{"seed": 11, "config": cfg}]))
+    with GraderClient(closed_episodes_file=str(closed)) as g:
+        assert g.call("open", mode="train", closed_index=0)["error"] == "closed_requires_eval"
+        assert "token" in g.call("open", mode="eval", closed_index=0)
+        assert g.call("open", mode="eval", closed_index=0)["error"] == "closed_already_opened"
+        assert g.call("open", mode="eval", closed_index=True)["error"] == "bad_index"
