@@ -148,7 +148,25 @@ $ make docker-check
 ```
 
 ### Проверено в песочнице разработки
-SANDBOX_CHECK_OUTPUT
+Чистый `git clone` + свежий venv Python 3.11.18 (`pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock`), 2 vCPU, 19.11.2026; `make check`:
+```
+[OK] generate train                                  0.3s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
+[OK] generate dev                                    0.3s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
+[OK] validate episodes                               1.0s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
+[OK] validate 300 random seeds                      25.9s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                         58.4s  192 passed in 58.08s
+[OK] run baseline policies (+competent)              2.1s  }
+[OK] solvability: competent_reconciler, 300 seeds + worst size   16.5s  [solvability] competent_reconciler: 310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            0.7s  1 passed, 7 deselected in 0.46s
+[OK] determinism (2 processes, PYTHONHASHSEED)       1.2s  [determinism] files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)                8.9s  [self-check] Не покрыто самопроверкой: harness жюри, их политики, их преобразования и закрытые seed.
+[OK] report                                          0.1s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
+== check: OK ==
+real	1m55.399s
+```
+После прогона в рабочем дереве меняется только `REPORT.md` (замеры времени и RSS); эпизоды и `trajectories.jsonl` совпадают с закоммиченными побайтово.
+
+Docker в песочнице: Docker Hub закрыт, поэтому образ собран на локальной базе Python 3.11 (rootfs песочницы) — `docker run --rm --network none --cpus 2 --memory 4g auditenv` → `== check: OK ==` за 107 с под непривилегированным пользователем.
 
 ## Структура
 
