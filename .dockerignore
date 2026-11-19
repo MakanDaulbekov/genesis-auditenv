@@ -2,3 +2,6 @@
 __pycache__
 .pytest_cache
 *.pyc
+jury_out
+grader_data/*.log
+grader_data/*log.jsonl

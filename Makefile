@@ -44,3 +44,12 @@ report:
 SPLIT ?= examples/closed_split_example.json
 jury-run:
 	$(PY) -m auditenv.jury_run --split $(SPLIT) $(if $(SECRET),--secret-file $(SECRET),) $(if $(POLICY),--policies $(POLICY),)
+
+## Docker: закрепить базовый образ по digest и прогнать проверку в контейнере без сети
+docker-pin:
+	sh docker/pin_base_image.sh
+
+BASE_IMAGE := $(shell cat docker/base-image.txt 2>/dev/null || echo python:3.11-slim)
+docker-check:
+	docker build --build-arg PYTHON_IMAGE=$(BASE_IMAGE) -t auditenv .
+	docker run --rm --network none --cpus 2 --memory 4g auditenv
