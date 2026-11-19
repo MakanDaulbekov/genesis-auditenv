@@ -1,0 +1,178 @@
+{
+ "split": "closed_example",
+ "config_version": "closed-example-1.0.0",
+ "episodes": [
+  {
+   "seed": 900001,
+   "overrides": {
+    "clean": true
+   }
+  },
+  {
+   "seed": 900002,
+   "overrides": {
+    "clean": true
+   }
+  },
+  {
+   "seed": 900003,
+   "overrides": {
+    "clean": true
+   }
+  },
+  {
+   "seed": 900004,
+   "overrides": {
+    "clean": true
+   }
+  },
+  {
+   "seed": 900005,
+   "overrides": {
+    "clean": true
+   }
+  },
+  {
+   "seed": 900101,
+   "overrides": {
+    "interactions": {
+     "partial_fx_boundary": 1,
+     "duplicate_cutoff": 0
+    }
+   }
+  },
+  {
+   "seed": 900102,
+   "overrides": {
+    "interactions": {
+     "partial_fx_boundary": 1,
+     "duplicate_cutoff": 1
+    }
+   }
+  },
+  {
+   "seed": 900103,
+   "overrides": {
+    "interactions": {
+     "partial_fx_boundary": 1,
+     "duplicate_cutoff": 0
+    }
+   }
+  },
+  {
+   "seed": 900104,
+   "overrides": {
+    "interactions": {
+     "partial_fx_boundary": 1,
+     "duplicate_cutoff": 1
+    }
+   }
+  },
+  {
+   "seed": 900105,
+   "overrides": {
+    "interactions": {
+     "partial_fx_boundary": 1,
+     "duplicate_cutoff": 0
+    }
+   }
+  },
+  {
+   "seed": 900201,
+   "overrides": {}
+  },
+  {
+   "seed": 900202,
+   "overrides": {
+    "currencies": {
+     "base": [
+      "JPY"
+     ]
+    }
+   }
+  },
+  {
+   "seed": 900203,
+   "overrides": {
+    "currencies": {
+     "base": [
+      "GBP",
+      "CHF"
+     ]
+    }
+   }
+  },
+  {
+   "seed": 900204,
+   "overrides": {
+    "errors": {
+     "duplicate_invoice": 3,
+     "missing_or_partial_allocation": 3,
+     "fx_wrong_date_or_rate": 3,
+     "period_cutoff_error": 3
+    },
+    "interactions": {
+     "partial_fx_boundary": 0,
+     "duplicate_cutoff": 0
+    }
+   }
+  },
+  {
+   "seed": 900205,
+   "overrides": {
+    "size": {
+     "n_invoices": [
+      90,
+      110
+     ],
+     "n_expenses": [
+      400,
+      500
+     ]
+    }
+   }
+  },
+  {
+   "seed": 900206,
+   "overrides": {
+    "currencies": {
+     "foreign_customer_share_pct": 90
+    }
+   }
+  },
+  {
+   "seed": 900207,
+   "overrides": {}
+  },
+  {
+   "seed": 900208,
+   "overrides": {}
+  },
+  {
+   "seed": 900209,
+   "overrides": {
+    "distractors": {
+     "recurring_groups": [
+      3,
+      4
+     ]
+    }
+   }
+  },
+  {
+   "seed": 900210,
+   "overrides": {
+    "size": {
+     "n_invoices": [
+      20,
+      24
+     ],
+     "n_expenses": [
+      80,
+      90
+     ]
+    }
+   }
+  }
+ ]
+}

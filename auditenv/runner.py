@@ -67,9 +67,15 @@ def aggregate(results: list[dict], grader_results: list[dict], clean_ids: set) -
         bt = {t: {k: sum(g["by_type"][t][k] for g in gs) for k in ("tp", "fp", "fn")} for t in TYPES}
         clean = [r for r in rs if r["episode_id"] in clean_ids]
         n = len(rs)
+        g_rew = {g["episode_id"]: g["reward"] for g in gs}
+        # в eval среда возвращает политике 0; истинная общая награда — из журнала оценщика
+        ret = [g_rew.get(r["episode_id"], r["return"]) for r in rs]
+        walls = sorted(r["wall_ms"] for r in rs)
         out[pol] = {
             "episodes": n,
-            "mean_return": round(sum(r["return"] for r in rs) / n, 4),
+            "mean_return": round(sum(ret) / n, 4),
+            "p50_wall_ms": walls[(n - 1) // 2],
+            "p95_wall_ms": walls[min(n - 1, -(-95 * n // 100) - 1)],
             "mean_precision": round(sum(g["precision"] for g in gs) / max(1, len(gs)), 4),
             "mean_recall": round(sum(g["recall"] for g in gs) / max(1, len(gs)), 4),
             "mean_f1": round(sum(g["f1"] for g in gs) / max(1, len(gs)), 4),
@@ -83,7 +89,8 @@ def aggregate(results: list[dict], grader_results: list[dict], clean_ids: set) -
             "invalid_submissions": sum(1 for g in gs if not g["valid"]),
             "truncated": sum(1 for r in rs if r["truncated"]),
             "clean_episodes": len(clean),
-            "clean_mean_return": round(sum(r["return"] for r in clean) / len(clean), 4) if clean else None,
+            "clean_mean_return": round(sum(g_rew.get(r["episode_id"], r["return"]) for r in clean) / len(clean), 4)
+            if clean else None,
             "by_type": bt,
         }
     return out

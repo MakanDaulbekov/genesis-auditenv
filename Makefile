@@ -39,3 +39,8 @@ jury:
 
 report:
 	$(PY) -m auditenv.report
+
+## Режим жюри: make jury-run SPLIT=closed_split.json [SECRET=secret.txt] [POLICY="their.module:Factory ..."]
+SPLIT ?= examples/closed_split_example.json
+jury-run:
+	$(PY) -m auditenv.jury_run --split $(SPLIT) $(if $(SECRET),--secret-file $(SECRET),) $(if $(POLICY),--policies $(POLICY),)

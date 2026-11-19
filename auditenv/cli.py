@@ -19,13 +19,27 @@ ROOT = Path(__file__).resolve().parent.parent
 from .generator.config import deep_merge  # noqa: E402  (реэкспорт для тестов/жюри)
 
 
+DEFAULT_SECRET_NOTE = ("ПРЕДУПРЕЖДЕНИЕ: --secret-file не задан — используется открытый детерминированный секрет "
+                       "по умолчанию (пустая строка). Повтор seed точен, но маленькие закрытые seed можно перебрать "
+                       "открытым генератором. Для закрытого прогона передайте --secret-file.")
+
+
+def read_secret(path: str | None) -> str:
+    return Path(path).read_text(encoding="utf-8").strip() if path else ""
+
+
 def split_configs(split_file: str) -> tuple[dict, list[tuple[int, dict]]]:
+    """Сплит: {"split", "config_version", "generator_config"?, "episodes": [{"seed", "overrides"? | "config"?}]}.
+    Без generator_config берётся configs/default.json; overrides/config мержатся поверх него."""
     spec = json.loads(Path(split_file).read_text(encoding="utf-8"))
-    base = json.loads((ROOT / spec["generator_config"]).read_text(encoding="utf-8"))
+    gc = spec.get("generator_config", "configs/default.json")
+    gp = Path(gc) if Path(gc).is_absolute() or Path(gc).exists() else ROOT / gc
+    base = json.loads(gp.read_text(encoding="utf-8"))
     out = []
     for e in spec["episodes"]:
-        cfg = deep_merge(base, e.get("overrides", {}))
-        cfg["config_version"] = spec["config_version"]
+        cfg = deep_merge(base, e.get("config", {}))
+        cfg = deep_merge(cfg, e.get("overrides", {}))
+        cfg["config_version"] = spec.get("config_version", cfg["config_version"])
         out.append((e["seed"], cfg))
     return spec, out
 
@@ -42,9 +56,12 @@ def cmd_generate(args) -> int:
         d.mkdir(parents=True)
     index = []
     from .generator.config import validate_config
+    if not args.secret_file and name not in ("train", "dev"):
+        print(DEFAULT_SECRET_NOTE, file=sys.stderr)
+    secret = read_secret(args.secret_file)
     for seed, cfg in items:
         validate_config(cfg)
-        ep = generate_episode(seed, cfg)
+        ep = generate_episode(seed, cfg, secret)
         (pub_root / ep.episode_id).mkdir()
         (prv_root / ep.episode_id).mkdir()
         for n, b in sorted(ep.public.items()):
@@ -170,6 +187,7 @@ def main(argv=None) -> int:
     g.add_argument("--split", required=True)
     g.add_argument("--episodes-root", default="episodes")
     g.add_argument("--grader-root", default="grader_data")
+    g.add_argument("--secret-file", default=None, help="секрет оценщика (закрытый прогон)")
     g.set_defaults(fn=cmd_generate)
     v = sub.add_parser("validate")
     v.add_argument("--splits", nargs="+", default=["train", "dev"])
