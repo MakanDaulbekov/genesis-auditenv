@@ -148,6 +148,14 @@ class AuditEnv:
         reward = 0.0 if self.mode == "eval" or "error" in out else float(out["reward"])
         return self._obs(result={"status": "submitted"}), reward, True, False, {}
 
+    def force_truncate(self, reason: str = "harness_abort"):
+        """ТОЛЬКО для harness: досрочно закрыть эпизод (напр. упал процесс агента).
+        Оценивается пустой ответ, как при truncation; причина пишется в журнал оценщика."""
+        if self._store is None or self._done:
+            return self._obs(error=err("episode_finished")), 0.0, True, False, {}
+        reward, info = self._finish({"episode_id": self._episode_id, "findings": []}, f"truncated_{reason}")
+        return self._obs(), reward, False, True, info
+
     def _parse(self, action):
         if isinstance(action, (str, bytes)):
             if len(action) > MAX_ACTION_BYTES:

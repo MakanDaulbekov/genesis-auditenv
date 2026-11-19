@@ -7,3 +7,4 @@ grader_data/run_summary.json
 grader_data/jury_log.jsonl
 grader_data/jury.json
 grader_data/agent_host_log.jsonl
+grader_data/agent_stderr.log

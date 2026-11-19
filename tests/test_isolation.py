@@ -254,10 +254,11 @@ def test_external_agent_process_on_closed_episodes(cfg, tmp_path):
     agent = f"{sys.executable} {ROOT / 'examples' / 'stdin_agent.py'}"
     traj = tmp_path / "t.jsonl"
     with GraderClient(closed_episodes_file=str(closed), secret_file=str(secret)) as g:
-        res = run_agent(agent, [{"closed_index": 0}, {"closed_index": 1}], g, "eval", str(traj))
+        res = run_agent(agent, [{"closed_index": 0}, {"closed_index": 1}], g, "eval", str(traj),
+                        stderr_path=str(tmp_path / "err.log"))
         g.call("finalize")
         graded = g.call("results")["results"]
-    assert [r["return"] for r in res] == [0.0, 0.0]
+    assert [r["return"] for r in res["episodes"]] == [0.0, 0.0] and not res["crashed"]
     assert graded[1]["reward"] == pytest.approx(1 - 0.002)  # чистая компания, 1 шаг осмотра
     text = traj.read_text()
     assert "123456789" not in text and "987654321" not in text
@@ -271,11 +272,12 @@ def test_hanging_agent_is_truncated(cfg, tmp_path):
     closed = tmp_path / "c.json"
     closed.write_text(json.dumps([{"seed": 3, "config": cfg}]))
     with GraderClient(closed_episodes_file=str(closed)) as g:
-        res = run_agent(f"{sys.executable} {hang}", [{"closed_index": 0}], g, "eval", time_limit_s=1.0)
+        res = run_agent(f"{sys.executable} {hang}", [{"closed_index": 0}], g, "eval", time_limit_s=1.0,
+                        stderr_path=str(tmp_path / "err.log"))
         g.call("finalize")
         graded = g.call("results")["results"]
     assert graded[0]["reason"] == "truncated_time" and graded[0]["n_findings"] == 0
-    assert res[0]["wall_s"] < 5
+    assert res["episodes"][0]["wall_s"] < 5 and res["episodes"][0]["status"] == "timeout"
 
 
 def test_closed_episodes_eval_only_and_single_open(cfg, tmp_path):
