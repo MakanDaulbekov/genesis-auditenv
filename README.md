@@ -139,13 +139,27 @@ docker run --rm --network none --cpus 2 --memory 4g auditenv      # CMD = python
 * В образе нет `make`: `CMD` вызывает проверку напрямую.
 * Чтобы обновить digest, выполните `make docker-pin` (по умолчанию тег `python:3.11-slim`; другой тег — `sh docker/pin_base_image.sh python:3.11.X-slim`).
 
-### Проверено командой (заполнить после реальной сборки)
+### Проверено командой
 ```
-дата: ____-__-__   машина: ______   docker --version: ______
-digest: python:3.11-slim@sha256:________________
-$ make docker-check
-... (вставьте последние ~15 строк вывода, включая "== check: OK ==")
+дата: 19-11-2026   машина: Windows x64, Docker Desktop   docker --version: 29.9.3
+digest: python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535
+
+$ docker build --build-arg PYTHON_IMAGE=python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535 -t auditenv .
+$ docker run --rm --network none --cpus 2 --memory 4g auditenv
+[OK] generate train                                  0.5s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
+[OK] generate dev                                    0.5s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
+[OK] validate episodes                               1.6s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
+[OK] validate 300 random seeds                      28.8s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                         69.6s  192 passed in 69.15s (0:01:09)
+[OK] run baseline policies (+competent)              3.5s
+[OK] solvability: competent_reconciler, 300 seeds + worst size   16.7s  310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            0.9s
+[OK] determinism (2 processes, PYTHONHASHSEED)       2.0s  files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)               14.5s  80/80
+[OK] report                                          0.3s
+== check: OK ==
 ```
+Тот же результат (те же episode_id, issues=1880, TP=1963) получен на Linux вне Docker на Python 3.11: генерация детерминирована и между машинами.
 
 ### Проверено в песочнице разработки
 Чистый `git clone` + свежий venv Python 3.11.18 (`pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock`), 2 vCPU, 19.11.2026; `make check`:
