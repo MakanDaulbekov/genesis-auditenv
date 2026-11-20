@@ -209,3 +209,49 @@ def test_oracle_from_truth_finds_truth_when_dir_name_differs_from_episode_id(tmp
         pol = load_policy("oracle_from_truth", trusted=True, truth_dir=str(tmp_path / "grader"))
         res = run_episode(AuditEnv(g, "train"), "oracle_from_truth", {"episode_ref": ref}, policy_obj=pol)
     assert res["return"] == 1.0 and res["metrics"]["tp"] == 8 and res["metrics"]["fp"] == 0
+
+
+# ----------------------------------------------------------------------------- F4/F5: README «с нуля»
+
+def _readme():
+    return (ROOT / "README.md").read_text(encoding="utf-8")
+
+
+def test_readme_quickstart_installs_pytest_in_first_20_lines():
+    """На чистом Python 3.11 `make check` падал на шаге pytest: установки не было в первых 20 строках."""
+    head = "\n".join(_readme().splitlines()[:20])
+    assert "requirements-dev.lock" in head and "--no-index" in head and "make check" in head
+
+
+def test_readme_recipe_for_own_transformed_episodes_works(tmp_path):
+    """Описанный в README путь жюри: свой каталог, index.json, флаги корней, пересчёт хэшей manifest — исполняется
+    буквально (команда пересчёта берётся из README)."""
+    import shlex
+    import shutil
+    import subprocess
+    from auditenv.cli import main
+    from auditenv.generator.validate import validate_episode_dir
+    text = _readme()
+    assert "index.json" in text and "--episodes-root" in text and "--grader-root" in text
+    snippet = [ln for ln in text.splitlines() if ln.startswith('python -c "import hashlib')]
+    assert len(snippet) == 1
+    src_p, src_g = ROOT / "episodes" / DIRTY_REF, ROOT / "grader_data" / DIRTY_REF
+    pd, gd = tmp_path / "my/episodes/perm/e1", tmp_path / "my/grader/perm/e1"
+    shutil.copytree(src_p, pd)
+    gd.mkdir(parents=True)
+    for n in ("truth.json", "provenance.json"):
+        shutil.copy(src_g / n, gd / n)
+    lines = (pd / "ledger.csv").read_bytes().split(b"\n")
+    (pd / "ledger.csv").write_bytes(b"\n".join([lines[0]] + [x for x in lines[1:] if x][::-1]) + b"\n")
+    (tmp_path / "my/episodes/perm/index.json").write_text('[{"ref": "perm/e1"}]', encoding="utf-8")
+    assert not validate_episode_dir(pd, gd)["ok"]  # хэш ledger.csv устарел
+    argv = shlex.split(snippet[0].replace("my/episodes/<split>/<name>", str(pd)))
+    subprocess.run([sys.executable] + argv[1:], check=True)
+    rep = validate_episode_dir(pd, gd)
+    assert rep["ok"], rep["errors"]
+    out = tmp_path / "out"
+    rc = main(["run", "--policies", "oracle", "--splits", "perm", "--episodes-root", str(tmp_path / "my/episodes"),
+               "--grader-root", str(tmp_path / "my/grader"), "--trajectories", str(out) + "_traj.jsonl",
+               "--grader-log", str(out) + "_g.jsonl", "--summary", str(out) + "_s.json"])
+    s = json.loads(Path(str(out) + "_s.json").read_text(encoding="utf-8"))
+    assert rc == 0 and s["aggregate"]["oracle"]["mean_return"] == 1.0 and s["aggregate"]["oracle"]["micro"]["fp"] == 0

@@ -3,7 +3,8 @@
 Среда генерирует синтетические компании с внедрёнными финансовыми ошибками. Агент расследует их через `reset/step` (5 узких инструментов) и отправляет findings с доказательствами. Оценщик работает в отдельном процессе и выдаёт общую награду раздела 05. Python 3.11, только stdlib, без сети и GPU.
 
 ```bash
-make check                        # без make: python3.11 -m auditenv.cli check   (≈2 мин, 2 CPU)
+python3.11 -m pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock  # pytest офлайн (в venv), 1 раз
+make check                        # без make: python3.11 -m auditenv.cli check   (≈2.5 мин, 2 CPU)
 ```
 Команда печатает по строке `[OK]/[FAIL]` на шаг и в конце `== check: OK ==`; при любом провале выход ненулевой. Шаги:
 1. генерация 10 train + 10 dev эпизодов;
@@ -55,7 +56,8 @@ class SilentAuditor:
 **Запуск одной командой:**
 ```bash
 # 1) в процессе среды (factory() -> объект с reset/act; модуль ищется и в текущем каталоге)
-python -m auditenv.cli run --policies your.module:YourPolicy --splits dev
+python -m auditenv.cli run --policies your.module:YourPolicy --splits dev --trajectories your_traj.jsonl
+#    (без --trajectories прогон перезапишет сдаваемый trajectories.jsonl; вернуть: git checkout trajectories.jsonl)
 # 2) отдельным процессом (жёсткая граница: у политики нет дескриптора оценщика)
 python -m auditenv.agent_host --policy your.module:YourPolicy --split dev
 python -m auditenv.agent_host --agent-cmd "python your_agent.py" --split dev   # любой язык, JSON stdin/stdout
@@ -103,6 +105,28 @@ make jury-run SPLIT=closed_split.json [SECRET=secret.txt] [POLICY="your.module:F
 
 **Секрет.** Генератор открыт, поэтому без секрета маленькие закрытые seed можно перебрать и получить эталон. Секрет входит в ключ эпизода, и это закрывает перебор. Без `--secret-file` выводится предупреждение и используется открытый детерминированный секрет по умолчанию, так что повтор seed остаётся точным.
 
+### Свои преобразованные эпизоды (перестановка строк, смена ID)
+`make jury-run` применяет наши `auditenv.transforms`. Свои преобразования подложите так (имена сплита и каталога — `[A-Za-z0-9_.-]`, любые):
+```
+my/episodes/<split>/<name>/   manifest.json policy.json ledger.csv invoices.jsonl payments.jsonl fx.csv documents.jsonl
+my/grader/<split>/<name>/     truth.json   (с теми же новыми ID; provenance.json нужен только валидатору)
+my/episodes/<split>/index.json   [{"ref": "<split>/<name>"}, ...]
+```
+```bash
+python -m auditenv.cli run --policies oracle competent_reconciler your.module:YourPolicy --splits <split> \
+  --episodes-root my/episodes --grader-root my/grader \
+  --trajectories my/traj.jsonl --grader-log my/grader_log.jsonl --summary my/summary.json
+```
+* `oracle` строит ответ в процессе оценщика по вашему `truth.json`. Свой oracle по диску — `--trusted --policies oracle_from_truth --truth-dir my/grader` (каталог может называться не так, как `episode_id`).
+* **ID** — любые строки до 128 символов: `INV/2026/0001`, `{uuid}`, пробелы, кириллица допустимы, если ID есть в открытых записях. Несуществующий ID — FP, а несуществующий вне `[A-Za-z0-9][A-Za-z0-9_.:-]` — неверная структура.
+* **`episode_id`** — до 128 символов, одинаковый в `manifest.json` и `truth.json`; с ним агент отправляет findings.
+* **`fx_id`** = `fx:<date>:<src>:<tgt>` вычисляется из содержимого `fx.csv` (в нём нет столбца ID). В эталоне его не переименовывайте, перестановка строк `fx.csv` на него не влияет.
+* **Хэши `manifest.files`** среда не проверяет, поэтому после перестановки эпизод открывается и без пересчёта. Наш валидатор их проверяет; пересчитать:
+```bash
+python -c "import hashlib,json,pathlib,sys; d=pathlib.Path(sys.argv[1]); p=d/'manifest.json'; m=json.loads(p.read_text('utf-8')); m['files']={n: hashlib.sha256((d/n).read_bytes()).hexdigest() for n in m['files']}; p.write_bytes((json.dumps(m, sort_keys=True, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))" my/episodes/<split>/<name>
+```
+* Валидатор: `python -m auditenv.cli validate --splits <split> --episodes-root my/episodes --grader-root my/grader`. Ему нужен `provenance.json` с той же биекцией ID, а схемы записей валидатора рассчитаны на наш формат ID (`[A-Za-z0-9_.:-]`, ≤64): ID в другом формате он отметит как `schema: … invalid … records`. Это ограничение валидатора, а не среды.
+
 ## Контракт среды
 
 ```python
@@ -117,6 +141,7 @@ with GraderClient() as grader:
 **Наблюдение и `reset`:**
 * наблюдение всегда имеет вид `{"result", "error": null | {"code", "message"}, "steps_remaining"}`;
 * `config` для `reset` может быть: `None` / `{}` / частичный dict / `{"episode_ref": "dev/ep_…"}` / `{"closed_index": i}`. Ошибка открытия — `EpisodeOpenError` с причиной.
+* `reset` посреди эпизода открывает новый эпизод с полным бюджетом; брошенный эпизод не оценивается и в итоги оценщика не попадает.
 
 **Действия:**
 * `list_records(table, cursor=None, limit=50)` — `cursor` и `limit` необязательны, лишние аргументы дают `invalid_arguments`;
@@ -129,7 +154,7 @@ with GraderClient() as grader:
 
 **Лимиты и награда:**
 * 100 шагов включая submit и 60 с на эпизод; промежуточная награда 0; при truncation оценивается пустой ответ;
-* `findings`: ≤30 выводов, ≤10 ID доказательств, explanation ≤1000 символов; неверная структура даёт −1;
+* `findings`: ≤30 выводов, ≤10 ID доказательств, explanation ≤1000 символов, ID и `episode_id` ≤128 символов, вложенность ≤32; неверная структура даёт −1;
 * награда — `clip(2*F1 − 1 − 0.002*inspection_steps, −1, 1)`;
 * сопоставление и допуски описаны в `grader/matcher.py` и в `policy.matching` каждого эпизода;
 * какие ID обязаны быть в `evidence_ids` для каждого типа, сказано в `policy.matching.required_evidence`. Например, для дубля нужны оба счёта и строка выпуска **каждого** из них, потому что одна строка доказывает только одну проводку.
@@ -163,7 +188,7 @@ Windows 11 x64, Python 3.12.11 (msys2), 12 логических CPU; `python -m 
 [OK] report                                          0.5s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
 == check: OK ==
 ```
-Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Два блока ниже сняты 19.11 **до** доработок; Dockerfile и digest с тех пор не менялись, но после изменений кода `make docker-check` стоит прогнать заново.
+Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Блок «Проверено командой» ниже снят 20.11 после доработок раунда 2 (206 тестов), блок «Проверено в песочнице» — 19.11, до них (192 теста). После правок аудита раунда 3 (`AUDIT.md`: код среды и оценщика, новые тесты) Dockerfile и digest не менялись, но `make docker-check` нужно прогнать заново и обновить блок «Проверено командой».
 
 ### Проверено командой
 ```

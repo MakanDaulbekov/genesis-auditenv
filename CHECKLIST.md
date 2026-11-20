@@ -5,7 +5,7 @@
 | Материал (PDF 09) | Что требуется | Файл(ы) | Тест / проверка | Статус |
 |---|---|---|---|---|
 | Исходный код | исходники с лицензией и зафиксированными зависимостями: генератор и среда | `auditenv/`, `LICENSE` (MIT), `pyproject.toml`, `requirements-dev.lock` (версии + SHA-256), `vendor/wheels` | `make check`; офлайн-установка `pip --no-index --require-hashes` | ✅ |
-| README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none …` на локальной базе Python 3.11 | ✅ (официальный `python:3.11-slim` — собрать командой, см. README) |
+| README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none --cpus 2 --memory 4g` на официальном `python:3.11-slim` по digest (машина команды, 20.11, 206 тестов — README) | ✅ (после правок раунда 3 — прогнать заново) |
 | Matcher и награда | общий код сопоставления и награды, схемы и политики | `auditenv/grader/matcher.py`, `reward.py`, `auditenv/schemas/*.schema.json`, `policy.json → matching` | `tests/test_reward.py`, самопроверка reward 20/20 | ✅ |
 | Эпизоды | 10 открытых train и 10 dev | `episodes/{train,dev}` (10+10; в dev есть base=JPY), эталон — `grader_data/{train,dev}`, конфиги — `configs/splits/*.json` | `test_committed_episodes_validate`, `make validate` | ✅ |
 | Тесты | тесты среды, сопоставления и награды | `tests/` (≈200 тестов): контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run, крайние config и доказательства (`test_robustness.py`) | `make test` | ✅ |
@@ -40,9 +40,10 @@
 | 12 | всё вымышлено, без реальных данных | генератор из словарей | — | ✅ |
 
 | 06/10 | эталон и доказательства проверяются жюри независимо по записям; равенства «до» ошибки | `cli export-before` → таблицы «до» в формате раздела 03; `jury-run` кладёт их в `jury_out/grader/<split>/<ep>/before/`; `policy.matching.required_evidence` | `test_export_before_is_clean_and_balanced`, `test_duplicate_evidence_needs_posting_of_both_invoices` | ✅ |
+| 06/10 | смена ID жюри в свой формат (`/`, `{uuid}`, кириллица, `episode_id` ≤128) сохраняет ответ oracle; глубокий `submit` → −1 без падения; путь «свои преобразованные эпизоды» | `grader/matcher.py`, `env/core.py`, README «Свои преобразованные эпизоды», `AUDIT.md` | `tests/test_round3_regressions.py` | ✅ |
 | 10 | крайние сочетания параметров не ломают генерацию | добор кандидатов в `world.py`, равномерное урезание сверх 12 в `episode._plan` | `test_extreme_configs_generate_and_validate`, `test_over_max_issues_is_balanced_across_types` | ✅ |
 
 ## Что команде сделать руками
 
-1. ~~Выполнить `make docker-pin && make docker-check`~~ — сделано 19.11 (digest закреплён, вывод в README). После последних правок кода желательно ещё раз выполнить `make docker-check` и обновить блок «Проверено командой» в README: Dockerfile и digest не менялись, но код и артефакты обновлены.
+1. ~~Выполнить `make docker-pin && make docker-check`~~ — сделано (digest закреплён 19.11, прогон после раунда 2 — 20.11, 206 тестов, вывод в README). После правок аудита раунда 3 (`AUDIT.md`) выполнить `make docker-check` ещё раз и обновить блок «Проверено командой»: Dockerfile и digest не менялись, но код среды/оценщика и тесты обновлены.
 2. Отправить ссылку на репозиторий/архив в форму сдачи (ссылку организаторы сообщат отдельно).
