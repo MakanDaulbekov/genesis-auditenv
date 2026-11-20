@@ -295,33 +295,33 @@ Windows 11 x64, Python 3.12.11 (msys2), 12 логических CPU; `python -m 
 [OK] report                                          0.5s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
 == check: OK ==
 ```
-Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Блок «Проверено командой» ниже снят 20.11 после добавления адаптера жюри `judge_adapter.py` (258 тестов, из них 35 — адаптер по определениям проверок) на официальном `python:3.11-slim` по digest; блок «Проверено в песочнице» — 19.11, до доработок (192 теста). Dockerfile и digest с 19.11 не менялись.
+Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Блок «Проверено командой» ниже снят 20.11 после добавления адаптера жюри `judge_adapter.py` (263 теста, из них 40 — адаптер по определениям проверок и регрессии независимого ревью) на официальном `python:3.11-slim` по digest; блок «Проверено в песочнице» — 19.11, до доработок (192 теста). Dockerfile и digest с 19.11 не менялись.
 
 ### Проверено командой
 ```
 дата: 20-11-2026   машина: Windows x64, Docker Desktop   docker --version: 29.9.3
 digest: python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535
-версия: адаптер жюри judge_adapter.py + matcher по определениям проверок 20.11.2026
+версия: адаптер жюри + matcher по определениям проверок 20.11.2026 + исправления независимого ревью
 
 $ docker build --build-arg PYTHON_IMAGE=python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535 -t auditenv .
 $ docker run --rm --network none --cpus 2 --memory 4g auditenv
 [OK] generate train                                  0.5s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
 [OK] generate dev                                    0.5s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
 [OK] validate episodes                               1.1s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
-[OK] validate 300 random seeds                      28.5s  [validate-seeds] 300/300 OK, issues=1880, clean=50
-[OK] pytest                                         94.7s  258 passed in 94.15s (0:01:34)
-[OK] run baseline policies (+competent)              3.9s
-[OK] solvability: competent_reconciler, 300 seeds + worst size   18.3s  310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
-[OK] trajectory leak scan                            0.8s
-[OK] determinism (2 processes, PYTHONHASHSEED)       1.9s  files=182 identical_across_processes=True
-[OK] self-check 4x20 (не оценка жюри)               15.8s  80/80
+[OK] validate 300 random seeds                      29.4s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                        101.7s  263 passed in 101.20s (0:01:41)
+[OK] run baseline policies (+competent)              4.3s
+[OK] solvability: competent_reconciler, 300 seeds + worst size   19.5s  310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            0.9s
+[OK] determinism (2 processes, PYTHONHASHSEED)       2.3s  files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)               17.4s  80/80
 [OK] report                                          0.3s
 == check: OK ==
 
 $ docker run --rm --network none auditenv python -m pytest -q tests/test_judge_adapter.py
-35 passed in 6.17s
+40 passed in 7.32s
 ```
-Тот же результат (те же episode_id, issues=1880, TP=1963, 258 тестов) получен на Linux вне Docker на Python 3.11, а эпизоды, эталон и траектории побайтово совпали с файлами, сгенерированными на Windows: генерация детерминирована и между машинами.
+Тот же результат (те же episode_id, issues=1880, TP=1963, 263 теста) получен на Linux вне Docker на Python 3.11, а эпизоды, эталон и траектории побайтово совпали с файлами, сгенерированными на Windows: генерация детерминирована и между машинами.
 
 ### Проверено в песочнице разработки
 Чистый `git clone` + свежий venv Python 3.11.18 (`pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock`), 2 vCPU, 19.11.2026; `make check`:
