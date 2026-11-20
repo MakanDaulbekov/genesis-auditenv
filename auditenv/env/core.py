@@ -25,6 +25,22 @@ from .tools import ACTION_ARGS, TOOLS_DESCRIPTION, ToolError, err, run_tool
 MAX_STEPS = 100
 TIME_LIMIT_S = 60.0
 MAX_ACTION_BYTES = 512 * 1024
+# Корректный findings имеет глубину 4 (объект → список → вывод → список ID). Предел с большим запасом
+# отсекает вложенность до сериализации: иначе в узком окне глубины json.dumps здесь проходил, а запрос
+# к оценщику падал RecursionError (AUDIT.md, F3).
+MAX_FINDINGS_DEPTH = 32
+
+
+def _too_deep(obj, limit: int = MAX_FINDINGS_DEPTH) -> bool:
+    """Вложенность контейнеров глубже limit. Итеративно: сама проверка не рекурсивна."""
+    stack = [(obj, 1)]
+    while stack:
+        x, d = stack.pop()
+        if isinstance(x, (dict, list, tuple)):
+            if d > limit:
+                return True
+            stack.extend((v, d + 1) for v in (x.values() if isinstance(x, dict) else x))
+    return False
 
 TASK_TEXT = (
     "Вы — аудитор. Изучите открытые записи компании за отчётный период с помощью инструментов и "
@@ -139,7 +155,9 @@ class AuditEnv:
                 else:
                     findings = args["findings"]
                     try:
-                        if len(json.dumps(findings)) > MAX_ACTION_BYTES:
+                        if _too_deep(findings):
+                            findings = {"__invalid__": "too_deep"}
+                        elif len(json.dumps(findings)) > MAX_ACTION_BYTES:
                             findings = {"__invalid__": "too_large"}
                     except (TypeError, ValueError, RecursionError):
                         findings = {"__invalid__": "not_serializable"}
