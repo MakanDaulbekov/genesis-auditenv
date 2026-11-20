@@ -31,23 +31,24 @@ real	2m23.216s
 
 | # | Сер. | Напр. | Находка | Пункт PDF | Статус |
 |---|---|---|---|---|---|
-| F1 | **P1** | A | ID жюри вне алфавита `[A-Za-z0-9_.:-]` (`/`, пробел, `{}`, `#`, `,`, кириллица): честный ответ oracle получает −1, хотя среда такие эпизоды открывает | 06, 10 «перестановка и смена ID сохраняет ответ oracle и награду» | к исправлению |
-| F2 | **P1** | A | `episode_id` длиной 65–128: −1 даже за пустой ответ на чистом эпизоде; `manifest.schema` допускает 128 | 06, 10 | к исправлению |
-| F3 | **P1** | B | `submit` с вложенностью ≈985–992: `RecursionError` из `env.step`, падение `agent_host` (exit 1, без итогов) или эпизод не оценён (0 вместо −1, нет записи у оценщика) | 04 «ограниченная ошибка», 05 «неверная структура → −1 и ошибка в журнале», 10 «неверный ввод» | к исправлению |
-| F4 | **P1** | F/G | Первые 20 строк README не говорят поставить pytest: на чистом Python 3.11 `make check` → `FAILED` | 09 README «единая команда проверки», 10 «запуск одной командой» | к исправлению |
-| F5 | **P1** | A | Не описан путь «подложить свой преобразованный эпизод»: нужны `index.json` и `--episodes-root/--grader-root`, которых нет в README; без них трейсбек | 06, 10 | к исправлению |
-| F6 | P2 | A | `oracle_from_truth` ищет эталон по имени каталога = `episode_id`; при другом имени каталога прогон падает | 06 | к исправлению (тривиально, не matcher/награда) |
-| F7 | P2 | F | DESIGN: «≤~1 900 проводок и ≤~190 документов» — измерено 1887/199; при всех верхних границах config до 2112/304, честной политике нужно до 97 шагов из 100 | 03, 07 | к исправлению (только DESIGN) |
-| F8 | P2 | F | README/CHECKLIST противоречат друг другу о Docker-прогоне (19.11 «до доработок» против блока 20-11 с 206 тестами) | 09, 10 | к исправлению (документация) |
-| F9 | P2 | F | DESIGN, допущение 6 «неизвестные ID → FP» неточно: ID вне алфавита → −1 | 05 «опубликуйте код нормализации» | к исправлению (после F1) |
-| F10 | P2 | E | Артефакт данных: проводки cutoff варианта `accrued_at_period_close` в последние 6 ч периода; трюк без чтения документов P=0.43, R(cutoff)=0.58, награда −0.547 против −0.667 у молчания | 02 «мешать простым трюкам» | не исправляется (меняет генератор и открытые данные); в честные ограничения |
-| F11 | P2 | A | Пример README для жюри `cli run --policies …` перезаписывает закоммиченный `trajectories.jsonl` | 09 «Траектории» | к исправлению (строка в README) |
+| F1 | **P1** | A | ID жюри вне алфавита `[A-Za-z0-9_.:-]` (`/`, пробел, `{}`, `#`, `,`, кириллица): честный ответ oracle получает −1, хотя среда такие эпизоды открывает | 06, 10 «перестановка и смена ID сохраняет ответ oracle и награду» | **исправлено** `bcb0b74` |
+| F2 | **P1** | A | `episode_id` длиной 65–128: −1 даже за пустой ответ на чистом эпизоде; `manifest.schema` допускает 128 | 06, 10 | **исправлено** `8b04a3d` |
+| F3 | **P1** | B | `submit` с вложенностью ≈985–992: `RecursionError` из `env.step`, падение `agent_host` (exit 1, без итогов) или эпизод не оценён (0 вместо −1, нет записи у оценщика) | 04 «ограниченная ошибка», 05 «неверная структура → −1 и ошибка в журнале», 10 «неверный ввод» | **исправлено** `a5b2c8d` |
+| F4 | **P1** | F/G | Первые 20 строк README не говорят поставить pytest: на чистом Python 3.11 `make check` → `FAILED` | 09 README «единая команда проверки», 10 «запуск одной командой» | **исправлено** `4855483` |
+| F5 | **P1** | A | Не описан путь «подложить свой преобразованный эпизод»: нужны `index.json` и `--episodes-root/--grader-root`, которых нет в README; без них трейсбек | 06, 10 | **исправлено** `4855483` |
+| F6 | P2 | A | `oracle_from_truth` ищет эталон по имени каталога = `episode_id`; при другом имени каталога прогон падает | 06 | **исправлено** `5710035` |
+| F7 | P2 | F | DESIGN: «≤~1 900 проводок и ≤~190 документов» — измерено 1887/199; при всех верхних границах config до 2112/304, честной политике нужно до 97 шагов из 100 | 03, 07 | **исправлено** в DESIGN `4855483` |
+| F8 | P2 | F | README/CHECKLIST противоречат друг другу о Docker-прогоне (19.11 «до доработок» против блока 20-11 с 206 тестами) | 09, 10 | **исправлено** `4855483` |
+| F9 | P2 | F | DESIGN, допущение 6 «неизвестные ID → FP» неточно: ID вне алфавита → −1 | 05 «опубликуйте код нормализации» | **исправлено** в DESIGN `4855483` |
+| F10 | P2 | E | Артефакт данных: проводки cutoff варианта `accrued_at_period_close` в последние 6 ч периода; трюк без чтения документов P=0.43, R(cutoff)=0.58, награда −0.547 против −0.667 у молчания | 02 «мешать простым трюкам» | не исправляется (меняет генератор и открытые данные); в честных ограничениях DESIGN `4855483` |
+| F11 | P2 | A | Пример README для жюри `cli run --policies …` перезаписывает закоммиченный `trajectories.jsonl` | 09 «Траектории» | **исправлено** `4855483` |
 | F12 | P2 | B | `cli run` (in-process harness) падает при логировании действия глубже ≈990 уровней | 10 | не исправляется: in-process политика — доверенный код (DESIGN §7); граница — `agent_host`, его закрывает F3 |
 | F13 | P2 | B | Нет явного байтового лимита наблюдения | 04 | не исправляется: ограничено структурно, измерено ≤34 КБ |
-| F14 | P2 | A | ID длиннее 128 символов недостижимы (`get_record` → `invalid_arguments`, `findings` maxLength 128) | 06 | не исправляется: документируется как лимит |
-| F15 | P2 | B | `reset` посреди эпизода: брошенный эпизод не оценивается и не попадает в `results` | 04 | не исправляется (контракт); документируется |
+| F14 | P2 | A | ID длиннее 128 символов недостижимы (`get_record` → `invalid_arguments`, `findings` maxLength 128) | 06 | не исправляется; лимит описан в README/DESIGN `4855483` |
+| F15 | P2 | B | `reset` посреди эпизода: брошенный эпизод не оценивается и не попадает в `results` | 04 | не исправляется (контракт); описано в README/DESIGN `4855483` |
 
-Открытые таблицы и ID эпизодов train/dev **не меняются ни одним фиксом** (подробности в «Данные» ниже).
+Открытые таблицы и ID эпизодов train/dev **не изменились** (подробности в «Данные» ниже). Коммиты — в ветке
+`audit-round3` поверх `1a1a5a1`; `master` не тронут (`git merge --ff-only audit-round3`).
 
 ---
 
@@ -388,8 +389,73 @@ F8, F9 (и F4 — первые 20 строк).
 
 ---
 
+## Итог после правок
+
+| коммит | что | файлы кода | тест (падал до фикса) |
+|---|---|---|---|
+| `f43fed8` | этот AUDIT.md до правок + скрипты `audit/` | — | — |
+| `a5b2c8d` | F3: предел вложенности findings 32 → −1 | `env/core.py` | `test_deeply_nested_submit_never_crashes_and_is_always_graded` |
+| `bcb0b74` | F1: ID вне `ID_RE` допустимы, если есть в открытых записях | `grader/matcher.py`, `grader/reward.py`, `grader/service.py` | `test_jury_renamed_ids_keep_oracle_reward[5 форматов]`; охрана: `test_odd_format_ids_still_invalid_unless_they_exist` |
+| `8b04a3d` | F2: `episode_id` ≤128 в findings | `schemas/findings.schema.json` | `test_long_episode_id_up_to_manifest_limit_is_valid[65,100,128]`; охрана: `…longer_than_manifest_limit_still_invalid` |
+| `5710035` | F6: `oracle_from_truth` по содержимому | `policies/api.py` | `test_oracle_from_truth_finds_truth_when_dir_name_differs_from_episode_id` |
+| `4855483` | F4, F5, F7–F11, F14, F15: README, DESIGN, CHECKLIST | — | `test_readme_quickstart_installs_pytest_in_first_20_lines`, `test_readme_recipe_for_own_transformed_episodes_works` (исполняет команду пересчёта хэшей из README) |
+| `d49b35e` | переносимость нового теста на Windows; холостая замена в `audit/d_attacks.py` | — | — |
+
+После каждого коммита с кодом — полный `make check` зелёный, 184 файла данных побайтово прежние.
+
+**Повтор воспроизведений на исправленном коде:**
+```
+$ python3.11 -I audit/a_jury_rename.py .        # F1, F2
+UUID в фигурных скобках / пробел / слэш / кириллица / решётка / запятая   0.996 (их oracle), 1.000 (наш)
+control + eid 65 символов                                                0.996, 1.000
+длина 129                                                               -1.000 (лимит F14, get_record → invalid_arguments)
+$ python3.11 -I audit/b_deep_sweep.py .         # F3
+RecursionError из env.step: []
+награда != -1 (эпизод не оценён): [] ... всего 0
+терминальных submit: 2189 | записей graded/invalid_findings у оценщика: 2189
+$ python3.11 -m auditenv.agent_host --agent-cmd "python audit/agents/deep_agent.py 985" --split dev --mode train …
+exit=0, оценено 10 эпизодов из 10, награда −1.0
+$ make jury-run                                  # examples/closed_split_example.json
+… парные проверки 20/20, oracle 1.000, competent_reconciler F1 = 1.000 … == итог: OK
+```
+Атаки D и контракт B дают те же исходы, что до правок (повторный прогон `audit/d_attacks.py`, `audit/b_contract.py`).
+
+**Финальный `make check`** — чистый `git clone` ветки, свежий venv, ровно две команды из первых строк README:
+```
+$ python3.11 -m pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock
+Successfully installed iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pytest-8.3.4
+$ make check
+[OK] generate train                                  0.4s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
+[OK] generate dev                                    0.3s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
+[OK] validate episodes                               1.1s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
+[OK] validate 300 random seeds                      29.9s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                         81.7s  220 passed in 81.30s (0:01:21)
+[OK] run baseline policies (+competent)              2.6s  }
+[OK] solvability: competent_reconciler, 300 seeds + worst size   18.4s  [solvability] competent_reconciler: 310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            0.8s  1 passed, 7 deselected in 0.54s
+[OK] determinism (2 processes, PYTHONHASHSEED)       1.3s  [determinism] files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)               10.8s  [self-check] … contract 20/20, data 20/20, reward 20/20, paired 20/20 … 80/80 …
+[OK] report                                          0.2s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
+== check: OK ==
+real	2m27.477s
+```
+Тот же результат (220 passed, остальное без изменений) — под непривилегированным пользователем без сети
+(`unshare -n`, `socket.create_connection` → `Errno 101 Network is unreachable`), `ulimit -v 4194304`, 2 CPU.
+Официальный Docker-образ здесь не собрать: Docker Hub закрыт прокси песочницы (`Forbidden … registry-1.docker.io`).
+
+**Осталось вручную:**
+1. `make docker-check` на машине команды (официальный digest) и обновить блок «Проверено командой» в README: 220 тестов
+   вместо 206, остальные числа прежние. Dockerfile и digest не менялись.
+2. По желанию — `python -m auditenv.cli check` на Windows/3.12. Правки — чистый Python; новый тест подставляет путь
+   после `shlex.split` и запускает `cli run` отдельным процессом.
+3. Влить ветку: `git checkout master && git merge --ff-only audit-round3`.
+
+---
+
 ## Данные
 
 Ни один фикс не меняет генератор, `world`/`mutations`/`render`, правила `is_match` и формулу награды. Открытые таблицы
-`ledger.csv`, `invoices.jsonl`, `payments.jsonl`, `fx.csv`, ID эпизодов train/dev и `trajectories.jsonl` должны остаться
-побайтово прежними. Это проверяется `sha256sum -c` по 184 файлам после каждого `make check`.
+`ledger.csv`, `invoices.jsonl`, `payments.jsonl`, `fx.csv`, ID эпизодов train/dev и `trajectories.jsonl` **не
+изменились**. Все 184 закоммиченных файла `episodes/`, `grader_data/` и `trajectories.jsonl` побайтово равны `1a1a5a1`
+(`sha256sum -c` после каждого `make check` и в чистом clone). `REPORT.md` не коммитился заново: при прогоне в нём
+меняются только время и RSS.
