@@ -5,7 +5,7 @@
 | Материал (PDF 09) | Что требуется | Файл(ы) | Тест / проверка | Статус |
 |---|---|---|---|---|
 | Исходный код | исходники с лицензией и зафиксированными зависимостями: генератор и среда | `auditenv/`, `LICENSE` (MIT), `pyproject.toml`, `requirements-dev.lock` (версии + SHA-256), `vendor/wheels` | `make check`; офлайн-установка `pip --no-index --require-hashes` | ✅ |
-| README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none --cpus 2 --memory 4g` на официальном `python:3.11-slim` по digest (машина команды, 20.11, после аудита раунда 3, 220 тестов — README) | ✅ |
+| README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none --cpus 2 --memory 4g` на официальном `python:3.11-slim` по digest (машина команды, 20.11, с адаптером жюри, 258 тестов — README) | ✅ |
 | Matcher и награда | общий код сопоставления и награды, схемы и политики | `auditenv/grader/matcher.py`, `reward.py`, `auditenv/schemas/*.schema.json`, `policy.json → matching` | `tests/test_reward.py`, самопроверка reward 20/20 | ✅ |
 | Эпизоды | 10 открытых train и 10 dev | `episodes/{train,dev}` (10+10; в dev есть base=JPY), эталон — `grader_data/{train,dev}`, конфиги — `configs/splits/*.json` | `test_committed_episodes_validate`, `make validate` | ✅ |
 | Тесты | тесты среды, сопоставления и награды | `tests/` (≈200 тестов): контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run, крайние config и доказательства (`test_robustness.py`) | `make test` | ✅ |
@@ -46,5 +46,5 @@
 
 ## Что команде сделать руками
 
-1. ~~Выполнить `make docker-pin && make docker-check`~~ — сделано: digest закреплён 19.11; прогон на официальном образе после аудита раунда 3 — 20.11, 220 тестов, вывод в README.
+1. ~~Выполнить `make docker-pin && make docker-check`~~ — сделано: digest закреплён 19.11; прогон на официальном образе с адаптером жюри — 20.11, 258 тестов (35 — адаптер), вывод в README.
 2. Отправить ссылку на репозиторий/архив в форму сдачи (ссылку организаторы сообщат отдельно).
