@@ -170,3 +170,29 @@ def test_odd_format_ids_still_invalid_unless_they_exist(tmp_path):
         assert o["findings"][0]["affected_ids"] != oracle_findings(truth)["findings"][0]["affected_ids"]
         _, r, te, _, info = env.step({"action": "submit", "args": {"findings": o}})
         assert te and r == -1.0 and info["metrics"]["valid"] is False
+
+
+# ----------------------------------------------------------------------------- F2: длинный episode_id
+
+@pytest.mark.parametrize("n", [65, 100, 128])
+def test_long_episode_id_up_to_manifest_limit_is_valid(tmp_path, n):
+    """manifest/truth допускают episode_id до 128 символов; findings раньше обрезали до 64 → −1 за любой ответ."""
+    eid = ("ep_" + "perm_" * 30)[:n]
+    same = lambda i, x: x  # noqa: E731  (ID не меняем, только episode_id)
+    clean_ref = "dev/ep_f412ff8e691af450"
+    refs = [(_put(tmp_path, "c", *_jury_rename(clean_ref, same, eid)), 0),
+            (_put(tmp_path, "d", *_jury_rename(DIRTY_REF, same, eid)), 8)]
+    with GraderClient(str(tmp_path / "episodes"), str(tmp_path / "grader")) as g:
+        for ref, n_issues in refs:
+            env = AuditEnv(g, "train")
+            obs, _ = env.reset(config={"episode_ref": ref})
+            assert obs["result"]["manifest"]["episode_id"] == eid
+            t2 = json.loads((tmp_path / "grader" / ref / "truth.json").read_text(encoding="utf-8"))
+            _, r, te, _, info = env.step({"action": "submit", "args": {"findings": oracle_findings(t2)}})
+            assert te and info["metrics"]["valid"] and info["metrics"]["tp"] == n_issues and r == 1.0
+
+
+def test_episode_id_longer_than_manifest_limit_still_invalid():
+    from auditenv.grader.matcher import InvalidFindings, normalize
+    with pytest.raises(InvalidFindings):
+        normalize({"episode_id": "e" * 129, "findings": []}, "e" * 129, {})

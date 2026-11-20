@@ -9,7 +9,7 @@
   "additionalProperties": false,
   "properties": {
     "episode_id": {
-      "maxLength": 64,
+      "maxLength": 128,
       "minLength": 1,
       "type": "string"
     },
