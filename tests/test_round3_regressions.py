@@ -150,8 +150,9 @@ def test_jury_renamed_ids_keep_oracle_reward(tmp_path, fmt):
         assert env2.oracle_step()[1] == 1.0  # oracle процесса оценщика
 
 
-def test_odd_format_ids_still_invalid_unless_they_exist(tmp_path):
-    """Правило не ослаблено для несуществующих ID: странный формат и Unicode-двойники по-прежнему −1."""
+def test_nonexistent_or_homoglyph_ids_are_fp_not_structure(tmp_path):
+    """Определения проверок жюри (matcher п. 1, 3, 8): ID любого формата структурно допустим; несуществующий
+    evidence_id или Unicode-двойник ID не сопоставляется — FP (раньше −1), утечки нет."""
     files, t2 = _jury_rename(DIRTY_REF, JURY_FORMATS["slash"])
     ref = _put(tmp_path, "e1", files, t2)
     homoglyph = str.maketrans("ABCEHKMOPTXY", "АВСЕНКМОРТХУ")
@@ -162,7 +163,8 @@ def test_odd_format_ids_still_invalid_unless_they_exist(tmp_path):
             o = oracle_findings(t2)
             o["findings"][0]["evidence_ids"] = o["findings"][0]["evidence_ids"][:9] + [bad]
             _, r, te, _, info = env.step({"action": "submit", "args": {"findings": o}})
-            assert te and r == -1.0 and info["metrics"]["valid"] is False, bad
+            m = info["metrics"]
+            assert te and m["valid"] is True and m["fp"] == 1 and m["tp"] == len(t2["issues"]) - 1, bad
     with GraderClient(str(ROOT / "episodes"), str(ROOT / "grader_data")) as g:
         env = AuditEnv(g, "train")
         env.reset(config={"episode_ref": DIRTY_REF})
@@ -171,7 +173,8 @@ def test_odd_format_ids_still_invalid_unless_they_exist(tmp_path):
         o["findings"][0]["affected_ids"] = [x.translate(homoglyph) for x in o["findings"][0]["affected_ids"]]
         assert o["findings"][0]["affected_ids"] != oracle_findings(truth)["findings"][0]["affected_ids"]
         _, r, te, _, info = env.step({"action": "submit", "args": {"findings": o}})
-        assert te and r == -1.0 and info["metrics"]["valid"] is False
+        m = info["metrics"]
+        assert te and m["valid"] is True and m["fp"] == 1 and m["fn"] == 1
 
 
 # ----------------------------------------------------------------------------- F2: длинный episode_id

@@ -55,7 +55,8 @@ class Ctx:
         return alias_map_from_tables(parse_jsonl(ep.public["invoices.jsonl"]), parse_jsonl(ep.public["payments.jsonl"]))
 
     def G(self, ep, findings, steps=0):
-        return grade(findings, ep.truth, self.alias(ep), 0, steps)
+        from auditenv.grader.matcher import public_ids_from_files
+        return grade(findings, ep.truth, self.alias(ep), 0, steps, public_ids_from_files(ep.public))
 
 
 def eid(obs):
@@ -356,7 +357,7 @@ def r12(x):
 def r13(x):
     f = oracle_findings(x.dirty.truth)["findings"][0]
     cases = [[f] * 31, [dict(f, evidence_ids=[f"R-{i}" for i in range(11)])], [dict(f, explanation="x" * 1001)],
-             [dict(f, extra=1)]]
+             [dict(f, evidence_ids=[f["evidence_ids"][0]] * 11)]]  # M05: лимит 10 — до удаления повторов
     return all(x.G(x.dirty, {"episode_id": x.dirty.episode_id, "findings": c})["reward"] == -1.0 for c in cases)
 
 

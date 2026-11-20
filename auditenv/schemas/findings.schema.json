@@ -1,12 +1,6 @@
 {
-  "$defs": {
-    "id": {
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
-      "type": "string"
-    }
-  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "episode_id": {
       "maxLength": 128,
@@ -15,7 +9,7 @@
     },
     "findings": {
       "items": {
-        "additionalProperties": false,
+        "additionalProperties": true,
         "properties": {
           "affected_ids": {
             "items": {
@@ -23,16 +17,15 @@
               "minLength": 1,
               "type": "string"
             },
-            "maxItems": 10,
-            "minItems": 1,
+            "maxItems": 100,
+            "minItems": 0,
             "type": "array"
           },
           "claimed_amount_minor": {
-            "minimum": 0,
             "type": "integer"
           },
           "currency": {
-            "pattern": "^[A-Za-z]{3}$",
+            "maxLength": 64,
             "type": "string"
           },
           "evidence_ids": {
@@ -49,12 +42,7 @@
             "type": "string"
           },
           "type": {
-            "enum": [
-              "duplicate_invoice",
-              "missing_or_partial_allocation",
-              "fx_wrong_date_or_rate",
-              "period_cutoff_error"
-            ],
+            "maxLength": 64,
             "type": "string"
           }
         },

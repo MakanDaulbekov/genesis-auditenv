@@ -7,7 +7,7 @@ import pytest
 from auditenv.common.drbg import DRBG
 from auditenv.env.store import parse_jsonl, parse_ledger_csv
 from auditenv.generator.episode import generate_episode
-from auditenv.grader.matcher import alias_map_from_tables
+from auditenv.grader.matcher import alias_map_from_tables, public_ids_from_files
 from auditenv.grader.reward import grade, metrics, oracle_findings
 from fractions import Fraction
 
@@ -21,7 +21,8 @@ def ctx(seed, cfg):
 
 
 def G(ep, alias, findings, steps=0):
-    return grade(findings, ep.truth, alias, 0, steps)
+    # как в процессе оценщика: с множеством ID открытых записей (несуществующий evidence_id -> FP)
+    return grade(findings, ep.truth, alias, 0, steps, public_ids_from_files(ep.public))
 
 
 def F(ep, items):
@@ -156,8 +157,9 @@ def test_wrong_currency_and_amount_in_other_currency(dirty):
     assert G(ep, alias, o3)["tp"] == 0
     o4 = copy.deepcopy(o)
     for f in o4["findings"]:
-        f["currency"] = f["currency"].lower()  # регистр нормализуется
-    assert G(ep, alias, o4)["tp"] == len(o["findings"])
+        f["currency"] = f["currency"].lower()  # точное сравнение (определения жюри, M06): регистр -> FP
+    r4 = G(ep, alias, o4)
+    assert r4["valid"] and r4["tp"] == 0 and r4["fp"] == len(o["findings"])
 
 
 def test_amount_tolerance_is_exact(dirty):
@@ -221,18 +223,12 @@ def _good_finding(ep):
     lambda f: f.update(claimed_amount_minor=float(f["claimed_amount_minor"])),
     lambda f: f.update(claimed_amount_minor=str(f["claimed_amount_minor"])),
     lambda f: f.update(claimed_amount_minor=True),
-    lambda f: f.update(claimed_amount_minor=-5),
-    lambda f: f.update(extra="x"),
     lambda f: f.pop("evidence_ids"),
     lambda f: f.pop("explanation"),
     lambda f: f.update(evidence_ids=[f"R-{i}" for i in range(11)]),
     lambda f: f.update(explanation="x" * 1001),
-    lambda f: f.update(type="fraud"),
-    lambda f: f.update(affected_ids=[]),
     lambda f: f.update(affected_ids="INV-1"),
-    lambda f: f.update(currency="US"),
     lambda f: f.update(currency=840),
-    lambda f: f.update(affected_ids=["../../grader_data/truth.json"]),
     lambda f: f.update(evidence_ids=[None]),
 ])
 def test_invalid_structure_minus_one(dirty, mutate):
@@ -241,6 +237,37 @@ def test_invalid_structure_minus_one(dirty, mutate):
     mutate(f)
     r = G(ep, alias, F(ep, [f]))
     assert r["valid"] is False and r["reward"] == -1.0
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda f: f.update(claimed_amount_minor=-5),
+    lambda f: f.update(type="fraud"),
+    lambda f: f.update(affected_ids=[]),
+    lambda f: f.update(currency="US"),
+    lambda f: f.update(currency=" " + f["currency"]),
+    lambda f: f.update(affected_ids=["../../grader_data/truth.json"]),
+    lambda f: f.update(evidence_ids=f["evidence_ids"][:9] + ["NO-SUCH-ID"]),
+    lambda f: f.update(evidence_ids=f["evidence_ids"][:9] + ["../../grader_data/truth.json"]),
+])
+def test_structurally_valid_but_wrong_is_fp(dirty, mutate):
+    """Определения проверок жюри, matcher п. 8: структурно правильный вывод с неправильным type,
+    affected_ids, валютой, суммой или доказательством — FP, а не авария эпизода (−1)."""
+    ep, alias = dirty
+    f = copy.deepcopy(_good_finding(ep))
+    mutate(f)
+    r = G(ep, alias, F(ep, [f]))
+    assert r["valid"] is True and r["tp"] == 0 and r["fp"] == 1
+
+
+def test_extra_keys_are_ignored(dirty):
+    """Лишние ключи не входят в перечень структурных ошибок определений жюри: игнорируются, TP сохраняется."""
+    ep, alias = dirty
+    f = copy.deepcopy(_good_finding(ep))
+    f["confidence"] = "high"
+    raw = F(ep, [f])
+    raw["note"] = "x"
+    r = G(ep, alias, raw)
+    assert r["valid"] is True and r["tp"] == 1 and r["fp"] == 0
 
 
 @pytest.mark.parametrize("raw", [

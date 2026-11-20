@@ -108,13 +108,10 @@ class GraderCore:
                 return {"error": "generation_failed",
                         "detail": "не удалось построить эпизод с этим config (слишком мало кандидатов для ошибок)"}
             public, truth = ep.public, ep.truth
-        from ..grader.matcher import alias_map_from_tables, odd_known_ids
-        from ..env.store import parse_ledger_csv
+        from ..grader.matcher import alias_map_from_tables, public_ids_from_files
         alias = alias_map_from_tables(parse_jsonl(public["invoices.jsonl"]), parse_jsonl(public["payments.jsonl"]))
-        # ID открытых записей вне ID_RE (только после смены ID жюри; у наших эпизодов пусто) — AUDIT.md, F1
-        known = odd_known_ids(list(alias) + list(alias.values()) + [
-            x for r in parse_ledger_csv(public["ledger.csv"])
-            for x in (r["row_id"], r["entity_id"], r["invoice_id"], r["payment_id"])])
+        # все ID открытых записей: несуществующий evidence_id -> FP (определения проверок жюри, matcher п. 3)
+        known = public_ids_from_files(public)
         tolerance = json.loads(public["manifest.json"])["rounding"]["tolerance_minor"]
         self.counter += 1
         token = f"t{self.counter}"

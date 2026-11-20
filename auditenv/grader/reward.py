@@ -44,7 +44,8 @@ def _by_type(findings, issues, pairs) -> dict:
     matched_f = {fi for fi, _ in pairs}
     matched_t = {iid for _, iid in pairs}
     for f in findings:
-        out[f.type]["tp" if f.index in matched_f else "fp"] += 1
+        out.setdefault(f.type if f.type in TYPES else "unknown_type", {"tp": 0, "fp": 0, "fn": 0})
+        out[f.type if f.type in TYPES else "unknown_type"]["tp" if f.index in matched_f else "fp"] += 1
     for t in issues:
         if t["issue_id"] not in matched_t:
             out[t["type"]]["fn"] += 1
@@ -52,9 +53,9 @@ def _by_type(findings, issues, pairs) -> dict:
 
 
 def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_steps: int,
-          known_ids: frozenset = frozenset()) -> dict:
+          known_ids: frozenset | None = None) -> dict:
     """Полная оценка одного эпизода. Возвращает только JSON-совместимые значения.
-    known_ids — ID эпизода вне ID_RE (matcher.odd_known_ids); по умолчанию пусто."""
+    known_ids — все ID открытых записей эпизода (matcher.public_ids): несуществующий evidence_id -> FP."""
     if isinstance(inspection_steps, bool) or not isinstance(inspection_steps, int) or inspection_steps < 0:
         raise ValueError("inspection_steps must be a non-negative int")
     try:
