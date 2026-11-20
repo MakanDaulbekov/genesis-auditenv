@@ -188,29 +188,30 @@ Windows 11 x64, Python 3.12.11 (msys2), 12 логических CPU; `python -m 
 [OK] report                                          0.5s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
 == check: OK ==
 ```
-Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Блок «Проверено командой» ниже снят 20.11 после доработок раунда 2 (206 тестов), блок «Проверено в песочнице» — 19.11, до них (192 теста). После правок аудита раунда 3 (`AUDIT.md`: код среды и оценщика, новые тесты) Dockerfile и digest не менялись, но `make docker-check` нужно прогнать заново и обновить блок «Проверено командой».
+Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Блок «Проверено командой» ниже снят 20.11 после правок аудита раунда 3 (`AUDIT.md`, 220 тестов) на официальном `python:3.11-slim` по digest; блок «Проверено в песочнице» — 19.11, до доработок (192 теста). Dockerfile и digest с 19.11 не менялись.
 
 ### Проверено командой
 ```
 дата: 20-11-2026   машина: Windows x64, Docker Desktop   docker --version: 29.9.3
 digest: python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535
+версия: после аудита раунда 3 (AUDIT.md)
 
 $ docker build --build-arg PYTHON_IMAGE=python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535 -t auditenv .
 $ docker run --rm --network none --cpus 2 --memory 4g auditenv
-[OK] generate train                                  0.6s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
+[OK] generate train                                  0.5s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
 [OK] generate dev                                    0.5s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
-[OK] validate episodes                               1.3s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
-[OK] validate 300 random seeds                      29.9s  [validate-seeds] 300/300 OK, issues=1880, clean=50
-[OK] pytest                                         79.9s  206 passed in 79.35s (0:01:19)
-[OK] run baseline policies (+competent)              4.0s
-[OK] solvability: competent_reconciler, 300 seeds + worst size   19.8s  310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
-[OK] trajectory leak scan                            0.9s
-[OK] determinism (2 processes, PYTHONHASHSEED)       2.3s  files=182 identical_across_processes=True
-[OK] self-check 4x20 (не оценка жюри)               15.9s  80/80
+[OK] validate episodes                               1.1s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
+[OK] validate 300 random seeds                      29.5s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                         85.9s  220 passed in 85.39s (0:01:25)
+[OK] run baseline policies (+competent)              3.8s
+[OK] solvability: competent_reconciler, 300 seeds + worst size   17.7s  310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            0.8s
+[OK] determinism (2 processes, PYTHONHASHSEED)       2.0s  files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)               15.0s  80/80
 [OK] report                                          0.3s
 == check: OK ==
 ```
-Тот же результат (те же episode_id, issues=1880, TP=1963, 206 тестов) получен на Linux вне Docker на Python 3.11, а эпизоды, эталон и траектории побайтово совпали с файлами, сгенерированными на Windows: генерация детерминирована и между машинами.
+Тот же результат (те же episode_id, issues=1880, TP=1963, 220 тестов) получен на Linux вне Docker на Python 3.11, а эпизоды, эталон и траектории побайтово совпали с файлами, сгенерированными на Windows: генерация детерминирована и между машинами.
 
 ### Проверено в песочнице разработки
 Чистый `git clone` + свежий venv Python 3.11.18 (`pip install --no-index --find-links vendor/wheels --require-hashes -r requirements-dev.lock`), 2 vCPU, 19.11.2026; `make check`:
