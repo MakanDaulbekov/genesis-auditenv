@@ -46,7 +46,7 @@ def with_first(**upd):
 
 f0 = O["findings"][0]
 aff0 = f0["affected_ids"][0]
-cyr = aff0.replace("A", "А").replace("E", "Е").replace("P", "Р").replace("C", "С")  # кириллические двойники
+cyr = aff0.translate(str.maketrans("ABCEHKMOPTXY", "АВСЕНКМОРТХУ"))  # кириллические двойники
 print("  эталон (oracle)                     ", G(O))
 print("  1 Unicode-двойник ID (кириллица)    ", G(with_first(affected_ids=[cyr] + f0["affected_ids"][1:])), "| ID", aff0, "->", cyr, cyr != aff0)
 print("  1b NFKC-ширина (полноширинные)      ", G(with_first(affected_ids=["".join(chr(ord(c) + 0xFEE0) if "!" <= c <= "~" else c for c in aff0)] + f0["affected_ids"][1:])))

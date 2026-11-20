@@ -1,13 +1,22 @@
 """Регрессии аудита раунда 3 (AUDIT.md). Каждый тест падал до своего фикса."""
+import csv
+import io
 import json
+import os
+import shlex
+import shutil
+import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from auditenv.env.core import AuditEnv  # noqa: E402
+from auditenv.grader.reward import oracle_findings  # noqa: E402
 from auditenv.grader.service import GraderClient  # noqa: E402
 
 REF = "dev/ep_053daf06ab62f121"
@@ -51,13 +60,6 @@ def test_deeply_nested_submit_never_crashes_and_is_always_graded(tmp_path):
 
 
 # ----------------------------------------------------------------------------- F1: ID в формате жюри
-
-import csv  # noqa: E402
-import io  # noqa: E402
-
-import pytest  # noqa: E402
-
-from auditenv.grader.reward import oracle_findings  # noqa: E402
 
 PUBLIC = ("manifest.json", "policy.json", "ledger.csv", "invoices.jsonl", "payments.jsonl", "fx.csv", "documents.jsonl")
 ID_PREFIXES = ("R-", "INV-", "PAY-", "D-", "E-")
@@ -226,10 +228,6 @@ def test_readme_quickstart_installs_pytest_in_first_20_lines():
 def test_readme_recipe_for_own_transformed_episodes_works(tmp_path):
     """Описанный в README путь жюри: свой каталог, index.json, флаги корней, пересчёт хэшей manifest — исполняется
     буквально (команда пересчёта берётся из README)."""
-    import shlex
-    import shutil
-    import subprocess
-    from auditenv.cli import main
     from auditenv.generator.validate import validate_episode_dir
     text = _readme()
     assert "index.json" in text and "--episodes-root" in text and "--grader-root" in text
@@ -245,13 +243,17 @@ def test_readme_recipe_for_own_transformed_episodes_works(tmp_path):
     (pd / "ledger.csv").write_bytes(b"\n".join([lines[0]] + [x for x in lines[1:] if x][::-1]) + b"\n")
     (tmp_path / "my/episodes/perm/index.json").write_text('[{"ref": "perm/e1"}]', encoding="utf-8")
     assert not validate_episode_dir(pd, gd)["ok"]  # хэш ledger.csv устарел
-    argv = shlex.split(snippet[0].replace("my/episodes/<split>/<name>", str(pd)))
-    subprocess.run([sys.executable] + argv[1:], check=True)
+    argv = shlex.split(snippet[0])  # путь подставляем после разбора: обратные слэши Windows не съедаются
+    assert argv[0] == "python" and argv[-1] == "my/episodes/<split>/<name>"
+    subprocess.run([sys.executable] + argv[1:-1] + [str(pd)], check=True)
     rep = validate_episode_dir(pd, gd)
     assert rep["ok"], rep["errors"]
     out = tmp_path / "out"
-    rc = main(["run", "--policies", "oracle", "--splits", "perm", "--episodes-root", str(tmp_path / "my/episodes"),
-               "--grader-root", str(tmp_path / "my/grader"), "--trajectories", str(out) + "_traj.jsonl",
-               "--grader-log", str(out) + "_g.jsonl", "--summary", str(out) + "_s.json"])
+    env = dict(os.environ, PYTHONPATH=str(ROOT))
+    r = subprocess.run([sys.executable, "-m", "auditenv.cli", "run", "--policies", "oracle", "--splits", "perm",
+                        "--episodes-root", str(tmp_path / "my/episodes"), "--grader-root", str(tmp_path / "my/grader"),
+                        "--trajectories", str(out) + "_traj.jsonl", "--grader-log", str(out) + "_g.jsonl",
+                        "--summary", str(out) + "_s.json"], cwd=tmp_path, env=env, capture_output=True)
+    assert r.returncode == 0, r.stderr[-2000:]
     s = json.loads(Path(str(out) + "_s.json").read_text(encoding="utf-8"))
-    assert rc == 0 and s["aggregate"]["oracle"]["mean_return"] == 1.0 and s["aggregate"]["oracle"]["micro"]["fp"] == 0
+    assert s["aggregate"]["oracle"]["mean_return"] == 1.0 and s["aggregate"]["oracle"]["micro"]["fp"] == 0
