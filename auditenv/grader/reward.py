@@ -51,12 +51,14 @@ def _by_type(findings, issues, pairs) -> dict:
     return out
 
 
-def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_steps: int) -> dict:
-    """Полная оценка одного эпизода. Возвращает только JSON-совместимые значения."""
+def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_steps: int,
+          known_ids: frozenset = frozenset()) -> dict:
+    """Полная оценка одного эпизода. Возвращает только JSON-совместимые значения.
+    known_ids — ID эпизода вне ID_RE (matcher.odd_known_ids); по умолчанию пусто."""
     if isinstance(inspection_steps, bool) or not isinstance(inspection_steps, int) or inspection_steps < 0:
         raise ValueError("inspection_steps must be a non-negative int")
     try:
-        findings = normalize(raw_findings, truth["episode_id"], alias)
+        findings = normalize(raw_findings, truth["episode_id"], alias, known_ids)
     except InvalidFindings as e:
         return {"valid": False, "error": str(e), "reward": -1.0, "reward_exact": "-1",
                 "tp": 0, "fp": 0, "fn": len(truth["issues"]), "precision": 0.0, "recall": 0.0, "f1": 0.0,

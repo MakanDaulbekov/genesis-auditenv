@@ -108,12 +108,17 @@ class GraderCore:
                 return {"error": "generation_failed",
                         "detail": "не удалось построить эпизод с этим config (слишком мало кандидатов для ошибок)"}
             public, truth = ep.public, ep.truth
-        from ..grader.matcher import alias_map_from_tables
+        from ..grader.matcher import alias_map_from_tables, odd_known_ids
+        from ..env.store import parse_ledger_csv
         alias = alias_map_from_tables(parse_jsonl(public["invoices.jsonl"]), parse_jsonl(public["payments.jsonl"]))
+        # ID открытых записей вне ID_RE (только после смены ID жюри; у наших эпизодов пусто) — AUDIT.md, F1
+        known = odd_known_ids(list(alias) + list(alias.values()) + [
+            x for r in parse_ledger_csv(public["ledger.csv"])
+            for x in (r["row_id"], r["entity_id"], r["invoice_id"], r["payment_id"])])
         tolerance = json.loads(public["manifest.json"])["rounding"]["tolerance_minor"]
         self.counter += 1
         token = f"t{self.counter}"
-        self.sessions[token] = {"mode": mode, "truth": truth, "alias": alias, "tolerance": tolerance,
+        self.sessions[token] = {"mode": mode, "truth": truth, "alias": alias, "tolerance": tolerance, "known": known,
                                 "graded": False, "episode_id": truth["episode_id"], "ref": ref,
                                 "closed_index": closed_index}
         return {"token": token, "files": {n: _b64(b) for n, b in public.items()}}
@@ -128,7 +133,7 @@ class GraderCore:
             return {"error": "already_graded"}
         s["graded"] = True
         t0 = time.perf_counter()
-        res = grade(findings, s["truth"], s["alias"], s["tolerance"], inspection_steps)
+        res = grade(findings, s["truth"], s["alias"], s["tolerance"], inspection_steps, s["known"])
         rec = {"event": "graded", "token": token, "episode_id": s["episode_id"], "mode": s["mode"],
                "reason": reason, "policy": policy, "ref": s["ref"], "closed_index": s["closed_index"],
                "n_truth": len(s["truth"]["issues"]), **res,

@@ -52,8 +52,17 @@ def alias_map_from_tables(invoices: list[dict], payments: list[dict]) -> dict[st
     return m
 
 
-def normalize(raw, episode_id: str, alias: dict[str, str]) -> list[NormFinding]:
-    """-> список нормализованных выводов или InvalidFindings (награда -1)."""
+def odd_known_ids(ids) -> frozenset:
+    """ID из открытых записей эпизода, не проходящие ID_RE (бывает только после смены ID жюри в свой
+    формат: «INV/2026/0001», «{uuid}», пробел, кириллица). У эпизодов генератора множество пустое."""
+    return frozenset(x for x in ids if isinstance(x, str) and x and not ID_RE.match(x))
+
+
+def normalize(raw, episode_id: str, alias: dict[str, str], known_ids: frozenset = frozenset()) -> list[NormFinding]:
+    """-> список нормализованных выводов или InvalidFindings (награда -1).
+
+    ID допустим, если проходит ID_RE или реально есть в открытых записях эпизода (known_ids, см. odd_known_ids):
+    честный ответ на эпизод с переименованными жюри ID не должен становиться «неверной структурой»."""
     try:
         size = len(json.dumps(raw, ensure_ascii=False))
     except (TypeError, ValueError):
@@ -68,7 +77,7 @@ def normalize(raw, episode_id: str, alias: dict[str, str]) -> list[NormFinding]:
     out = []
     for i, f in enumerate(raw["findings"]):
         for x in f["affected_ids"] + f["evidence_ids"]:
-            if not ID_RE.match(x):
+            if not ID_RE.match(x) and x not in known_ids:
                 raise InvalidFindings("malformed id")
         affected = tuple(sorted({alias.get(x, x) for x in f["affected_ids"]}))
         evidence = frozenset(alias.get(x, x) for x in f["evidence_ids"])
