@@ -39,6 +39,8 @@ def determinism_check(split_files: list[str]) -> dict:
 
 def main(argv=None) -> int:
     import argparse
+    from .common.console import utf8_stdio
+    utf8_stdio()
     p = argparse.ArgumentParser()
     p.add_argument("what", choices=["determinism"])
     p.add_argument("--splits", nargs="+", default=["configs/splits/train.json", "configs/splits/dev.json"])

@@ -25,6 +25,18 @@ def _f(x, n=3):
     return "—" if x is None else f"{x:.{n}f}"
 
 
+def _v(x):
+    return "—" if x is None else x
+
+
+def _machine() -> str:
+    """Где сделан замер времени/памяти (честная пометка в отчёте)."""
+    import os
+    import platform
+    return (f"{platform.system()} {platform.release()} {platform.machine()}, Python {platform.python_version()}, "
+            f"{os.cpu_count()} логических CPU")
+
+
 def load_episode(ref: str):
     pub = ROOT / "episodes" / ref
     prv = ROOT / "grader_data" / ref
@@ -97,6 +109,8 @@ def failure_analysis(policy: str, refs: list[str], subs: dict) -> dict:
 
 
 def main() -> int:
+    from .common.console import utf8_stdio
+    utf8_stdio()
     t0 = time.perf_counter()
     summary = json.loads((ROOT / "grader_data" / "run_summary.json").read_text(encoding="utf-8"))
     subs = submitted_findings(ROOT / "trajectories.jsonl")
@@ -123,7 +137,7 @@ def main() -> int:
         L.append(f"| {pol} | {_f(a['mean_return'])} | {_f(a['mean_precision'])} | {_f(a['mean_recall'])} | "
                  f"{_f(a['mean_f1'])} | {_f(m['precision'], 2)} / {_f(m['recall'], 2)} / {_f(m['f1'], 2)} | "
                  f"{m['tp']}/{m['fp']}/{m['fn']} | {a['mean_steps']} | {a.get('p50_wall_ms')} / {a.get('p95_wall_ms')} / "
-                 f"{a['max_wall_ms']} | {a.get('peak_rss_mb_env_policy', '—')} / {a.get('peak_rss_mb_grader', '—')} | "
+                 f"{a['max_wall_ms']} | {_v(a.get('peak_rss_mb_env_policy'))} / {_v(a.get('peak_rss_mb_grader'))} | "
                  f"{_f(a['clean_mean_return'])} | {a['invalid_submissions']} |")
     L.append("\nПримечания: P/R «средние» усредняются по эпизодам; на чистом эпизоде без выводов P=R=0 по правилу "
              "нулевого знаменателя (поэтому у oracle средние P/R < 1 при F1 = 1). Каждая политика прогоняется в своём "
@@ -235,11 +249,12 @@ def main() -> int:
                  "`make jury-run`, который принимает их сплит, секрет и политики), а также реальная сборка Docker-образа.\n")
     L.append("## 5. Ограничения отчёта\n")
     L.append("* 20 открытых эпизодов — малая выборка; числа характеризуют базовые политики, а не потолок задачи.")
-    L.append("* Время измерено в песочнице разработки (2 vCPU); у организаторов оно будет другим, но запас до лимита "
-             "60 с — несколько порядков.")
+    L.append(f"* Время и память измерены на машине: {_machine()}. У организаторов числа будут другими, но запас до "
+             "лимита 60 с на эпизод — несколько порядков. Остальные числа отчёта (TP/FP/FN, награды, шаги) "
+             "детерминированы и от машины не зависят.")
     L.append("* Полный список ограничений среды — DESIGN.md, раздел «Честные ограничения».")
     L.append(f"\n_Отчёт построен за {time.perf_counter() - t0:.2f} с._")
-    (ROOT / "REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    (ROOT / "REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8", newline="\n")
     print(f"[report] REPORT.md: {len(L)} строк; simple_reconciler FP={sum(fa['fp_kind'].values())} "
           f"FN={sum(fa['fn_variant'].values())}")
     return 0

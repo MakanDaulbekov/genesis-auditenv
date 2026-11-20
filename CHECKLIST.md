@@ -8,7 +8,7 @@
 | README | инструкции контейнера и единая команда проверки | `README.md` (первые 20 строк — одна команда), `Dockerfile`, `Makefile: check, docker-check, docker-pin, jury-run` | `make check`; `docker run --network none …` на локальной базе Python 3.11 | ✅ (официальный `python:3.11-slim` — собрать командой, см. README) |
 | Matcher и награда | общий код сопоставления и награды, схемы и политики | `auditenv/grader/matcher.py`, `reward.py`, `auditenv/schemas/*.schema.json`, `policy.json → matching` | `tests/test_reward.py`, самопроверка reward 20/20 | ✅ |
 | Эпизоды | 10 открытых train и 10 dev | `episodes/{train,dev}` (10+10; в dev есть base=JPY), эталон — `grader_data/{train,dev}`, конфиги — `configs/splits/*.json` | `test_committed_episodes_validate`, `make validate` | ✅ |
-| Тесты | тесты среды, сопоставления и награды | `tests/` (≈190 тестов): контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run | `make test` | ✅ |
+| Тесты | тесты среды, сопоставления и награды | `tests/` (≈200 тестов): контракт, награда/атаки, данные/MI, парные, изоляция, agent_host, reset/config, API политик, jury-run, крайние config и доказательства (`test_robustness.py`) | `make test` | ✅ |
 | Базовые политики | четыре адаптера базовых политик | `auditenv/policies/api.py` (`Policy`, `load_policy`), `baselines.py`: `random_explorer`, `simple_reconciler`, `flag_all`, `oracle` (оценщик) + `competent_reconciler`, `oracle_from_truth` (`--trusted`), `process_adapter.py`; `--policy module:factory` | `tests/test_policy_api.py`, `tests/test_policies.py` | ✅ |
 | Траектории | `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated; без эталона в наблюдениях | `trajectories.jsonl` (5 политик × 20 эпизодов) | `test_committed_trajectories_have_no_truth`, `test_trajectory_fields_and_no_truth` | ✅ |
 | Записка о дизайне | краткое описание устройства среды | `DESIGN.md` (Assumptions, Честные ограничения) | — | ✅ |
@@ -39,7 +39,10 @@
 | 10 | измеренный разбор сбоев, честные ограничения | `REPORT.md` (разделы 2–3), `DESIGN.md` §7 | — | ✅ |
 | 12 | всё вымышлено, без реальных данных | генератор из словарей | — | ✅ |
 
+| 06/10 | эталон и доказательства проверяются жюри независимо по записям; равенства «до» ошибки | `cli export-before` → таблицы «до» в формате раздела 03; `jury-run` кладёт их в `jury_out/grader/<split>/<ep>/before/`; `policy.matching.required_evidence` | `test_export_before_is_clean_and_balanced`, `test_duplicate_evidence_needs_posting_of_both_invoices` | ✅ |
+| 10 | крайние сочетания параметров не ломают генерацию | добор кандидатов в `world.py`, равномерное урезание сверх 12 в `episode._plan` | `test_extreme_configs_generate_and_validate`, `test_over_max_issues_is_balanced_across_types` | ✅ |
+
 ## Что команде сделать руками
 
-1. Выполнить `make docker-pin && make docker-check` на машине с доступом к Docker Hub, закоммитить `docker/base-image.txt` и вставить вывод в README («Проверено командой»).
+1. ~~Выполнить `make docker-pin && make docker-check`~~ — сделано 19.11 (digest закреплён, вывод в README). После последних правок кода желательно ещё раз выполнить `make docker-check` и обновить блок «Проверено командой» в README: Dockerfile и digest не менялись, но код и артефакты обновлены.
 2. Отправить ссылку на репозиторий/архив в форму сдачи (ссылку организаторы сообщат отдельно).

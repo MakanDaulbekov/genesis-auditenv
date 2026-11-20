@@ -108,9 +108,12 @@ def duplicate_invoice(world: dict, rng: DRBG, params: dict) -> dict:
     world["invoices"][dup["invoice_id"]] = dup
     touched.update([x, dup["invoice_id"]])
     xd = dup["invoice_id"]
-    rows = [rid(world, x, "ar"), rid(world, x, "rev"), rid(world, xd, "ar"), rid(world, xd, "rev")]
+    # «проведён более одного раза» доказывается проводкой КАЖДОГО из двух счетов (AR или revenue):
+    # одна строка показала бы лишь одну проводку. 2 × 2 = 4 допустимых набора по 4 ID.
+    rows_x = [rid(world, x, "ar"), rid(world, x, "rev")]
+    rows_d = [rid(world, xd, "ar"), rid(world, xd, "rev")]
     issue = _issue(world, "duplicate_invoice", [x, xd], inv["total_minor"], inv["currency"],
-                   [[x, xd, r] for r in rows], params.get("group"))
+                   [[x, xd, a, b] for a in rows_x for b in rows_d], params.get("group"))
     return {"type": "duplicate_invoice", "variant": "out_of_period_copy" if want_out_of_period else "in_period_copy",
             "cause": {"original_invoice_id": x, "duplicate_invoice_id": xd,
                       "before": None, "after": {"invoice_id": xd, "issued_at": dup["issued_at"]}},

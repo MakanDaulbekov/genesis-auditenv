@@ -28,6 +28,8 @@ def short(action) -> str:
 
 
 def main(argv=None) -> int:
+    from .common.console import utf8_stdio
+    utf8_stdio()
     idx = json.loads((ROOT / "episodes" / "dev" / "index.json").read_text(encoding="utf-8"))
     ref = idx[3]["ref"]
     print(f"== Демо: эпизод {ref}, политика simple_reconciler, режим train ==")

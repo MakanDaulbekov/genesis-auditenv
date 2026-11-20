@@ -105,10 +105,11 @@ def run_policies(policies, splits, episodes_root="episodes", grader_root="grader
         refs += [(s, e["ref"]) for e in idx]
     if grader_log:
         Path(grader_log).parent.mkdir(parents=True, exist_ok=True)
-        Path(grader_log).write_text("", encoding="utf-8")
+        Path(grader_log).write_text("", encoding="utf-8", newline="\n")
     results = []
     grader_results = []
-    with open(trajectories, "w", encoding="utf-8") as traj:
+    grader_rss = []
+    with open(trajectories, "w", encoding="utf-8", newline="\n") as traj:
         for pol in policies:
             # у каждой политики свой процесс оценщика; op "oracle" разрешён только процессу oracle,
             # поэтому никакая политика не может вызвать oracle через клиент среды
@@ -120,6 +121,8 @@ def run_policies(policies, splits, episodes_root="episodes", grader_root="grader
                                         split=split))
                 g.call("finalize")
                 grader_results += g.call("results")["results"]
+                grader_rss.append(g.call("stats").get("peak_rss_mb"))
     clean_ids = {r["episode_id"] for r in grader_results if r["n_truth"] == 0}
+    rss = [x for x in grader_rss if x is not None]
     return {"aggregate": aggregate(results, grader_results, clean_ids), "episodes": results,
-            "grader": grader_results}
+            "grader": grader_results, "grader_peak_rss_mb": max(rss) if rss else None}

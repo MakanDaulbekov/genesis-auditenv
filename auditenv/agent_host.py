@@ -18,11 +18,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import queue
 import select
 import shlex
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -34,16 +36,88 @@ class AgentCrashed(Exception):
     pass
 
 
+def _writer(p):
+    """Windows: буфер канала ~4 КБ, и запись агенту, который не читает stdin, блокировала бы хост навсегда
+    (на Linux буфер 64 КБ). Поэтому там пишет фоновый поток; таймаут эпизода по-прежнему соблюдается."""
+    w = getattr(p, "_auditenv_writer", None)
+    if w is None:
+        q, state = queue.Queue(), {"broken": False}
+
+        def pump():
+            while True:
+                data = q.get()
+                if data is None:
+                    return
+                try:
+                    p.stdin.write(data)
+                    p.stdin.flush()
+                except (BrokenPipeError, OSError, ValueError):
+                    state["broken"] = True
+                    return
+
+        threading.Thread(target=pump, daemon=True).start()
+        w = p._auditenv_writer = (q, state)
+    return w
+
+
 def _send(p, msg):
+    data = (json.dumps(msg, ensure_ascii=False) + "\n").encode("utf-8")
+    if os.name == "nt":
+        q, state = _writer(p)
+        if state["broken"] or p.poll() is not None:
+            raise AgentCrashed()
+        q.put(data)
+        return
     try:
-        p.stdin.write((json.dumps(msg, ensure_ascii=False) + "\n").encode("utf-8"))
+        p.stdin.write(data)
         p.stdin.flush()
     except (BrokenPipeError, OSError, ValueError):
         raise AgentCrashed() from None
 
 
+def _kill(p) -> None:
+    """Завершить агента. На Windows — всем деревом: лаунчеры venv запускают интерпретатор дочерним
+    процессом, и TerminateProcess одного лаунчера оставил бы агента живым."""
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(p.pid)], stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+    try:
+        p.kill()
+    except OSError:
+        pass
+
+
+def _line_queue(p) -> "queue.Queue":
+    """Windows: select() не работает с каналами, поэтому строки агента читает фоновый поток в очередь."""
+    q = getattr(p, "_auditenv_lines", None)
+    if q is None:
+        q = queue.Queue()
+
+        def pump():
+            try:
+                while True:
+                    line = p.stdout.readline(1024 * 1024)
+                    q.put(line)
+                    if not line:
+                        return
+            except (OSError, ValueError):
+                q.put(b"")
+
+        threading.Thread(target=pump, daemon=True).start()
+        p._auditenv_lines = q
+    return q
+
+
 def _recv(p, timeout: float):
     """-> str (строка агента) | None (таймаут). Конец потока = агент завершился -> AgentCrashed."""
+    if os.name == "nt":
+        try:
+            line = _line_queue(p).get(timeout=max(0.0, timeout))
+        except queue.Empty:
+            return None
+        if not line:
+            raise AgentCrashed()
+        return line.decode("utf-8", "replace")
     r, _, _ = select.select([p.stdout], [], [], max(0.0, timeout))
     if not r:
         return None
@@ -56,7 +130,11 @@ def _recv(p, timeout: float):
 def build_agent_argv(agent_cmd: str) -> list[str]:
     """`python`/`python3` в начале команды заменяются текущим интерпретатором: агент гарантированно
     получает тот же Python 3.11, что и среда (venv жюри), даже если `python` в PATH другой."""
-    argv = shlex.split(agent_cmd)
+    if os.name == "nt":  # пути Windows с обратной косой чертой: без POSIX-экранирования, кавычки снимаем
+        argv = [a[1:-1] if len(a) >= 2 and a[0] == a[-1] and a[0] in "\"'" else a
+                for a in shlex.split(agent_cmd, posix=False)]
+    else:
+        argv = shlex.split(agent_cmd)
     if not argv:
         raise ValueError("пустая --agent-cmd")
     if argv[0] in ("python", "python3", "python3.11"):
@@ -79,6 +157,9 @@ def run_agent(agent_cmd: str, configs: list[dict], grader: GraderClient, mode: s
     workdir = tempfile.mkdtemp(prefix="agent_home_")
     env_vars = {"PATH": os.environ.get("PATH", ""), "HOME": workdir, "PYTHONHASHSEED": "0",
                 "LANG": os.environ.get("LANG", "C.UTF-8"), "PYTHONIOENCODING": "utf-8"}
+    if os.name == "nt":  # без SYSTEMROOT интерпретатор Windows не стартует; это не каналы к оценщику
+        env_vars.update({k: os.environ[k] for k in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATHEXT", "COMSPEC")
+                         if k in os.environ})
     env_vars.update(extra_env or {})
     err_f = None
     if stderr_path:
@@ -88,7 +169,7 @@ def run_agent(agent_cmd: str, configs: list[dict], grader: GraderClient, mode: s
                          stderr=err_f if err_f else subprocess.DEVNULL, cwd=cwd or os.getcwd(), env=env_vars)
     out = []
     crashed, crash_ep = False, None
-    traj = open(traj_path, "w", encoding="utf-8") if traj_path else None
+    traj = open(traj_path, "w", encoding="utf-8", newline="\n") if traj_path else None
 
     def log_step(ep_id, step, action, o, r, te, tr):
         if traj:
@@ -150,7 +231,7 @@ def run_agent(agent_cmd: str, configs: list[dict], grader: GraderClient, mode: s
         try:
             p.wait(timeout=2)
         except subprocess.TimeoutExpired:
-            p.kill()
+            _kill(p)
             p.wait()
         if err_f:
             err_f.close()
@@ -162,6 +243,8 @@ def run_agent(agent_cmd: str, configs: list[dict], grader: GraderClient, mode: s
 
 
 def main(argv=None) -> int:
+    from .common.console import utf8_stdio
+    utf8_stdio()
     ap = argparse.ArgumentParser(description="Запуск внешнего агента (отдельный процесс, JSON через stdin/stdout)")
     g_ = ap.add_mutually_exclusive_group(required=True)
     g_.add_argument("--agent-cmd", help="команда агента; относительные пути — от текущего каталога")

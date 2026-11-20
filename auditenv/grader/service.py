@@ -2,7 +2,7 @@
 
 Протокол: только строки JSON через stdin/stdout отдельного ОС-процесса — никакого
 pickle от стороны агента, т.е. процесс агента не может «записать» в оценщик ничего,
-кроме разрешённых операций: open, grade, oracle, finalize, results.
+кроме разрешённых операций: open, grade, oracle, finalize, results (+ stats: только пик RSS).
   * grade принимается ровно один раз на эпизод (token); повтор логируется и отклоняется.
   * В режиме eval grade возвращает 0 и ничего больше; результаты доступны через results
     только после finalize, после которого новые эпизоды не открываются.
@@ -18,7 +18,10 @@ import sys
 import time
 from pathlib import Path
 
-REF_RE = re.compile(r"^(train|dev|test|[a-z][a-z0-9_-]{0,31})/ep_[0-9a-f]{16}$")
+# <сплит>/<каталог эпизода>: оба компонента начинаются с буквы/цифры и не содержат '/', поэтому '..',
+# абсолютные пути и выход за корни невозможны. Имя каталога не обязано быть ep_<16 hex> — жюри может
+# положить свои преобразованные эпизоды под любыми именами.
+REF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}/[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 PUBLIC_FILES = ("manifest.json", "policy.json", "ledger.csv", "invoices.jsonl", "payments.jsonl",
                 "fx.csv", "documents.jsonl")
 
@@ -50,7 +53,7 @@ class GraderCore:
 
     def log(self, rec: dict) -> None:
         if self.log_path:
-            with open(self.log_path, "a", encoding="utf-8") as f:
+            with open(self.log_path, "a", encoding="utf-8", newline="\n") as f:
                 f.write(json.dumps(rec, sort_keys=True, ensure_ascii=False) + "\n")
 
     # ------------------------------------------------------------------ ops
@@ -86,6 +89,10 @@ class GraderCore:
             pdir, gdir = self.episodes_root / ref, self.grader_root / ref
             if not pdir.is_dir() or not gdir.is_dir():
                 return {"error": "not_found"}
+            missing = [n for n in PUBLIC_FILES if not (pdir / n).is_file()]
+            if missing or not (gdir / "truth.json").is_file():
+                return {"error": "missing_files",
+                        "detail": f"в каталоге эпизода нет файлов: {missing or ['truth.json (эталон)']}"}
             public = {n: (pdir / n).read_bytes() for n in PUBLIC_FILES}
             truth = json.loads((gdir / "truth.json").read_text(encoding="utf-8"))
         else:
@@ -166,12 +173,17 @@ class GraderCore:
             return {"error": "not_finalized"}
         return {"results": [{k: v for k, v in r.items() if k != "matches"} for r in self.results]}
 
+    def op_stats(self) -> dict:
+        """Только диагностика ресурсов (пик RSS процесса оценщика); ничего об эталоне/наградах."""
+        from ..common.rss import self_peak_rss_mb
+        return {"peak_rss_mb": self_peak_rss_mb()}
+
 
 def serve(inp, out, settings: dict) -> None:
     """Цикл оценщика: одна JSON-строка запроса -> одна JSON-строка ответа."""
     core = GraderCore(settings)
     ops = {"open": core.op_open, "grade": core.op_grade, "oracle": core.op_oracle,
-           "finalize": core.op_finalize, "results": core.op_results}
+           "finalize": core.op_finalize, "results": core.op_results, "stats": core.op_stats}
     while True:
         line = inp.readline(MAX_MSG + 1)
         if not line:

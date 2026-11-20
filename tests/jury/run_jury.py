@@ -485,6 +485,8 @@ def engineering() -> list[tuple[str, int]]:
 
 
 def main() -> int:
+    from auditenv.common.console import utf8_stdio
+    utf8_stdio()
     x = Ctx()
     x.dirty_seed = next(s for s in range(500, 600)
                         if len({i["type"] for i in generate_episode(s, CFG).truth["issues"]}) == 4)
@@ -519,7 +521,8 @@ def main() -> int:
     print(f"[self-check] Самопроверка: {total}/80 наших проверок, зеркальных разделам 06 и 10 PDF. Это не оценка жюри.")
     print("[self-check] Не покрыто самопроверкой: harness жюри, их политики, их преобразования и закрытые seed.")
     out = {"blocks": res, "engineering": eng, "passed": total, "of": 80}
-    (ROOT / "grader_data" / "jury.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "grader_data" / "jury.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
+                                                    newline="\n")
     return 0 if all(res[b]["passed"] == 20 for b in weights) else 1
 
 

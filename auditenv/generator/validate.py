@@ -389,10 +389,12 @@ def recompute_from_evidence(t: dict, issue: dict, evidence: list[str]) -> tuple[
         if (a["entity_id"], a["currency"], a["total_minor"], _canon_lines(a["line_items"])) != \
            (c["entity_id"], c["currency"], c["total_minor"], _canon_lines(c["line_items"])):
             return None, "invoices differ"
-        ok_row = any(r["invoice_id"] in (a["invoice_id"], c["invoice_id"]) and r["payment_id"] is None
-                     and r["account"] in ("accounts_receivable", "revenue") for r in kinds["ledger"])
-        if not ok_row:
-            return None, "no posting row proving the double booking"
+        # двойное проведение доказывается строкой выпуска (AR-дебет или revenue) КАЖДОГО из двух счетов
+        for inv in (a, c):
+            if not any(r["invoice_id"] == inv["invoice_id"] and r["payment_id"] is None
+                       and ((r["account"] == "accounts_receivable" and r["debit_minor"] > 0) or r["account"] == "revenue")
+                       for r in kinds["ledger"]):
+                return None, "no posting row for each of the two invoices"
         return {"type": typ, "affected_ids": sorted([a["invoice_id"], c["invoice_id"]]),
                 "amount": a["total_minor"], "currency": a["currency"]}, ""
     if typ == "missing_or_partial_allocation":

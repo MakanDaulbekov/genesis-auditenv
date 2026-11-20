@@ -1,4 +1,5 @@
-PY ?= python3.11
+# python3.11, если есть; иначе python3 (код — только stdlib; генерация побайтово совпадает на 3.11 и 3.12)
+PY ?= $(shell command -v python3.11 >/dev/null 2>&1 && echo python3.11 || echo python3)
 export PYTHONPATH := $(CURDIR)
 export PYTHONDONTWRITEBYTECODE := 1
 

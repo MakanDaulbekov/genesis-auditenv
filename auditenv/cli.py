@@ -71,7 +71,7 @@ def cmd_generate(args) -> int:
         index.append({"ref": f"{name}/{ep.episode_id}", "config_version": cfg["config_version"]})
         print(f"[generate] {name}/{ep.episode_id}: issues={len(ep.truth['issues'])} "
               f"rows={json.loads(ep.public['manifest.json'])['counts']['ledger_rows']}")
-    (pub_root / "index.json").write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    (pub_root / "index.json").write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8", newline="\n")
     return 0
 
 
@@ -93,6 +93,38 @@ def cmd_validate(args) -> int:
                 for e in rep["errors"][:10]:
                     print("    -", e)
     return 1 if bad else 0
+
+
+def export_before(pub_dir: Path, grader_dir: Path, out_dir: Path) -> dict:
+    """Снимок открытых таблиц ДО внесения ошибок (восстановлен из provenance.diff) в формате раздела 03 —
+    чтобы жюри могло своими средствами проверить бухгалтерские равенства «до» и сравнить с «после»."""
+    from .generator.render import fx_csv, json_bytes, jsonl, ledger_csv
+    from .generator.validate import PUBLIC, parse_public, reconstruct_before
+    files = {n: (pub_dir / n).read_bytes() for n in PUBLIC}
+    prov = json.loads((grader_dir / "provenance.json").read_text(encoding="utf-8"))
+    before = reconstruct_before(parse_public(files), prov["diff"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = {"ledger.csv": ledger_csv(before["ledger"]), "invoices.jsonl": jsonl(before["invoices"]),
+           "payments.jsonl": jsonl(before["payments"]), "documents.jsonl": jsonl(before["documents"]),
+           "fx.csv": fx_csv(before["fx"]), "policy.json": json_bytes(before["policy"])}
+    for n, b in out.items():
+        (out_dir / n).write_bytes(b)
+    note = {"note": "состояние ДО внесения ошибок: открытые записи с откатом provenance.diff; manifest.json "
+                    "эпизода описывает состояние ПОСЛЕ (его хэши к этим файлам не относятся)",
+            "episode_id": prov["episode_id"],
+            "counts": {"ledger_rows": len(before["ledger"]), "invoices": len(before["invoices"]),
+                       "payments": len(before["payments"]), "documents": len(before["documents"])}}
+    (out_dir / "BEFORE.json").write_bytes(json_bytes(note))
+    return note
+
+
+def cmd_export_before(args) -> int:
+    refs = args.refs or [r for s in ("train", "dev") for r in episode_refs(s, args.episodes_root)]
+    for ref in refs:
+        dst = Path(args.out) / ref
+        note = export_before(Path(args.episodes_root) / ref, Path(args.grader_root) / ref, dst)
+        print(f"[export-before] {ref} -> {dst}: {note['counts']}")
+    return 0
 
 
 def cmd_validate_seeds(args) -> int:
@@ -181,17 +213,19 @@ def cmd_solvability(args) -> int:
                               "max_steps": max(r["steps"] for r in recs if r["variant"] == v)}
                           for v in dict.fromkeys(r["variant"] for r in recs)},
            "failures": fails}
-    Path(args.out).write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(args.out).write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     print(f"[solvability] competent_reconciler: {out['perfect']}/{out['episodes']} эпизодов с F1=1 и без FP; "
           f"TP={out['tp']} FP={out['fp']} FN={out['fn']}; шаги max={out['max_steps']} mean={out['mean_steps']}")
     return 0 if out["max_steps"] < 100 else 1
 
 
-def _peak_rss_mb() -> dict:
-    import resource
-    # Linux: ru_maxrss в КБ. RUSAGE_CHILDREN — пик среди завершённых дочерних (процесс оценщика).
-    return {"peak_rss_mb_env_policy": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
-            "peak_rss_mb_grader": round(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024, 1)}
+def _peak_rss_mb(grader_reported: float | None = None) -> dict:
+    """Пик RSS: среда+политика (этот процесс) и оценщик. POSIX: RUSAGE_CHILDREN — пик среди завершённых
+    дочерних (процесс оценщика); где он недоступен (Windows) — значение, которое сообщил сам оценщик."""
+    from .common.rss import children_peak_rss_mb, self_peak_rss_mb
+    child = children_peak_rss_mb()
+    return {"peak_rss_mb_env_policy": self_peak_rss_mb(),
+            "peak_rss_mb_grader": child if child is not None else grader_reported}
 
 
 def cmd_run(args) -> int:
@@ -202,8 +236,10 @@ def cmd_run(args) -> int:
     from .runner import run_policies
     if args.isolate and len(args.policies) > 1:
         merged = {"aggregate": {}, "episodes": [], "grader": []}
-        with tempfile.TemporaryDirectory() as tmp, open(args.trajectories, "w", encoding="utf-8") as traj, \
-                open(args.grader_log, "w", encoding="utf-8") if args.grader_log else open(os.devnull, "w") as glog:
+        with tempfile.TemporaryDirectory() as tmp, \
+                open(args.trajectories, "w", encoding="utf-8", newline="\n") as traj, \
+                open(args.grader_log, "w", encoding="utf-8", newline="\n") if args.grader_log \
+                else open(os.devnull, "w") as glog:
             for i, pol in enumerate(args.policies):
                 t, sm, gl = (Path(tmp) / f"{i}.{x}" for x in ("traj.jsonl", "summary.json", "glog.jsonl"))
                 cmd = [sys.executable, "-m", "auditenv.cli", "run", "--no-isolate", "--policies", pol,
@@ -226,10 +262,11 @@ def cmd_run(args) -> int:
                                grader_log=args.grader_log, mode=args.mode, trusted=args.trusted,
                                truth_dir=args.truth_dir)
         if len(args.policies) == 1:
-            summary["aggregate"][args.policies[0]].update(_peak_rss_mb())
+            summary["aggregate"][args.policies[0]].update(_peak_rss_mb(summary.get("grader_peak_rss_mb")))
     print(json.dumps(summary["aggregate"], indent=2, ensure_ascii=False))
     if args.summary:
-        Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        Path(args.summary).write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+                                      newline="\n")
     return 0
 
 
@@ -253,12 +290,15 @@ def cmd_check(args) -> int:
     """Единая проверка (то же, что make check): ненулевой выход при любом провале."""
     import subprocess
     import time
-    env = dict(os.environ, PYTHONPATH=str(ROOT), PYTHONDONTWRITEBYTECODE="1")
+    # UTF-8 для дочерних процессов и для разбора их вывода — независимо от локали ОС (Windows cp1252 и т.п.)
+    env = dict(os.environ, PYTHONPATH=str(ROOT), PYTHONDONTWRITEBYTECODE="1", PYTHONUTF8="1",
+               PYTHONIOENCODING="utf-8")
     rows = []
     ok_all = True
     for name, cmd in CHECK_STEPS:
         t0 = time.monotonic()
-        r = subprocess.run([sys.executable] + cmd, cwd=ROOT, env=env, capture_output=True, text=True)
+        r = subprocess.run([sys.executable] + cmd, cwd=ROOT, env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
         dt = time.monotonic() - t0
         ok = r.returncode == 0
         ok_all &= ok
@@ -277,6 +317,8 @@ def cmd_check(args) -> int:
 
 
 def main(argv=None) -> int:
+    from .common.console import utf8_stdio
+    utf8_stdio()
     p = argparse.ArgumentParser(prog="auditenv")
     sub = p.add_subparsers(dest="cmd", required=True)
     g = sub.add_parser("generate")
@@ -290,6 +332,12 @@ def main(argv=None) -> int:
     v.add_argument("--episodes-root", default="episodes")
     v.add_argument("--grader-root", default="grader_data")
     v.set_defaults(fn=cmd_validate)
+    eb = sub.add_parser("export-before", help="снимок открытых таблиц ДО внесения ошибок (для независимой проверки)")
+    eb.add_argument("--refs", nargs="*", default=None, help="напр. dev/ep_053daf06ab62f121; по умолчанию все train+dev")
+    eb.add_argument("--episodes-root", default="episodes")
+    eb.add_argument("--grader-root", default="grader_data")
+    eb.add_argument("--out", default="before_state")
+    eb.set_defaults(fn=cmd_export_before)
     vs = sub.add_parser("validate-seeds")
     vs.add_argument("--n", type=int, default=300)
     vs.set_defaults(fn=cmd_validate_seeds)

@@ -138,7 +138,8 @@ def simple_reconciler(first: dict):
             a, b = sorted(g, key=lambda x: x["issued_at"])[:2]
             findings.append({"type": "duplicate_invoice", "affected_ids": [a["invoice_id"], b["invoice_id"]],
                              "claimed_amount_minor": a["total_minor"], "currency": a["currency"],
-                             "evidence_ids": [a["invoice_id"], b["invoice_id"], ar_row(b["invoice_id"])["row_id"]],
+                             "evidence_ids": [a["invoice_id"], b["invoice_id"], ar_row(a["invoice_id"])["row_id"],
+                                              ar_row(b["invoice_id"])["row_id"]],
                              "explanation": "same customer, amount and lines posted twice"})
 
     # FX и cutoff (наивная дата)
@@ -298,7 +299,8 @@ def competent_reconciler(first: dict):
             a, b = sorted(g, key=lambda x: x["invoice_id"])
             findings.append({"type": "duplicate_invoice", "affected_ids": [a["invoice_id"], b["invoice_id"]],
                              "claimed_amount_minor": a["total_minor"], "currency": a["currency"],
-                             "evidence_ids": [a["invoice_id"], b["invoice_id"], ar_row(b["invoice_id"])["row_id"]],
+                             "evidence_ids": [a["invoice_id"], b["invoice_id"], ar_row(a["invoice_id"])["row_id"],
+                                              ar_row(b["invoice_id"])["row_id"]],
                              "explanation": "identical invoice (entity, lines, service periods) posted twice"})
 
     # --- cutoff и FX по счетам (время компании)

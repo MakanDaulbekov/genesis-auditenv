@@ -9,7 +9,7 @@ make check                        # без make: python3.11 -m auditenv.cli chec
 1. генерация 10 train + 10 dev эпизодов;
 2. независимый валидатор;
 3. 300 случайных seed;
-4. ≈190 тестов;
+4. ≈200 тестов;
 5. 5 политик и `trajectories.jsonl`;
 6. решаемость на 310 эпизодах;
 7. детерминизм в 2 процессах;
@@ -88,11 +88,18 @@ make jury-run SPLIT=closed_split.json [SECRET=secret.txt] [POLICY="your.module:F
 `overrides` — любой частичный config (поля `configs/default.json`), который мержится с дефолтом. Неверное поле даёт понятную ошибку с его именем.
 
 Шаги внутри:
-1. генерация: открытые записи пишутся в `jury_out/episodes/`, **эталон — в `jury_out/grader/`**, отдельный корень, чтобы вы могли независимо проверить эталон и доказательства по записям;
+1. генерация: открытые записи пишутся в `jury_out/episodes/`, **эталон — в `jury_out/grader/`**, отдельный корень, чтобы вы могли независимо проверить эталон и доказательства по записям; рядом с эталоном каждого эпизода лежит `before/` — открытые таблицы в состоянии **до** внесения ошибок, в том же формате раздела 03;
 2. независимый валидатор;
 3. политики в режиме eval, `oracle` добавляется всегда;
 4. 20 парных проверок: повтор seed/действий побайтово, перестановка и смена ID через `auditenv.transforms`;
 5. таблица P/R/F1/возврат/шаги/время по политикам — для всех, чистых и взаимодействующих эпизодов. Она пишется в `jury_out/jury_report.md`.
+
+**Независимая проверка эталона без нашего кода.**
+* `jury_out/grader/<split>/<episode>/truth.json`: `issue_id`, `type`, канонические `affected_ids`, `expected_amount_minor`, `currency`, `evidence_sets` (любой полный набор достаточен) и `interaction_group`;
+* `provenance.json`: причинные мутации «было → стало» и дифф открытых записей;
+* `before/`: состояние до ошибок. Для открытых train/dev то же самое делает `python -m auditenv.cli export-before --refs dev/ep_… --out before_state`;
+* правила, по которым считается расхождение (дата курса, граница периода, округление, распределение, требуемые доказательства), агент получает в `policy.json` первого наблюдения;
+* наш независимый валидатор: `python -m auditenv.cli validate --splits <split> --episodes-root jury_out/episodes --grader-root jury_out/grader`.
 
 **Секрет.** Генератор открыт, поэтому без секрета маленькие закрытые seed можно перебрать и получить эталон. Секрет входит в ключ эпизода, и это закрывает перебор. Без `--secret-file` выводится предупреждение и используется открытый детерминированный секрет по умолчанию, так что повтор seed остаётся точным.
 
@@ -124,7 +131,8 @@ with GraderClient() as grader:
 * 100 шагов включая submit и 60 с на эпизод; промежуточная награда 0; при truncation оценивается пустой ответ;
 * `findings`: ≤30 выводов, ≤10 ID доказательств, explanation ≤1000 символов; неверная структура даёт −1;
 * награда — `clip(2*F1 − 1 − 0.002*inspection_steps, −1, 1)`;
-* сопоставление и допуски описаны в `grader/matcher.py` и в `policy.matching` каждого эпизода.
+* сопоставление и допуски описаны в `grader/matcher.py` и в `policy.matching` каждого эпизода;
+* какие ID обязаны быть в `evidence_ids` для каждого типа, сказано в `policy.matching.required_evidence`. Например, для дубля нужны оба счёта и строка выпуска **каждого** из них, потому что одна строка доказывает только одну проводку.
 
 ## Docker
 
@@ -138,6 +146,24 @@ docker run --rm --network none --cpus 2 --memory 4g auditenv      # CMD = python
 * pytest и его зависимости лежат в `vendor/wheels` и ставятся по SHA-256 из `requirements-dev.lock` с `--no-index`, так что сборке нужна сеть только для базового образа.
 * В образе нет `make`: `CMD` вызывает проверку напрямую.
 * Чтобы обновить digest, выполните `make docker-pin` (по умолчанию тег `python:3.11-slim`; другой тег — `sh docker/pin_base_image.sh python:3.11.X-slim`).
+
+### Проверено после доработок (20.11.2026, без Docker)
+Windows 11 x64, Python 3.12.11 (msys2), 12 логических CPU; `python -m auditenv.cli check`:
+```
+[OK] generate train                                  1.5s  [generate] train/ep_7c609c9a4771e31a: issues=5 rows=700
+[OK] generate dev                                    1.5s  [generate] dev/ep_053daf06ab62f121: issues=3 rows=446
+[OK] validate episodes                               5.3s  [validate] dev/ep_053daf06ab62f121: OK issues=3 checks=67
+[OK] validate 300 random seeds                     300.5s  [validate-seeds] 300/300 OK, issues=1880, clean=50
+[OK] pytest                                        546.9s  206 passed in 545.87s (0:09:05)
+[OK] run baseline policies (+competent)              9.7s  }
+[OK] solvability: competent_reconciler, 300 seeds + worst size  159.6s  [solvability] competent_reconciler: 310/310 эпизодов с F1=1 и без FP; TP=1963 FP=0 FN=0; шаги max=73 mean=41.6
+[OK] trajectory leak scan                            2.5s  1 passed, 7 deselected in 1.54s
+[OK] determinism (2 processes, PYTHONHASHSEED)       8.3s  [determinism] files=182 identical_across_processes=True
+[OK] self-check 4x20 (не оценка жюри)               76.9s  [self-check] Не покрыто самопроверкой: harness жюри, их политики, их преобразования и закрытые seed.
+[OK] report                                          0.5s  [report] REPORT.md: 108 строк; simple_reconciler FP=346 FN=27
+== check: OK ==
+```
+Машина медленнее Linux-песочницы (≈6× на генерации), отсюда время. Эпизоды и все числа (issues=1880, TP=1963, 80/80) совпадают с прогонами на Linux/3.11. Два блока ниже сняты 19.11 **до** доработок; Dockerfile и digest с тех пор не менялись, но после изменений кода `make docker-check` стоит прогнать заново.
 
 ### Проверено командой
 ```

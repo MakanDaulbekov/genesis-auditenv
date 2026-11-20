@@ -1,7 +1,7 @@
 {
   "$defs": {
     "id": {
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
       "type": "string"
     }
   },
@@ -19,7 +19,7 @@
         "properties": {
           "affected_ids": {
             "items": {
-              "maxLength": 64,
+              "maxLength": 128,
               "minLength": 1,
               "type": "string"
             },
@@ -37,7 +37,7 @@
           },
           "evidence_ids": {
             "items": {
-              "maxLength": 64,
+              "maxLength": 128,
               "minLength": 1,
               "type": "string"
             },

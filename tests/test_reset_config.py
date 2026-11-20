@@ -73,7 +73,10 @@ def test_split_configs_are_valid():
 
 
 def test_infeasible_config_reports_generation_failure(grader):
+    # Сценарий «частичный платёж в ДРУГОЙ валюте» невозможен, если иностранных валют нет вовсе.
+    # (Прежний пример 3+3 сценария при 0% иностранных клиентов теперь выполним: генератор добирает
+    # кандидатов — см. tests/test_robustness.py::test_extreme_configs_generate_and_validate.)
     with pytest.raises(EpisodeOpenError) as ei:
-        AuditEnv(grader, "train").reset(seed=1, config={"interactions": {"partial_fx_boundary": 3, "duplicate_cutoff": 3},
-                                                        "currencies": {"foreign_customer_share_pct": 0}})
+        AuditEnv(grader, "train").reset(seed=1, config={"interactions": {"partial_fx_boundary": 1, "duplicate_cutoff": 0},
+                                                        "currencies": {"base": ["USD"], "foreign": ["USD"]}})
     assert "не удалось построить эпизод" in str(ei.value)

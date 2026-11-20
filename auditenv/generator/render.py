@@ -76,7 +76,14 @@ def build_policy(world: dict) -> dict:
                 "duplicate_invoice": "both invoice_id (order irrelevant)",
                 "missing_or_partial_allocation": "[invoice_id, payment_id]",
                 "fx_wrong_date_or_rate": "[invoice_id or payment_id of the mis-converted document]",
-                "period_cutoff_error": "[invoice_id of the document booked in the wrong period]",
+                "period_cutoff_error": "[invoice_id or payment_id of the document booked in the wrong period]",
+            },
+            "required_evidence": {
+                "rule": "evidence_ids must contain at least one complete admissible set (extra ids are allowed)",
+                "duplicate_invoice": "both invoice_id + one posting row (accounts_receivable debit or revenue) of EACH of the two invoices",
+                "missing_or_partial_allocation": "invoice_id + payment_id + the payment's customer_advances row",
+                "fx_wrong_date_or_rate": "document id + its posting row (accounts_receivable or revenue for an invoice; bank for a payment) + fx id of the correct rate: fx:<local date of the document in company timezone>:<document currency>:<base>",
+                "period_cutoff_error": "document id + its posting row (accounts_receivable or revenue for an invoice; bank for a payment)",
             },
             "amounts": {
                 "duplicate_invoice": "total_minor of the duplicate, invoice currency",

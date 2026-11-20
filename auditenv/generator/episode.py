@@ -38,20 +38,31 @@ def episode_key(seed: int, cfg: dict, secret: str = "") -> bytes:
     return derive_key("auditenv", GENERATOR_VERSION, secret, seed, canonical_json(cfg))
 
 
-def _plan(rng: DRBG, cfg: dict) -> tuple[list[str], list[str]]:
+def _plan(rng: DRBG, cfg: dict) -> tuple[list[str], list[str], int]:
+    """-> (сценарии, одиночные ошибки, сколько одиночных отброшено сверх MAX_ISSUES)."""
     if cfg.get("clean"):
-        return [], []
+        return [], [], 0
     scen = []
     for name in sorted(cfg.get("interactions", {})):
         scen += [name] * _rand_range(rng, cfg["interactions"][name])
     singles = []
     for t in ERROR_TYPES:
         singles += [t] * _rand_range(rng, cfg["errors"].get(t, 0))
-    # не более MAX_ISSUES: сценарий даёт 2 issue; лишние одиночные отбрасываются с конца
+    # не более MAX_ISSUES: сценарий даёт 2 issue. Если одиночных больше, чем помещается, они урезаются
+    # ПОРОВНУ по типам (по кругу), чтобы ни один заказанный тип не пропал целиком; иначе порядок прежний.
     room = MAX_ISSUES - 2 * len(scen)
     if room < 0:
         raise GenerationError("too many scenarios")
-    return scen, singles[:room]
+    if len(singles) <= room:
+        return scen, singles, 0
+    left = {t: singles.count(t) for t in ERROR_TYPES}
+    kept = {t: 0 for t in ERROR_TYPES}
+    while sum(kept.values()) < room:
+        for t in ERROR_TYPES:
+            if left[t] and sum(kept.values()) < room:
+                left[t] -= 1
+                kept[t] += 1
+    return scen, [t for t in ERROR_TYPES for _ in range(kept[t])], len(singles) - room
 
 
 def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]:
@@ -59,7 +70,7 @@ def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]
     before_entries = post_all(world)
     before = render(world, before_entries)
     rng = DRBG(derive_key(key, "mutations"))
-    scen, singles = _plan(rng, cfg)
+    scen, singles, dropped = _plan(rng, cfg)
     log: list[dict] = []
     scenarios: list[dict] = []
     for i, name in enumerate(scen):
@@ -73,7 +84,10 @@ def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]
         raise GenerationError("too many issues")
     after_entries = post_all(world)
     after = render(world, after_entries)
-    return world, before, after, log, scenarios, {"planned_scenarios": scen, "planned_singles": singles}
+    plan = {"planned_scenarios": scen, "planned_singles": singles}
+    if dropped:
+        plan["dropped_over_max_issues"] = dropped  # записано честно: config просил больше 12 ошибок
+    return world, before, after, log, scenarios, plan
 
 
 def generate_episode(seed: int, cfg: dict, secret: str = "") -> Episode:

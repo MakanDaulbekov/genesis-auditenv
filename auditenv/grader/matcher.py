@@ -23,7 +23,9 @@ from dataclasses import dataclass
 
 from ..common.jsonschema_lite import check
 
-ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$")
+# Синтаксис ID: буква/цифра, затем [A-Za-z0-9_.:-], до 128 символов (с запасом для переименованных
+# ID жюри, напр. UUID). Пути, пробелы и управляющие символы — неверная структура.
+ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
 MAX_FINDINGS_BYTES = 256 * 1024
 
 

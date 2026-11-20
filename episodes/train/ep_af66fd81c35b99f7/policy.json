@@ -55,13 +55,20 @@
       "duplicate_invoice": "both invoice_id (order irrelevant)",
       "fx_wrong_date_or_rate": "[invoice_id or payment_id of the mis-converted document]",
       "missing_or_partial_allocation": "[invoice_id, payment_id]",
-      "period_cutoff_error": "[invoice_id of the document booked in the wrong period]"
+      "period_cutoff_error": "[invoice_id or payment_id of the document booked in the wrong period]"
     },
     "evidence_id_formats": {
       "fx": "fx:<date>:<source_currency>:<target_currency>",
       "invoices": "invoice_id or doc_id",
       "ledger": "row_id",
       "payments": "payment_id or doc_id"
+    },
+    "required_evidence": {
+      "duplicate_invoice": "both invoice_id + one posting row (accounts_receivable debit or revenue) of EACH of the two invoices",
+      "fx_wrong_date_or_rate": "document id + its posting row (accounts_receivable or revenue for an invoice; bank for a payment) + fx id of the correct rate: fx:<local date of the document in company timezone>:<document currency>:<base>",
+      "missing_or_partial_allocation": "invoice_id + payment_id + the payment's customer_advances row",
+      "period_cutoff_error": "document id + its posting row (accounts_receivable or revenue for an invoice; bank for a payment)",
+      "rule": "evidence_ids must contain at least one complete admissible set (extra ids are allowed)"
     },
     "tolerance_minor": 0
   },

@@ -21,7 +21,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from .cli import DEFAULT_SECRET_NOTE, cmd_generate, read_secret, split_configs
+from .cli import DEFAULT_SECRET_NOTE, cmd_generate, export_before, read_secret, split_configs
 from .env.core import AuditEnv
 from .env.store import parse_jsonl
 from .generator.episode import generate_episode
@@ -105,6 +105,8 @@ def _stats(rows: list[dict]) -> dict:
 
 
 def main(argv=None) -> int:
+    from .common.console import utf8_stdio
+    utf8_stdio()
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--split", required=True, help="файл сплита: {split, config_version, episodes:[{seed, overrides}]}")
     ap.add_argument("--secret-file", default=None)
@@ -143,6 +145,10 @@ def main(argv=None) -> int:
             print(f"   FAIL {ref}: {rep['errors'][:3]}")
     print(f"   корректных эпизодов: {n_ok}/{len(refs)}")
     rc |= n_ok != len(refs)
+    # снимок «до внесения ошибок» рядом с эталоном: жюри проверяет равенства «до» своими средствами
+    for ref in refs:
+        export_before(ep_root / ref, gr_root / ref, gr_root / ref / "before")
+    print(f"   состояние «до ошибок» для независимой проверки: {gr_root}/<split>/<episode>/before/")
 
     print(f"== 3. политики (eval): {policies}")
     summary = run_policies(policies, [split], str(ep_root), str(gr_root), trajectories=str(out / "trajectories.jsonl"),
@@ -188,10 +194,10 @@ def main(argv=None) -> int:
               f"{sum(v == 'interacting' for v in kind.values())})",
               f"* валидатор: {n_ok}/{len(refs)}", f"* парные проверки: {n_pairs}/{len(pairs)}",
               f"* секрет: {'задан' if a.secret_file else 'НЕ задан (открытый по умолчанию)'}", "", table, ""]
-    (out / "jury_report.md").write_text("\n".join(report), encoding="utf-8")
+    (out / "jury_report.md").write_text("\n".join(report), encoding="utf-8", newline="\n")
     (out / "jury_summary.json").write_text(json.dumps({"validator_ok": n_ok, "episodes": len(refs), "pairs": pairs,
                                                        "aggregate": summary["aggregate"]}, ensure_ascii=False,
-                                                      indent=2) + "\n", encoding="utf-8")
+                                                      indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"== итог: {'OK' if rc == 0 else 'FAILED'}; отчёт {out / 'jury_report.md'}")
     return 1 if rc else 0
 

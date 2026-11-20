@@ -61,6 +61,11 @@ def _rand_range(rng: DRBG, spec) -> int:
     return rng.randint(lo, hi)
 
 
+def _spec_hi(spec) -> int:
+    """Верхняя граница спецификации «int или [lo, hi]» (без расхода ГПСЧ)."""
+    return spec if isinstance(spec, int) else spec[1]
+
+
 def _rate_str(d: Decimal) -> str:
     with localcontext() as ctx:
         ctx.prec = 7
@@ -257,6 +262,12 @@ def build_world(key: bytes, cfg: dict) -> dict:
             issued = rand_instant(lo, min(lo + timedelta(hours=20), end_dt - timedelta(minutes=1)))
             group.append(new_invoice(eid, issued, lines, "recurring"))
         if len(group) >= 2:
+            # одна подписка = один договор: общий PO у всех счетов группы (как у копии-дубля), поэтому
+            # совпадение PO не отличает законный повтор от дубля — нужно сравнивать периоды услуг.
+            # Присваивание после генерации: поток ГПСЧ не меняется.
+            po = world["invoices"][group[0]]["po_number"]
+            for iid in group:
+                world["invoices"][iid]["po_number"] = po
             world["distractors"].append({"kind": "recurring_same_amount", "ids": sorted(group)})
 
     # --- отвлекающее: одинаковая сумма, другой состав строк у того же клиента
@@ -298,13 +309,16 @@ def build_world(key: bytes, cfg: dict) -> dict:
                 break
 
     # --- счета прошлого периода, открытые на начало (входящее сальдо)
-    for _ in range(_rand_range(rng, size["n_prior_invoices"])):
+    def add_prior_invoice() -> str:
         eid = rng.choice(customers)
         issued = rand_instant(start_dt - timedelta(days=60), start_dt - timedelta(hours=2))
         prev_end = p_start - timedelta(days=1)
         prev_start = prev_end.replace(day=1)
-        new_invoice(eid, issued, make_lines(world["entities"][eid]["currency"], prev_start, prev_end,
-                                            rng.randint(1, 3)), "prior")
+        return new_invoice(eid, issued, make_lines(world["entities"][eid]["currency"], prev_start, prev_end,
+                                                   rng.randint(1, 3)), "prior")
+
+    for _ in range(_rand_range(rng, size["n_prior_invoices"])):
+        add_prior_invoice()
 
     # --- счета следующего периода (видны в документах, в книгу этого периода не попадают)
     for _ in range(_rand_range(rng, size["n_next_invoices"])):
@@ -397,7 +411,13 @@ def build_world(key: bytes, cfg: dict) -> dict:
     # --- отвлекающее: платёж в иностранной валюте у конца периода, наивная дата которого
     #     уже в следующем периоде (верно проведён по курсу локальной даты компании)
     foreign_customers = [e for e in customers if world["entities"][e]["currency"] != base]
-    for _ in range(_rand_range(rng, cfg["distractors"]["tz_boundary_receipts"])):
+    # сценарий partial_fx_boundary строится на таком платеже: их должно хватить на максимум сценариев
+    # из config (иначе генерация на этом config не удалась бы никогда). Для дефолтных диапазонов
+    # max(...) равен выпавшему числу — поток ГПСЧ не меняется.
+    n_tzr = _rand_range(rng, cfg["distractors"]["tz_boundary_receipts"])
+    if not cfg.get("clean"):
+        n_tzr = max(n_tzr, _spec_hi(cfg.get("interactions", {}).get("partial_fx_boundary", 0)))
+    for _ in range(n_tzr):
         if not foreign_customers:
             break
         for _try in range(60):
@@ -465,6 +485,16 @@ def build_world(key: bytes, cfg: dict) -> dict:
                 pid = new_payment(eid, t, ccy, amt, None, [], "Advance payment under contract", "next_prepayment")
                 world["distractors"].append({"kind": "next_period_prepayment_not_booked", "ids": [pid]})
                 break
+
+    # --- кандидатов period_cutoff_error (документы других периодов) должно хватить на максимум из config;
+    #     недостающие добираются счетами прошлого периода. Для дефолтных диапазонов (≥ 2 прошлых + ≥ 1
+    #     следующий при максимуме 2 ошибок) ничего не добавляется — поток ГПСЧ не меняется.
+    if not cfg.get("clean"):
+        need = _spec_hi(cfg.get("errors", {}).get("period_cutoff_error", 0))
+        have = sum(1 for v in world["invoices"].values() if v["_kind"] in ("prior", "next")) + \
+            sum(1 for v in world["payments"].values() if v["_kind"] == "next_prepayment")
+        for _ in range(max(0, need - have)):
+            add_prior_invoice()
 
     # --- расходы (шум книги)
     for n in range(_rand_range(rng, size["n_expenses"])):

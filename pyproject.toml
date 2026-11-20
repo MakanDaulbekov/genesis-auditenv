@@ -2,7 +2,7 @@
 name = "auditenv"
 version = "1.0.0"
 description = "Воспроизводимая RL-среда для ИИ-аудитора (GENESIS Hackathon, FinTech)"
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = []
 
