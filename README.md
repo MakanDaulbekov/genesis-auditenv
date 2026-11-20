@@ -10,7 +10,7 @@ make check                        # без make: python3.11 -m auditenv.cli chec
 1. генерация 10 train + 10 dev эпизодов;
 2. независимый валидатор;
 3. 300 случайных seed;
-4. ≈200 тестов;
+4. ≈260 тестов (из них 40 — адаптер жюри по определениям проверок);
 5. 5 политик и `trajectories.jsonl`;
 6. решаемость на 310 эпизодах;
 7. детерминизм в 2 процессах;
@@ -79,10 +79,34 @@ ja.validate_episode(output_dir)                  # дополнительно: �
 * `affected_ids` и `evidence_ids` — множества. Лимит 10 для `evidence_ids` проверяется до удаления повторов.
 * Несуществующий `evidence_id` даёт FP. Неизвестный `type`, неверная валюта, сумма или доказательства тоже дают FP.
 * Неверная структура (−1): нет обязательного поля, неверный JSON-тип (сумма — строка, bool или дробь), больше 30 выводов, больше 10 доказательств, explanation длиннее 1000 code points, чужой `episode_id`. Лишние ключи игнорируются.
-* Допуск τ берётся из `manifest.rounding.tolerance_minor` (и `policy.matching.tolerance_minor`); у всех наших эпизодов τ = 0.
+* Допуск τ — опубликованное целое: `manifest.rounding.tolerance_minor` и `policy.matching.tolerance_minor`. Если они различаются (жюри изменило одно поле), действует большее. У всех наших эпизодов оба равны 0.
+* Эталон нормализуется так же, как ответ: `affected_ids` — отсортированное множество, `doc_id` в эталоне равнозначен ID записи. Порядок `affected_ids` в `truth.json` после смены ID значения не имеет.
 * Ничьи разрешаются так: максимальное паросочетание, а среди равных — лексикографически наименьшая последовательность `(issue_id, индекс вывода)`.
 
-**Рецепты config для матрицы D01–D20.** Все ключи документированы в `auditenv/generator/config.py`, остальное берётся из дефолта; seed задаёт жюри. В тесте `tests/test_judge_adapter.py::test_D_recipes_generate_valid_episodes` каждый рецепт проверяется валидатором.
+**Минимальный цикл политики через адаптер** (политика жюри может работать в своём процессе — адаптеру нужен только транспорт `step`):
+```python
+import judge_adapter as ja
+ja.generate_episode(42, {"clean": True}, "jury/ep42")
+env = ja.make_env()
+obs, _ = env.reset(42, {"mode": "closed", "episode_dir": "jury/ep42"})
+eid, cur, rows, steps = obs["manifest"]["episode_id"], None, [], 0
+while obs["remaining_steps"] > 1:
+    obs, r, term, trunc, _ = env.step({"name": "list_records", "args": {"table": "invoices", "cursor": cur}})
+    steps += 1
+    rows += obs["result"]["records"]
+    cur = obs["result"]["next_cursor"]
+    if cur is None:
+        break
+findings = {"episode_id": eid, "findings": []}          # ... выводы политики
+obs, r, term, trunc, _ = env.step({"name": "submit", "args": {"findings": findings}})
+print(obs["result"], r)                                  # {'accepted': True} 0.0  (closed)
+print(ja.score_episode("jury/ep42", findings, steps))    # чистый эпизод: tp=fp=fn=0, return = 1 - 0.002*steps
+env.close()
+```
+
+**Поля со ссылками на ID** (для согласованной замены ID в парных проверках): `ledger.csv` — `row_id`, `entity_id`, `invoice_id`, `payment_id`; `invoices.jsonl` — `invoice_id`, `doc_id`, `entity_id`; `payments.jsonl` — `payment_id`, `doc_id`, `invoice_refs[].invoice_id`; `documents.jsonl` — `doc_id`, `record.*` (копия записи счёта/платежа), `payer_entity_id`, `refund_of`, `remittance.lines[].invoice_id`; `truth.json` — `affected_ids`, `evidence_sets`. `fx_id` = `fx:<date>:<source>:<target>` вычисляется из содержимого `fx.csv` и не переименовывается.
+
+**Рецепты config для матрицы D01–D20.** Все ключи документированы в `auditenv/generator/config.py`, остальное берётся из дефолта; seed задаёт жюри. Частичный config **мержится** с дефолтом, поэтому `Z` и `I` обязательно обнуляют остальные типы и сценарии: иначе они возьмутся из дефолта `[0, 2]` и `[0, 1]`. В тесте `tests/test_judge_adapter.py::test_D_recipes_generate_valid_episodes` каждый рецепт проверяется валидатором.
 ```text
 Z = {"duplicate_invoice": 0, "missing_or_partial_allocation": 0, "fx_wrong_date_or_rate": 0, "period_cutoff_error": 0}
 I = {"partial_fx_boundary": 0, "duplicate_cutoff": 0}
@@ -99,9 +123,18 @@ D14–D15 период            {"errors": Z + {"period_cutoff_error": 1}, "in
 D16–D18 сценарий 1        {"errors": Z, "interactions": I + {"partial_fx_boundary": 1}}  — частичный платёж в иностранной валюте у границы периода: allocation + fx
 D19–D20 сценарий 2        {"errors": Z, "interactions": I + {"duplicate_cutoff": 1}}     — дубль счёта, копия за границей периода: duplicate + cutoff
 ```
-Параметры сценариев (размер, валюты, `foreign_customer_share_pct`, отвлекающие случаи) меняются теми же ключами `size`, `currencies` и `distractors`.
+Внутренние варианты ошибок в сценариях фиксированы: `partial_fx_boundary` — частичное распределение + FX по «наивной» дате; `duplicate_cutoff` — копия счёта, начисленная на закрытии периода. `error_variants` действует только на одиночные ошибки. Параметры сценариев меняются ключами `size`, `currencies` и `distractors`, например:
+```text
+D16  {"errors": Z, "interactions": I + {"partial_fx_boundary": 1}, "currencies": {"base": ["KZT"], "foreign": ["USD", "EUR"]}}
+D17  … то же с "currencies": {"base": ["EUR"], "foreign": ["JPY", "GBP"], "foreign_customer_share_pct": 80}
+D18  … то же с "size": {"n_invoices": [60, 75]}, "distractors": {"tz_boundary_receipts": [4, 6]}
+D19  {"errors": Z, "interactions": I + {"duplicate_cutoff": 1}, "currencies": {"base": ["USD"]}}
+D20  … то же с "size": {"n_invoices": [20, 30]}, "distractors": {"tz_boundary_next_invoices": [4, 6]}
+```
 
 ## Для жюри: как подключить свои политики
+
+> Этот раздел — **внутренний** API команды (`{"action", "args"}`, `observation["result"]`). Harness жюри по определениям проверок использует **адаптер** `judge_adapter.py` (раздел выше) с оболочкой `{"name", "args"}`.
 
 **Интерфейс** (`auditenv/policies/api.py`):
 ```python

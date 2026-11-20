@@ -13,9 +13,10 @@
 Запуск из корня репозитория (рабочая директория образа — /app):  `python -c "import judge_adapter"`.
 Только stdlib, Python 3.11.
 
-Граница доступа. Объект среды не читает и не разбирает truth/provenance: при reset с episode_dir открытые
-файлы и закрытые файлы копируются в РАЗНЫЕ временные корни; закрытые читает только отдельный ОС-процесс
-оценщика (auditenv.grader.service, общение строками JSON). В закрытом режиме reward = 0 на каждом шаге,
+Граница доступа. Объект среды не разбирает truth/provenance: при reset с episode_dir открытые и закрытые
+файлы копируются в РАЗНЫЕ временные корни (каталог 0700), закрытые читает только отдельный ОС-процесс
+оценщика (auditenv.grader.service, общение строками JSON), и сразу после открытия эпизода копии удаляются —
+эталон остаётся только в памяти оценщика. Файл секрета (если задан) удаляется сразу после старта оценщика. В закрытом режиме reward = 0 на каждом шаге,
 info = {}; истинная награда пишется в журнал оценщика (AUDITENV_JUDGE_LOG, по умолчанию
 ./judge_grader_log.jsonl). Секрет генератора (если нужен) — переменная AUDITENV_GRADER_SECRET.
 """
@@ -37,7 +38,8 @@ from auditenv.env.store import parse_jsonl  # noqa: E402
 from auditenv.env.tools import ACTION_ARGS  # noqa: E402
 from auditenv.generator.config import resolve_config  # noqa: E402
 from auditenv.generator.episode import generate_episode as _generate  # noqa: E402
-from auditenv.grader.matcher import alias_map_from_tables, public_ids_from_files, structure_error  # noqa: E402
+from auditenv.grader.matcher import (alias_map_from_tables, public_ids_from_files, structure_error,  # noqa: E402
+                                     tolerance_from_files)
 from auditenv.grader.reward import grade  # noqa: E402
 from auditenv.grader.service import PUBLIC_FILES, GraderClient  # noqa: E402
 
@@ -57,17 +59,23 @@ def _log_path() -> str:
 
 
 def _log(rec: dict) -> None:
-    with open(_log_path(), "a", encoding="utf-8", newline="\n") as f:
-        f.write(json.dumps(rec, sort_keys=True, ensure_ascii=False) + "\n")
+    try:
+        with open(_log_path(), "a", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(rec, sort_keys=True, ensure_ascii=False) + "\n")
+    except OSError as e:   # журнал недоступен (read-only ФС): оценка не падает, предупреждение в stderr
+        sys.stderr.write(f"[judge_adapter] журнал {_log_path()} недоступен ({type(e).__name__})\n")
 
 
 def _secret() -> str:
     return os.environ.get("AUDITENV_GRADER_SECRET", "")
 
 
+WRAPPER_KEYS = {"mode", "episode_dir", "team_config"}
+
+
 def _team_config(config):
-    """Принимает config генератора команды или обёртку {"team_config": {...}, ...}."""
-    if isinstance(config, dict) and "team_config" in config:
+    """Принимает config генератора команды или обёртку {"mode"?, "episode_dir"?, "team_config"?}."""
+    if isinstance(config, dict) and config and set(config) <= WRAPPER_KEYS:
         return config.get("team_config")
     return config
 
@@ -108,11 +116,17 @@ class JudgeEnv:
         secret_file = None
         if _secret():
             secret_file = self._tmp / "secret.txt"
-            secret_file.write_text(_secret(), encoding="utf-8")
+            fd = os.open(secret_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(_secret())
         self._grader = GraderClient(str(self._tmp / "pub"), str(self._tmp / "grd"), log_path=_log_path(),
                                     secret_file=str(secret_file) if secret_file else None)
+        if secret_file:
+            self._grader.call("stats")      # оценщик прочитал секрет при старте -> файл больше не нужен
+            secret_file.unlink()
         self._env: AuditEnv | None = None
         self._episode_id: str | None = None
+        self._ended: tuple[bool, bool] | None = None
         self._n = 0
 
     # -- reset
@@ -135,6 +149,11 @@ class JudgeEnv:
                 shutil.copyfile(src / n, grd / n)
         return f"j/{name}"
 
+    def _unstage(self) -> None:
+        for root in (self._tmp / "pub" / "j", self._tmp / "grd" / "j"):
+            for old in list(root.iterdir()):
+                shutil.rmtree(old, ignore_errors=True)
+
     def reset(self, seed: int | None = None, config: dict | None = None, options: dict | None = None):
         cfg = config if config is not None else (options or {}).get("config") or {}
         if not isinstance(cfg, dict):
@@ -144,8 +163,12 @@ class JudgeEnv:
             raise ValueError("config.mode: ожидается 'closed' или 'train'")
         self._env = AuditEnv(self._grader, mode="eval" if mode == "closed" else "train",
                              max_steps=self._max_steps, time_limit_s=self._time_limit_s)
+        self._ended = None
         if cfg.get("episode_dir"):
-            obs, _ = self._env.reset(config={"episode_ref": self._stage(cfg["episode_dir"])})
+            try:
+                obs, _ = self._env.reset(config={"episode_ref": self._stage(cfg["episode_dir"])})
+            finally:
+                self._unstage()          # эталон уже в памяти процесса оценщика: копий на диске не остаётся
         else:
             obs, _ = self._env.reset(seed=seed, config=cfg.get("team_config"))
         r = obs["result"]
@@ -178,6 +201,12 @@ class JudgeEnv:
             core = "\x00"                               # -> invalid_json в среде, шаг расходуется
         obs, reward, terminated, truncated, _ = self._env.step(core)
         result, error = obs["result"], obs["error"]
+        if error is not None and error.get("code") == "episode_finished" and self._ended is not None:
+            terminated, truncated = self._ended          # после конца эпизода флаги те же, что при завершении
+        elif terminated or truncated:
+            self._ended = (bool(terminated), bool(truncated))
+        if error is not None and error.get("code") == "invalid_action_format":
+            error = {"code": "invalid_action_format", "message": "Ожидается объект {\"name\": str, \"args\": object}."}
         if error is None and result is not None and isinstance(name, str) and name in ACTION_ARGS:
             if name == "list_records":
                 result = {"records": result["records"], "next_cursor": result["next_cursor"]}
@@ -225,7 +254,7 @@ def score_episode(episode_dir: str, findings: dict, inspection_steps: int) -> di
     truth = json.loads((d / "truth.json").read_text(encoding="utf-8"))
     public = {n: (d / n).read_bytes() for n in PUBLIC_FILES}
     alias = alias_map_from_tables(parse_jsonl(public["invoices.jsonl"]), parse_jsonl(public["payments.jsonl"]))
-    tolerance = json.loads(public["manifest.json"])["rounding"]["tolerance_minor"]
+    tolerance = tolerance_from_files(public)
     res = grade(findings, truth, alias, tolerance, inspection_steps, public_ids_from_files(public))
     _log({"event": "score_episode", "episode_id": truth.get("episode_id"), "valid": res["valid"],
           "error": res["error"], "tp": res["tp"], "fp": res["fp"], "fn": res["fn"], "reward": res["reward"],

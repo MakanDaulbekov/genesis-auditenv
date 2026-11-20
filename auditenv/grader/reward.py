@@ -65,8 +65,14 @@ def grade(raw_findings, truth: dict, alias: dict, tolerance: int, inspection_ste
                 "tp": 0, "fp": 0, "fn": len(truth["issues"]), "precision": 0.0, "recall": 0.0, "f1": 0.0,
                 "inspection_steps": inspection_steps, "n_findings": None, "matches": [],
                 "by_type": _by_type([], truth["issues"], [])}
-    pairs = max_matching(findings, truth["issues"], tolerance)
-    by_type = _by_type(findings, truth["issues"], pairs)
+    # эталон нормализуется ТАК ЖЕ, как выводы: affected_ids — отсортированное множество после алиаса
+    # doc_id -> invoice_id/payment_id, evidence_sets — через тот же алиас. Иначе эталон жюри с другим
+    # порядком affected_ids (после смены ID) или с doc_id вместо ID записи не сопоставляется.
+    issues = [dict(t, affected_ids=sorted({alias.get(x, x) for x in t["affected_ids"]}),
+                   evidence_sets=[[alias.get(x, x) for x in es] for es in t["evidence_sets"]])
+              for t in truth["issues"]]
+    pairs = max_matching(findings, issues, tolerance)
+    by_type = _by_type(findings, issues, pairs)
     tp = len(pairs)
     fp = len(findings) - tp
     fn = len(truth["issues"]) - tp

@@ -86,6 +86,23 @@ def public_ids_from_files(files: dict) -> frozenset:
                        "documents": parse_jsonl(files["documents.jsonl"])})
 
 
+def tolerance_from_files(files: dict) -> int:
+    """Опубликованный допуск суммы τ (целые минимальные единицы): manifest.rounding.tolerance_minor и
+    policy.matching.tolerance_minor. В наших эпизодах оба равны 0; если жюри задало τ в одном из мест,
+    действует большее из опубликованных значений (τ не выбирается по ответу агента)."""
+    vals = []
+    for name, path in (("manifest.json", ("rounding", "tolerance_minor")), ("policy.json", ("matching", "tolerance_minor"))):
+        try:
+            v = json.loads(files[name])
+            for k in path:
+                v = v[k]
+        except (KeyError, TypeError, ValueError):
+            continue
+        if isinstance(v, int) and not isinstance(v, bool) and v >= 0:
+            vals.append(v)
+    return max(vals) if vals else 0
+
+
 def structure_error(raw, episode_id: str) -> str | None:
     """Проверка СТРУКТУРЫ submit без эталона (её можно сообщить политике). None — структура верна."""
     try:

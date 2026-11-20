@@ -1,5 +1,8 @@
 # AUDIT: финальный аудит auditenv (раунд 3)
 
+> **Обновление 20.11.2026 (после публикации «определений проверок» жюри).** Правило F1 заменено официальным: ID в выводе — любая строка 1..128 символов, сравнение точное; **несуществующий** `evidence_id` (в том числе путь или Unicode-двойник) даёт **FP**, а не −1 (определения, matcher п. 3 и 8, пример M04). Тест `test_odd_format_ids_still_invalid_unless_they_exist` заменён на `test_nonexistent_or_homoglyph_ids_are_fp_not_structure`. Валюта сравнивается точно, регистр → FP (M06). Эталон нормализуется так же, как выводы (порядок `affected_ids`, `doc_id`). Число тестов: 263. Подробности — README «Адаптер жюри», `tests/test_judge_adapter.py`.
+
+
 Дата: 20.11.2026. Исходный коммит: `1a1a5a1` (master). Работа идёт в ветке `audit-round3`.
 Окружение: Linux x86_64, Python 3.11.18, 2 vCPU; pytest из `vendor/wheels` по `requirements-dev.lock`.
 

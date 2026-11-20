@@ -53,8 +53,13 @@ class GraderCore:
 
     def log(self, rec: dict) -> None:
         if self.log_path:
-            with open(self.log_path, "a", encoding="utf-8", newline="\n") as f:
-                f.write(json.dumps(rec, sort_keys=True, ensure_ascii=False) + "\n")
+            try:
+                with open(self.log_path, "a", encoding="utf-8", newline="\n") as f:
+                    f.write(json.dumps(rec, sort_keys=True, ensure_ascii=False) + "\n")
+            except OSError as e:   # журнал недоступен (read-only ФС и т.п.): оценка не должна падать
+                if not getattr(self, "_log_warned", False):
+                    self._log_warned = True
+                    sys.stderr.write(f"[grader] журнал недоступен ({type(e).__name__}); записи пропускаются\n")
 
     # ------------------------------------------------------------------ ops
     def op_open(self, mode: str, seed=None, config=None, ref=None, closed_index=None) -> dict:
@@ -108,11 +113,11 @@ class GraderCore:
                 return {"error": "generation_failed",
                         "detail": "не удалось построить эпизод с этим config (слишком мало кандидатов для ошибок)"}
             public, truth = ep.public, ep.truth
-        from ..grader.matcher import alias_map_from_tables, public_ids_from_files
+        from ..grader.matcher import alias_map_from_tables, public_ids_from_files, tolerance_from_files
         alias = alias_map_from_tables(parse_jsonl(public["invoices.jsonl"]), parse_jsonl(public["payments.jsonl"]))
         # все ID открытых записей: несуществующий evidence_id -> FP (определения проверок жюри, matcher п. 3)
         known = public_ids_from_files(public)
-        tolerance = json.loads(public["manifest.json"])["rounding"]["tolerance_minor"]
+        tolerance = tolerance_from_files(public)
         self.counter += 1
         token = f"t{self.counter}"
         self.sessions[token] = {"mode": mode, "truth": truth, "alias": alias, "tolerance": tolerance, "known": known,

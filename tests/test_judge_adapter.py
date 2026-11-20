@@ -566,3 +566,81 @@ def test_generate_episode_is_deterministic_and_accepts_wrapper(root):
     ja.generate_episode(5, {"team_config": {"errors": {"duplicate_invoice": 1}}}, str(c))
     for f in a.iterdir():
         assert f.read_bytes() == (b / f.name).read_bytes() == (c / f.name).read_bytes(), f.name
+
+
+# ============================================================================= регрессии независимого ревью (20.11)
+
+def test_R1_truth_normalized_like_findings(M):
+    """Эталон жюри с другим порядком affected_ids (после смены ID) и с doc_id вместо ID записи
+    сопоставляется так же, как наш: нормализация эталона = нормализация выводов."""
+    inv = _rows(M["dir"], "invoices")
+    r1, r2 = inv[0], inv[1]
+    a = dict(M["A"], affected_ids=sorted([r1["invoice_id"], r2["invoice_id"]], reverse=True))   # не по порядку
+    _set_truth(M, [a])
+    assert _S(M, [_F(M, a, affected_ids=[r1["invoice_id"], r2["invoice_id"]])])["tp"] == 1
+    d = dict(M["A"], affected_ids=[r1["doc_id"]], evidence_sets=[[r1["doc_id"], M["D"][0]]])  # doc_id в эталоне
+    _set_truth(M, [d])
+    for aff, ev in (([r1["invoice_id"]], [r1["invoice_id"], M["D"][0]]), ([r1["doc_id"]], [r1["doc_id"], M["D"][0]])):
+        res = _S(M, [_F(M, d, affected_ids=aff, evidence_ids=ev)])
+        assert (res["tp"], res["fp"], res["fn"]) == (1, 0, 0), aff
+
+
+def test_R2_tolerance_published_in_policy_only(M):
+    a = M["A"]
+    _set_truth(M, [a])
+    pf = M["dir"] / "policy.json"
+    orig = pf.read_bytes()
+    try:
+        pol = json.loads(orig)
+        pol["matching"]["tolerance_minor"] = 1
+        pf.write_text(json.dumps(pol), encoding="utf-8")
+        assert _S(M, [_F(M, a, claimed_amount_minor=10001)])["tp"] == 1
+        assert _S(M, [_F(M, a, claimed_amount_minor=10002)])["fp"] == 1
+    finally:
+        pf.write_bytes(orig)
+
+
+def test_R3_no_truth_or_secret_left_on_disk(E, monkeypatch):
+    monkeypatch.setenv("AUDITENV_GRADER_SECRET", "jury-secret-XYZ")
+    e = ja.make_env()
+    try:
+        assert not list(e._tmp.rglob("secret.txt"))
+        for _ in range(2):
+            e.reset(config=_closed(E))
+            left = [p.name for p in e._tmp.rglob("*") if p.is_file()]
+            assert left == [], left
+            o, r, te, tr, _ = e.step(A("submit", findings=_oracle(E)))
+            assert te and o["result"] == {"accepted": True} and r == 0.0
+    finally:
+        e.close()
+
+
+def test_R4_unwritable_log_does_not_break_grading(E, tmp_path, monkeypatch):
+    monkeypatch.setenv("AUDITENV_JUDGE_LOG", str(tmp_path / "no_such_dir" / "log.jsonl"))
+    assert ja.score_episode(str(E), _oracle(E), 3)["tp"] == 1
+    e = ja.make_env()
+    try:
+        e.reset(config={"mode": "train", "episode_dir": str(E)})
+        o, r, te, tr, _ = e.step(A("submit", findings=_oracle(E)))
+        assert te and r == pytest.approx(1.0, abs=1e-9)
+    finally:
+        e.close()
+
+
+def test_R5_wrapper_config_and_messages_and_flags(root, C):
+    a, b = root / "wr_a", root / "wr_b"
+    ja.generate_episode(9, {"mode": "closed"}, str(a))
+    ja.generate_episode(9, None, str(b))
+    assert (a / "ledger.csv").read_bytes() == (b / "ledger.csv").read_bytes()
+    e = ja.JudgeEnv(max_steps=3)
+    try:
+        e.reset(config={"mode": "train", "episode_dir": str(C)})
+        o, *_ = e.step({"action": "calculator", "args": {"expression": "1"}})
+        assert o["error"]["code"] == "invalid_action_format" and '"name"' in o["error"]["message"]
+        e.step(A("calculator", expression="1"))
+        o, r, te, tr, _ = e.step(A("calculator", expression="1"))
+        assert tr and not te
+        o, r, te, tr, _ = e.step(A("calculator", expression="1"))
+        assert o["error"]["code"] == "episode_finished" and tr and not te and r == 0.0
+    finally:
+        e.close()
