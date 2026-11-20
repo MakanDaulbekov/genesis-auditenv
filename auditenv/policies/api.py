@@ -70,6 +70,10 @@ class OracleFromTruth:
         eid = observation["result"]["manifest"]["episode_id"]
         hits = sorted(self.truth_dir.rglob(f"{eid}/truth.json"))
         if not hits:
+            # каталог эпизода жюри может называться иначе, чем episode_id: ищем по содержимому (AUDIT.md, F6)
+            hits = [p for p in sorted(self.truth_dir.rglob("truth.json"))
+                    if json.loads(p.read_text(encoding="utf-8")).get("episode_id") == eid]
+        if not hits:
             raise FileNotFoundError(f"oracle_from_truth: нет truth.json для {eid} в {self.truth_dir}")
         truth = json.loads(hits[0].read_text(encoding="utf-8"))
         self._findings = {"episode_id": eid, "findings": [

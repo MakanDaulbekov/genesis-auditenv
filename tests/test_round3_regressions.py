@@ -196,3 +196,16 @@ def test_episode_id_longer_than_manifest_limit_still_invalid():
     from auditenv.grader.matcher import InvalidFindings, normalize
     with pytest.raises(InvalidFindings):
         normalize({"episode_id": "e" * 129, "findings": []}, "e" * 129, {})
+
+
+# ----------------------------------------------------------------------------- F6: oracle_from_truth и имена каталогов
+
+def test_oracle_from_truth_finds_truth_when_dir_name_differs_from_episode_id(tmp_path):
+    """Жюри кладёт эпизод под своим именем каталога (e1), episode_id внутри прежний: раньше FileNotFoundError."""
+    from auditenv.policies.api import load_policy
+    from auditenv.runner import run_episode
+    ref = _put(tmp_path, "e1", *_jury_rename(DIRTY_REF, JURY_FORMATS["slash"]))
+    with GraderClient(str(tmp_path / "episodes"), str(tmp_path / "grader")) as g:
+        pol = load_policy("oracle_from_truth", trusted=True, truth_dir=str(tmp_path / "grader"))
+        res = run_episode(AuditEnv(g, "train"), "oracle_from_truth", {"episode_ref": ref}, policy_obj=pol)
+    assert res["return"] == 1.0 and res["metrics"]["tp"] == 8 and res["metrics"]["fp"] == 0
