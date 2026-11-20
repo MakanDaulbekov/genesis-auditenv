@@ -14,7 +14,14 @@ from ..common.money import CURRENCY_EXPONENTS
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "configs" / "default.json"
 ERROR_TYPES = ("duplicate_invoice", "missing_or_partial_allocation", "fx_wrong_date_or_rate", "period_cutoff_error")
 SCENARIOS = ("partial_fx_boundary", "duplicate_cutoff")
-TOP_KEYS = {"config_version", "schema_version", "size", "currencies", "distractors", "errors", "interactions", "clean"}
+TOP_KEYS = {"config_version", "schema_version", "size", "currencies", "distractors", "errors", "interactions", "clean",
+            "error_variants"}
+# Необязательно: какими вариантами внедрять одиночные ошибки типа (по умолчанию — все варианты, выбор
+# по seed). Нужен, чтобы гарантированно получить, напр., пропуск И частичное распределение (D09–D11).
+# Без этого ключа генерация побайтово прежняя.
+ERROR_VARIANTS = {"missing_or_partial_allocation": ("missing", "partial"),
+                  "fx_wrong_date_or_rate": ("naive_date", "shifted_date", "due_date", "wrong_pair"),
+                  "period_cutoff_error": ("next_period_booked", "prior_period_booked", "next_period_payment_booked")}
 # Верхние границы выбраны так, чтобы эпизод оставался в диапазоне раздела 03 (≤2 000 проводок,
 # ≤200 документов) и честная политика (competent_reconciler) укладывалась в 100 шагов с запасом:
 # худший замеренный случай n_invoices=75, n_expenses=700 -> см. REPORT.md (solvability).
@@ -110,6 +117,14 @@ def validate_config(cfg) -> None:
         if k not in ERROR_TYPES:
             raise ConfigError(f"config.errors.{k}: неизвестный тип ошибки; допустимы {list(ERROR_TYPES)}")
         _range(f"errors.{k}", v, 0, 12)
+    ev = cfg.get("error_variants", {})
+    if not isinstance(ev, dict):
+        raise ConfigError("config.error_variants: ожидается объект {тип ошибки: [варианты]}")
+    for k, v in ev.items():
+        if k not in ERROR_VARIANTS:
+            raise ConfigError(f"config.error_variants.{k}: варианты задаются только для {sorted(ERROR_VARIANTS)}")
+        if not isinstance(v, list) or not v or len(set(v)) != len(v) or any(x not in ERROR_VARIANTS[k] for x in v):
+            raise ConfigError(f"config.error_variants.{k}: ожидается непустой список без повторов из {list(ERROR_VARIANTS[k])}")
     for k, v in cfg["interactions"].items():
         if k not in SCENARIOS:
             raise ConfigError(f"config.interactions.{k}: неизвестный сценарий; допустимы {list(SCENARIOS)}")

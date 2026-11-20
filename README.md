@@ -23,9 +23,83 @@ make check                        # без make: python3.11 -m auditenv.cli chec
 | метрики, решаемость, разбор сбоев | [REPORT.md](REPORT.md) |
 | устройство, допущения, честные ограничения | [DESIGN.md](DESIGN.md) |
 | требование PDF → файл → тест | [CHECKLIST.md](CHECKLIST.md) |
+| **адаптер жюри** (определения проверок 20.11) | [`judge_adapter.py`](judge_adapter.py), раздел ниже, тесты `tests/test_judge_adapter.py` |
 | режим жюри на ваших seed и политиках | `make jury-run` (ниже) |
 
 ---
+
+## Адаптер жюри `judge_adapter.py` (определения проверок от 20.11.2026)
+
+Файл `judge_adapter.py` лежит в корне репозитория. **Рабочая директория** — корень репозитория (`/app` в образе). Импорт: `import judge_adapter as ja`, путь к пакету адаптер добавляет сам. В образе:
+```bash
+docker run --rm --network none auditenv python -c "import judge_adapter as ja; print(ja.make_env())"
+docker run --rm --network none auditenv python -m pytest -q tests/test_judge_adapter.py   # C01–C20, T01–T20, M01–M12, P, D
+```
+```python
+import judge_adapter as ja
+ja.generate_episode(seed, config, output_dir)   # 7 открытых файлов §03 + truth.json + provenance.json в output_dir
+env = ja.make_env()
+obs, info = env.reset(seed, {"mode": "closed", "episode_dir": output_dir})        # или "mode": "train"
+obs, reward, terminated, truncated, info = env.step({"name": "list_records", "args": {"table": "ledger", "cursor": None, "limit": 50}})
+ja.score_episode(output_dir, findings, inspection_steps)  # {"tp","fp","fn","precision","recall","f1","return"}
+ja.validate_episode(output_dir)                  # дополнительно: наш независимый валидатор (нужен provenance.json)
+```
+* **`generate_episode(seed, config, output_dir)`** — обёртка над генератором команды. `config` — config генератора: частичный dict мержится с `configs/default.json`; принимается и обёртка `{"team_config": {...}}`. Повтор с теми же seed и config даёт побайтово те же файлы.
+* **`reset(seed, config)`**, где `config = {"mode": "closed"|"train", "episode_dir"?: str, "team_config"?: dict}`.
+  * С `episode_dir` загружается именно переданный эпизод: ID не меняются, повторный reset начинает его заново.
+  * Без `episode_dir` эпизод строит генератор команды по `seed` и `team_config`.
+  * Открытые и закрытые файлы копируются в **разные** временные корни. `truth.json` и `provenance.json` читает только отдельный ОС-процесс оценщика, а объект среды их не разбирает.
+* **Первое наблюдение:** `{"task": str, "manifest": object, "policy": object, "remaining_steps": 100}`. Следующие: `{"result": value|null, "error": null|{"code","message"}, "remaining_steps": int}`. `info` всегда `{}`.
+* **Действия** (`{"name", "args"}`) и их результаты:
+
+| name | args | result |
+|---|---|---|
+| `list_records` | `table` ∈ `ledger, invoices, payments, fx`; `cursor` (первый — `null`); `limit` 1..50, по умолчанию 50 | `{"records": [...], "next_cursor": str\|null}` |
+| `get_record` | `table`, `id` (row_id / invoice_id или doc_id / payment_id или doc_id / fx_id) | объект записи (поля §03; у строк fx есть вычисляемое `fx_id`) |
+| `get_document` | `doc_id` | объект документа (remittance advice, PO, memo, строки) |
+| `calculator` | `expression` — только десятичные `+ - * / ( )` | десятичная строка, например `"0.3"` |
+| `submit` | `findings` — объект findings.json §05 | `{"accepted": true}` или ошибка `invalid_findings` (только структура) |
+
+* **Коды ошибок:** `invalid_json`, `invalid_action_format`, `unknown_action`, `invalid_arguments`, `unknown_table`, `not_found`, `invalid_cursor`, `limit_out_of_range`, `calc_error`, `invalid_findings`, `episode_finished`, `not_reset`. Каждый ошибочный вызов расходует шаг. Код не раскрывает совпадение с эталоном.
+* **Лимиты.** 100 действий, submit входит в лимит; submit на 100-м действии принимается. `inspection_steps` — все действия до submit, включая ошибочные, без самого submit. 100 исследовательских действий без submit дают `truncated=true` и пустые findings. Лимит 60 с считается от reset и включает время политики.
+* **Режимы.** В `closed` reward политике всегда `0.0`, включая завершение. Истинная награда пишется в журнал оценщика: `AUDITENV_JUDGE_LOG`, по умолчанию `./judge_grader_log.jsonl`. В `train` терминальная награда возвращается политике.
+* **`score_episode`.** Тот же matcher и та же общая награда, что в среде. При неверной структуре `return = -1`, остальные поля `null`, а ошибка пишется в тот же журнал.
+
+**Соответствие четырёх типов ошибок** (`type` в findings и truth; подробно — `policy.matching` каждого эпизода):
+
+| type | канонические `affected_ids` | `claimed_amount_minor`, валюта | минимальный набор доказательств |
+|---|---|---|---|
+| `duplicate_invoice` | оба `invoice_id` | `total_minor` дубля, валюта счёта | оба счёта + строка проводки (AR или revenue) **каждого** |
+| `missing_or_partial_allocation` | `[invoice_id, payment_id]` | нераспределённая по remittance часть, валюта платежа | счёт + платёж + строка `customer_advances` платежа |
+| `fx_wrong_date_or_rate` | `[invoice_id или payment_id]` | \|проведено − верно\| в base | документ + его проводка + `fx_id` верного курса |
+| `period_cutoff_error` | `[invoice_id или payment_id]` | сумма ошибочной проводки в base | документ + его проводка |
+
+**Matcher** соответствует разделу «Точные соглашения matcher»:
+* ID, `type` и `currency` сравниваются точно, без смены регистра и обрезки пробелов. Единственное документированное правило — `doc_id` счёта или платежа равнозначен его `invoice_id`/`payment_id`.
+* `affected_ids` и `evidence_ids` — множества. Лимит 10 для `evidence_ids` проверяется до удаления повторов.
+* Несуществующий `evidence_id` даёт FP. Неизвестный `type`, неверная валюта, сумма или доказательства тоже дают FP.
+* Неверная структура (−1): нет обязательного поля, неверный JSON-тип (сумма — строка, bool или дробь), больше 30 выводов, больше 10 доказательств, explanation длиннее 1000 code points, чужой `episode_id`. Лишние ключи игнорируются.
+* Допуск τ берётся из `manifest.rounding.tolerance_minor` (и `policy.matching.tolerance_minor`); у всех наших эпизодов τ = 0.
+* Ничьи разрешаются так: максимальное паросочетание, а среди равных — лексикографически наименьшая последовательность `(issue_id, индекс вывода)`.
+
+**Рецепты config для матрицы D01–D20.** Все ключи документированы в `auditenv/generator/config.py`, остальное берётся из дефолта; seed задаёт жюри. В тесте `tests/test_judge_adapter.py::test_D_recipes_generate_valid_episodes` каждый рецепт проверяется валидатором.
+```text
+Z = {"duplicate_invoice": 0, "missing_or_partial_allocation": 0, "fx_wrong_date_or_rate": 0, "period_cutoff_error": 0}
+I = {"partial_fx_boundary": 0, "duplicate_cutoff": 0}
+D01 обычная сверка        {"clean": true}
+D02 разбитый платёж       {"clean": true, "distractors": {"payment_mix_pct": {"none": 10, "full": 30, "split": 60, "partial": 0, "overpay": 0}}}
+D03 корректный возврат    {"clean": true, "distractors": {"prepayments": [2, 3], "refund_pct": 100}}
+D04 повторяющиеся суммы   {"clean": true, "distractors": {"recurring_groups": [3, 4], "same_total_diff_lines": [1, 2]}}
+D05 граница валюты/периода {"clean": true, "currencies": {"foreign_customer_share_pct": 70}, "distractors": {"tz_boundary_invoices": [3, 5], "tz_boundary_next_invoices": [2, 3], "tz_boundary_receipts": [2, 3]}}
+D06–D08 дубль             {"errors": Z + {"duplicate_invoice": 1}, "interactions": I}
+D09 пропуск распределения {"errors": Z + {"missing_or_partial_allocation": 1}, "interactions": I, "error_variants": {"missing_or_partial_allocation": ["missing"]}}
+D10 частичное             … то же с ["partial"];  D11 — без error_variants (вариант по seed)
+D12–D13 FX                {"errors": Z + {"fx_wrong_date_or_rate": 1}, "interactions": I}   (вариант: error_variants.fx_wrong_date_or_rate ⊆ [naive_date, shifted_date, due_date, wrong_pair])
+D14–D15 период            {"errors": Z + {"period_cutoff_error": 1}, "interactions": I}     (⊆ [next_period_booked, prior_period_booked, next_period_payment_booked])
+D16–D18 сценарий 1        {"errors": Z, "interactions": I + {"partial_fx_boundary": 1}}  — частичный платёж в иностранной валюте у границы периода: allocation + fx
+D19–D20 сценарий 2        {"errors": Z, "interactions": I + {"duplicate_cutoff": 1}}     — дубль счёта, копия за границей периода: duplicate + cutoff
+```
+Параметры сценариев (размер, валюты, `foreign_customer_share_pct`, отвлекающие случаи) меняются теми же ключами `size`, `currencies` и `distractors`.
 
 ## Для жюри: как подключить свои политики
 
@@ -118,7 +192,7 @@ python -m auditenv.cli run --policies oracle competent_reconciler your.module:Yo
   --trajectories my/traj.jsonl --grader-log my/grader_log.jsonl --summary my/summary.json
 ```
 * `oracle` строит ответ в процессе оценщика по вашему `truth.json`. Свой oracle по диску — `--trusted --policies oracle_from_truth --truth-dir my/grader` (каталог может называться не так, как `episode_id`).
-* **ID** — любые строки до 128 символов: `INV/2026/0001`, `{uuid}`, пробелы, кириллица допустимы, если ID есть в открытых записях. Несуществующий ID — FP, а несуществующий вне `[A-Za-z0-9][A-Za-z0-9_.:-]` — неверная структура.
+* **ID** — любые строки до 128 символов (`INV/2026/0001`, `{uuid}`, пробелы, кириллица) сравниваются точно. Несуществующий `evidence_id` даёт FP, а не неверную структуру.
 * **`episode_id`** — до 128 символов, одинаковый в `manifest.json` и `truth.json`; с ним агент отправляет findings.
 * **`fx_id`** = `fx:<date>:<src>:<tgt>` вычисляется из содержимого `fx.csv` (в нём нет столбца ID). В эталоне его не переименовывайте, перестановка строк `fx.csv` на него не влияет.
 * **Хэши `manifest.files`** среда не проверяет, поэтому после перестановки эпизод открывается и без пересчёта. Наш валидатор их проверяет; пересчитать:

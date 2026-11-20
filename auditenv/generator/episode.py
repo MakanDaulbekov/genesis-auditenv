@@ -65,6 +65,16 @@ def _plan(rng: DRBG, cfg: dict) -> tuple[list[str], list[str], int]:
     return scen, [t for t in ERROR_TYPES for _ in range(kept[t])], len(singles) - room
 
 
+def _variant_params(cfg: dict, typ: str) -> dict:
+    """config.error_variants -> параметры мутации. Нет ключа -> {} (поведение и байты прежние)."""
+    v = cfg.get("error_variants", {}).get(typ)
+    if not v:
+        return {}
+    if typ == "missing_or_partial_allocation":
+        return {"variant": v[0]} if len(v) == 1 else {}
+    return {"variants": list(v)}
+
+
 def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]:
     world = build_world(key, cfg)
     before_entries = post_all(world)
@@ -79,7 +89,7 @@ def _attempt(key: bytes, cfg: dict) -> tuple[dict, dict, dict, list, list, dict]
         log += entries
         scenarios.append({"group": group, "scenario": name})
     for t in singles:
-        log.append(MUTATIONS[t](world, rng, {}))
+        log.append(MUTATIONS[t](world, rng, _variant_params(cfg, t)))
     if len(log) > MAX_ISSUES:
         raise GenerationError("too many issues")
     after_entries = post_all(world)

@@ -10,3 +10,4 @@ grader_data/agent_host_log.jsonl
 grader_data/agent_stderr.log
 jury_out/
 before_state/
+judge_grader_log.jsonl

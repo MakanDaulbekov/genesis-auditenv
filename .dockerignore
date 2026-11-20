@@ -5,3 +5,4 @@ __pycache__
 jury_out
 grader_data/*.log
 grader_data/*log.jsonl
+judge_grader_log.jsonl
